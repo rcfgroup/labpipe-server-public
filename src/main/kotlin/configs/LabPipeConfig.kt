@@ -1,6 +1,9 @@
 package configs
 
-data class LabPipeConfig (var tempPath: String) {
+import java.nio.file.Paths
+
+data class LabPipeConfig (
+    var tempPath: String = Paths.get(System.getProperty("user.home"), "labpipe").toString()) {
     var dbHost: String = "localhost"
     var dbPort: Int = 27017
     var dbName: String = "labpipe-dev"
