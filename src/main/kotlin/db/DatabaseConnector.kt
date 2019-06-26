@@ -5,21 +5,20 @@ import com.mongodb.MongoClientURI
 import com.mongodb.client.MongoDatabase
 import configs.LabPipeConfig
 import org.litote.kmongo.*
+import sessions.InMemoryData
 
 class DatabaseConnector {
 
     companion object {
-        lateinit var client: MongoClient
-        lateinit var database: MongoDatabase
 
-        fun connect(c: LabPipeConfig) {
-            val mongoConnectionString = if (c.dbUser != null && c.dbPass != null)
-                "mongodb://${c.dbUser}:${c.dbPass}@${c.dbHost}:${c.dbPort}/${c.dbName}"
+        fun connect() {
+            val mongoConnectionString = if (InMemoryData.labPipeConfig.dbUser != null && InMemoryData.labPipeConfig.dbPass != null)
+                "mongodb://${InMemoryData.labPipeConfig.dbUser}:${InMemoryData.labPipeConfig.dbPass}@${InMemoryData.labPipeConfig.dbHost}:${InMemoryData.labPipeConfig.dbPort}/${InMemoryData.labPipeConfig.dbName}"
             else
-                "mongodb://${c.dbHost}:${c.dbPort}/${c.dbName}"
+                "mongodb://${InMemoryData.labPipeConfig.dbHost}:${InMemoryData.labPipeConfig.dbPort}/${InMemoryData.labPipeConfig.dbName}"
             val mongoUri = MongoClientURI(mongoConnectionString)
-            client = KMongo.createClient(mongoUri) //get com.mongodb.MongoClient new instance
-            database = client.getDatabase("bz-test") //normal java driver usage
+            InMemoryData.mongoClient = KMongo.createClient(mongoUri)
+            InMemoryData.mongoDatabase = InMemoryData.mongoClient.getDatabase(InMemoryData.labPipeConfig.dbName)
         }
     }
 }
