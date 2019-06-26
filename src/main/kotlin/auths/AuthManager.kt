@@ -10,10 +10,11 @@ import io.javalin.core.security.Role
 import io.javalin.http.Context
 import org.litote.kmongo.*
 import org.mindrot.jbcrypt.BCrypt
+import sessions.InMemoryData
 
 object AuthManager {
-    fun setManager(app: Javalin) {
-        app.config.accessManager { handler, ctx, permittedRoles ->
+    fun setManager() {
+        InMemoryData.labPipeServer.config.accessManager { handler, ctx, permittedRoles ->
             val userRole = getUserRole(ctx)
             if (permittedRoles.contains(userRole)) {
                 handler.handle(ctx)
@@ -23,12 +24,18 @@ object AuthManager {
         }
     }
 
-    private fun getUserRole(ctx: Context): Role {
+    fun getUser(ctx: Context): ParamOperator? {
+        val basicAuthCredentials = ctx.basicAuthCredentials() ?: return null
+        val col = InMemoryData.mongoDatabase.getCollection<ParamOperator>("operators")
+        return col.findOne(eq("username",  basicAuthCredentials.username))
+    }
+
+    fun getUserRole(ctx: Context): Role {
         val basicAuthCredentials = ctx.basicAuthCredentials() ?: return ApiRole.PUBLIC
-        val colOperator = DatabaseConnector.database.getCollection<ParamOperator>("operators")
+        val colOperator = InMemoryData.mongoDatabase.getCollection<ParamOperator>("operators")
         val operator: ParamOperator? = colOperator.findOne(eq("username",  basicAuthCredentials.username))
         if (operator == null) {
-            val colToken = DatabaseConnector.database.getCollection<ParamAccessToken>("ACCESS_TOKENS")
+            val colToken = InMemoryData.mongoDatabase.getCollection<ParamAccessToken>("ACCESS_TOKENS")
             val accessToken: ParamAccessToken? = colToken.findOne(eq("token", basicAuthCredentials.username))
             return if (accessToken == null) {
                 ApiRole.PUBLIC
@@ -62,7 +69,7 @@ object AuthManager {
     }
 
     fun getApiRoles(url: String): List<String> {
-        val col = DatabaseConnector.database.getCollection<ParamApiRole>("API_ACCESS_ROLES")
+        val col = InMemoryData.mongoDatabase.getCollection<ParamApiRole>("API_ACCESS_ROLES")
         val apiRole: ParamApiRole? = col.findOne(eq("url",  url))
         return apiRole?.roles ?: listOf()
     }
