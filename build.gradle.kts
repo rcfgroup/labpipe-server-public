@@ -19,7 +19,7 @@ dependencies {
     testImplementation("io.kotlintest", "kotlintest-runner-junit5", "3.3.0")
 
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
-    testCompile("org.slf4j", "slf4j-simple", "1.7.26")
+    compile("org.slf4j", "slf4j-simple", "1.7.26")
 
     // https://mvnrepository.com/artifact/com.github.ajalt/clikt
     compile("com.github.ajalt", "clikt", "2.0.0")
