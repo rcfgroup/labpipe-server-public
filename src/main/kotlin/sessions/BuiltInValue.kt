@@ -27,6 +27,7 @@ class BuiltInValue {
         const val DB_MONGO_COL_REPORT_TEMPLATES = "REPORT_TEMPLATES"
         const val DB_MONGO_COL_INSTRUMENTS = "INSTRUMENTS"
         const val DB_MONGO_COL_LOCATIONS = "LOCATIONS"
+        const val DB_MONGO_COL_EMAIL_GROUPS = "EMAIL_GROUPS"
 
         const val DB_MONGO_COL_FORM_DATA_PREFIX = "FORM_DATA_"
     }
