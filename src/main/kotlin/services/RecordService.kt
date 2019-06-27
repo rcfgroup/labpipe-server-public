@@ -33,7 +33,7 @@ object RecordService {
         val record = Document.parse(Gson().toJson(jsonElement))
         try {
             val collection = InMemoryData.mongoDatabase
-                .getCollection("UPLOADED_FORM_DATA_$formCode")
+                .getCollection("FORM_DATA_$formCode")
             collection.insertOne(record)
         } catch (e: Exception) {
             return "[Form: $formCode] data cannot be saved."
