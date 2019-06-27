@@ -6,6 +6,7 @@ import org.simplejavamail.email.EmailBuilder
 import org.simplejavamail.email.Recipient
 import org.simplejavamail.mailer.Mailer
 import org.simplejavamail.mailer.MailerBuilder
+import sessions.InMemoryData
 import javax.activation.FileDataSource
 
 data class SJMAttachment (var name: String, var file: FileDataSource)
@@ -13,11 +14,11 @@ data class SJMAttachment (var name: String, var file: FileDataSource)
 object SJMEmailUtil {
     lateinit var mailer: Mailer
 
-    fun connect(config: LabPipeConfig): Mailer {
-        mailer = MailerBuilder.withSMTPServerHost(config.emailHost)
-            .withSMTPServerPort(config.emailPort)
-            .withSMTPServerUsername(config.emailUser)
-            .withSMTPServerPassword(config.emailPass).buildMailer()
+    fun connect(): Mailer {
+        mailer = MailerBuilder.withSMTPServerHost(InMemoryData.labPipeConfig.emailHost)
+            .withSMTPServerPort(InMemoryData.labPipeConfig.emailPort)
+            .withSMTPServerUsername(InMemoryData.labPipeConfig.emailUser)
+            .withSMTPServerPassword(InMemoryData.labPipeConfig.emailPass).buildMailer()
         return mailer
     }
 
