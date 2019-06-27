@@ -8,6 +8,7 @@ import io.javalin.core.security.SecurityUtil
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOne
 import org.litote.kmongo.getCollection
+import sessions.BuiltInValue
 import sessions.InMemoryData
 
 object FormService {
@@ -20,7 +21,7 @@ object FormService {
 
 
     fun getFormTemplate(formCode: String): ParamFormTemplate? {
-        val col = InMemoryData.mongoDatabase.getCollection<ParamFormTemplate>("FORM_TEMPLATES")
+        val col = InMemoryData.mongoDatabase.getCollection<ParamFormTemplate>(BuiltInValue.DB_MONGO_COL_FORM_TEMPLATES)
         return col.findOne(ParamFormTemplate::code eq formCode)
     }
 }
