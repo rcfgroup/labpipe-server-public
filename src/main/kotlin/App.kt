@@ -1,6 +1,6 @@
-import commandline.LabPipeServerCommandLine
+import uk.ac.le.ember.labpipe.server.cmdline.LPServerCmdLine
 
 
 fun main(args: Array<String>) {
-    LabPipeServerCommandLine().main(args)
+    LPServerCmdLine().main(args)
 }
