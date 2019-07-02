@@ -8,17 +8,15 @@ import org.simplejavamail.mailer.MailerBuilder
 import uk.ac.le.ember.labpipe.server.sessions.RuntimeData
 import javax.activation.FileDataSource
 
-data class SJMAttachment (var name: String, var file: FileDataSource)
+data class EmailAttachment (var name: String, var file: FileDataSource)
 
-object SJMEmailUtil {
-    lateinit var mailer: Mailer
-
+object EmailUtil {
     fun connect(): Mailer {
-        mailer = MailerBuilder.withSMTPServerHost(RuntimeData.labPipeConfig.emailHost)
+        RuntimeData.mailer = MailerBuilder.withSMTPServerHost(RuntimeData.labPipeConfig.emailHost)
             .withSMTPServerPort(RuntimeData.labPipeConfig.emailPort)
             .withSMTPServerUsername(RuntimeData.labPipeConfig.emailUser)
             .withSMTPServerPassword(RuntimeData.labPipeConfig.emailPass).buildMailer()
-        return mailer
+        return RuntimeData.mailer
     }
 
     fun sendEmail(
@@ -27,7 +25,7 @@ object SJMEmailUtil {
         subject: String,
         text: String,
         html: String,
-        attachments: List<SJMAttachment>,
+        attachments: List<EmailAttachment> = mutableListOf(),
         async: Boolean
     ) {
         val email = EmailBuilder.startingBlank()
@@ -38,6 +36,6 @@ object SJMEmailUtil {
             .withHTMLText(html)
             .withAttachments(attachments.map { x -> AttachmentResource(x.name, x.file) })
             .buildEmail()
-        mailer.sendMail(email, async)
+        RuntimeData.mailer.sendMail(email, async)
     }
 }
