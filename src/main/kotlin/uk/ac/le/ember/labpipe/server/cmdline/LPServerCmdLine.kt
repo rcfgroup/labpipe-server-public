@@ -3,15 +3,17 @@ package uk.ac.le.ember.labpipe.server.cmdline
 import uk.ac.le.ember.labpipe.server.auths.AuthManager
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.output.TermUi.echo
+import com.github.ajalt.clikt.parameters.options.Option
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.choice
 import com.github.ajalt.clikt.parameters.types.int
-import uk.ac.le.ember.labpipe.server.configs.LPConfig
-import uk.ac.le.ember.labpipe.server.db.DBConnector
+import uk.ac.le.ember.labpipe.server.db.DatabaseUtil
 import org.apache.commons.configuration2.PropertiesConfiguration
 import org.apache.commons.configuration2.builder.fluent.Configurations
 import org.apache.commons.configuration2.ex.ConfigurationException
+import uk.ac.le.ember.labpipe.server.data.LPConfig
+import uk.ac.le.ember.labpipe.server.notification.EmailUtil
 import uk.ac.le.ember.labpipe.server.services.*
 import uk.ac.le.ember.labpipe.server.sessions.StaticValue
 import uk.ac.le.ember.labpipe.server.sessions.RuntimeData
@@ -62,31 +64,32 @@ fun readConfig(path: String? = null): PropertiesConfiguration? {
     val configFilePath = path ?: StaticValue.DEFAULT_CONFIG_FILE_NAME
     val configFile = File(configFilePath)
     val configs = Configurations()
-    when {
-        !configFile.exists() -> {
-            updateConfig(path = path, key = StaticValue.PROPS_FIELD_DB_HOST, value = "localhost")
-            updateConfig(path = path, key = StaticValue.PROPS_FIELD_DB_PORT, value = 27017)
-            updateConfig(path = path, key = StaticValue.PROPS_FIELD_DB_NAME, value = "labpipe-dev")
+    if (!configFile.exists()) {
+        updateConfig(path = path, key = StaticValue.PROPS_FIELD_DB_HOST, value = "localhost")
+        updateConfig(path = path, key = StaticValue.PROPS_FIELD_DB_PORT, value = 27017)
+        updateConfig(path = path, key = StaticValue.PROPS_FIELD_DB_NAME, value = "labpipe-dev")
 
-            updateConfig(path = path, key = StaticValue.PROPS_FIELD_EMAIL_HOST, value = "localhost")
-            updateConfig(path = path, key = StaticValue.PROPS_FIELD_EMAIL_PORT, value = 25)
+        updateConfig(path = path, key = StaticValue.PROPS_FIELD_EMAIL_HOST, value = "localhost")
+        updateConfig(path = path, key = StaticValue.PROPS_FIELD_EMAIL_PORT, value = 25)
+        updateConfig(path = path, key = StaticValue.PROPS_FIELD_EMAIL_NOTIFICATION_NAME, value = "LabPipe Notification")
+        updateConfig(path = path, key = StaticValue.PROPS_FIELD_EMAIL_NOTIFICATION_ADDR, value = "no-reply@labpipe.org")
 
-            val defaultCacheDir = Paths.get(System.getProperty("user.home"), "labpipe").toString()
-            updateConfig(path = path, key = StaticValue.PROPS_FIELD_PATH_CACHE, value = defaultCacheDir)
+        val defaultCacheDir = Paths.get(System.getProperty("user.home"), "labpipe").toString()
+        updateConfig(path = path, key = StaticValue.PROPS_FIELD_PATH_CACHE, value = defaultCacheDir)
 
-            echo("Config file not found at: [$path]")
-            echo("Created config file at: [${configFile.absolutePath}]")
-            echo("Default settings:")
-            echo("------ Database ------")
-            echo("[HOST]: localhost")
-            echo("[PORT]: 27017")
-            echo("[NAME]: labpipe-dev")
-            echo("------ Email Server ------")
-            echo("[HOST]: localhost")
-            echo("[PORT]: 25")
-            echo("------ Cache Directory ------")
-            echo("[CACHE]: $defaultCacheDir")
-        }
+        echo("Config file not found at: [$path]")
+        echo("Created config file at: [${configFile.absolutePath}]")
+        echo("Default settings:")
+        echo("------ Database ------")
+        echo("[HOST]: localhost")
+        echo("[PORT]: 27017")
+        echo("[NAME]: labpipe-dev")
+        echo("------ Email Server ------")
+        echo("[HOST]: localhost")
+        echo("[PORT]: 25")
+        echo("[NOTIFY FROM]: LabPipe Notification <no-reply@labpipe.org>")
+        echo("------ Cache Directory ------")
+        echo("[CACHE]: $defaultCacheDir")
     }
     return try
     {
@@ -139,11 +142,20 @@ fun importConfig(configPath: String?) {
             properties.containsKey(StaticValue.PROPS_FIELD_EMAIL_PASS) -> properties.getString(StaticValue.PROPS_FIELD_EMAIL_PASS)
             else -> null
         }
+        RuntimeData.labPipeConfig.notificationEmailName = when {
+            properties.containsKey(StaticValue.PROPS_FIELD_EMAIL_NOTIFICATION_NAME) -> properties.getString(StaticValue.PROPS_FIELD_EMAIL_NOTIFICATION_NAME)
+            else -> "LabPipe Notification"
+        }
+        RuntimeData.labPipeConfig.notificationEmailAddress = when {
+            properties.containsKey(StaticValue.PROPS_FIELD_EMAIL_NOTIFICATION_ADDR) -> properties.getString(StaticValue.PROPS_FIELD_EMAIL_NOTIFICATION_ADDR)
+            else -> "no-reply@labpipe.org"
+        }
     }
 }
 
 fun startServer(port: Int) {
-    DBConnector.connect()
+    DatabaseUtil.connect()
+    EmailUtil.connect()
     AuthManager.setManager()
     GeneralService.routes()
     ParameterService.routes()
@@ -171,6 +183,8 @@ class LPServerCmdLine : CliktCommand() {
     val emailPort by option("--email-port", help = "email port").int()
     val emailUser by option("--email-user", help = "email user")
     val emailPass by option("--email-pass", help = "email password")
+    val notificationEmailName by option("--email-notification-name", help = "notification email sender name")
+    val notificationEmailAddress by option("--email-notification-address", help = "notification email sender address")
 
     val cacheDir by option("--cache-dir", help = "cache directory")
 
@@ -185,6 +199,8 @@ class LPServerCmdLine : CliktCommand() {
         updateConfig(path = configPath, key = StaticValue.PROPS_FIELD_EMAIL_PORT, value = emailPort)
         updateConfig(path = configPath, key = StaticValue.PROPS_FIELD_EMAIL_USER, value = emailUser)
         updateConfig(path = configPath, key = StaticValue.PROPS_FIELD_EMAIL_PASS, value = emailPass)
+        updateConfig(path = configPath, key = StaticValue.PROPS_FIELD_EMAIL_NOTIFICATION_NAME, value = notificationEmailName)
+        updateConfig(path = configPath, key = StaticValue.PROPS_FIELD_EMAIL_NOTIFICATION_ADDR, value = notificationEmailAddress)
 
         updateConfig(path = configPath, key = StaticValue.PROPS_FIELD_PATH_CACHE, value = cacheDir)
 
