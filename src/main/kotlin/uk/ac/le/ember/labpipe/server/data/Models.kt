@@ -1,6 +1,24 @@
 package uk.ac.le.ember.labpipe.server.data
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import java.nio.file.Paths
+
+data class LPConfig (
+    var tempPath: String = Paths.get(System.getProperty("user.home"), "labpipe").toString()) {
+    var dbHost: String = "localhost"
+    var dbPort: Int = 27017
+    var dbName: String = "labpipe-dev"
+    var dbUser: String? = null
+    var dbPass: String? = null
+
+    var emailHost: String = "localhost"
+    var emailPort: Int = 25
+    var emailUser: String? = null
+    var emailPass: String? = null
+
+    var notificationEmailName: String = "LabPipe Notification"
+    var notificationEmailAddress: String = "no-reply@labpipe.org"
+}
 
 data class Parameter(@JsonProperty("param_name") var name: String) {
     @JsonProperty("param_value")
@@ -50,6 +68,9 @@ data class FormTemplate(var code: String, var name: String) {
 
     var template: WizardTemplate = WizardTemplate("Default Wizard Template")
     var url: String? = null
+
+    @JsonProperty("notification_style")
+    var notificationStyle: String = "all"
 }
 
 data class ElectronFileFilter(var name: String) {
@@ -86,8 +107,13 @@ data class WizardTemplate(var title: String) {
 
 data class EmailGroup(var code: String) {
     var name: String = ""
-    var study_code: String = ""
-    var form_code: String = ""
+
+    @JsonProperty("study_code")
+    var studyCode: String = ""
+
+    @JsonProperty("form_code")
+    var formCode: String = ""
+
     var admin: List<String> = mutableListOf()
     var member: List<String> = mutableListOf()
 }
