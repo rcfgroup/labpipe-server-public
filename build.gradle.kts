@@ -3,7 +3,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     java
     application
-    kotlin("jvm") version "1.3.31"
+    kotlin("jvm") version "1.3.40"
+    id("com.github.johnrengelman.shadow") version "5.1.0"
 }
 
 group = "uk.ac.le.ember"
@@ -16,7 +17,9 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.0-M2")
     testImplementation("io.kotlintest", "kotlintest-runner-junit5", "3.3.0")
+
 
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
     compile("org.slf4j", "slf4j-simple", "1.7.26")
@@ -48,7 +51,7 @@ dependencies {
     compile("org.apache.commons", "commons-lang3", "3.9")
 
     // https://mvnrepository.com/artifact/io.javalin/javalin
-    compile("io.javalin", "javalin", "3.0.0")
+    compile("io.javalin", "javalin", "3.1.0")
 
     // https://mvnrepository.com/artifact/org.simplejavamail/simple-java-mail
     compile("org.simplejavamail", "simple-java-mail", "5.1.7")
@@ -70,7 +73,7 @@ configure<JavaPluginConvention> {
     sourceCompatibility = JavaVersion.VERSION_11
 }
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "11"
+    kotlinOptions.jvmTarget = "1.8"
 }
 
 application {
