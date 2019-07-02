@@ -12,6 +12,8 @@ class StaticValue {
         const val PROPS_FIELD_EMAIL_PORT = "mail.port"
         const val PROPS_FIELD_EMAIL_USER = "mail.user"
         const val PROPS_FIELD_EMAIL_PASS = "mail.pass"
+        const val PROPS_FIELD_EMAIL_NOTIFICATION_NAME = "mail.notification.name"
+        const val PROPS_FIELD_EMAIL_NOTIFICATION_ADDR = "mail.notification.addr"
 
         const val PROPS_FIELD_PATH_CACHE = "path.cache"
 
@@ -30,5 +32,11 @@ class StaticValue {
         const val DB_MONGO_COL_FORM_DATA_PREFIX = "FORM_DATA_"
 
         const val DEFAULT_CONFIG_FILE_NAME = "config.ini"
+
+        const val NOTIFICATION_STYLE_DO_NOT_NOTIFY = "DO_NOT_NOTIFY"
+        const val NOTIFICATION_STYLE_NOTIFY_ALL = "NOTIFY_ALL"
+        const val NOTIFICATION_STYLE_OPERATOR_ONLY = "OPERATOR_ONLY"
+        const val NOTIFICATION_STYLE_ADMIN_ONLY = "ADMIN_ONLY"
+        const val NOTIFICATION_STYLE_MEMBER_ONLY = "MEMBER_ONLY"
     }
 }
