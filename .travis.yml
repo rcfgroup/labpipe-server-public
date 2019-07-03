@@ -5,7 +5,6 @@ cache:
   directories:
   - "$HOME/.gradle/caches/"
   - "$HOME/.gradle/wrapper/"
-install: gradle wrapper --gradle-version 5.4.1
 #deploy:
 #  provider: releases
 #  api_key:
