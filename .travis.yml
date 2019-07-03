@@ -1,0 +1,21 @@
+language: java
+jdk:
+- oraclejdk8
+branches:
+  only:
+  - master
+cache:
+  directories:
+  - "$HOME/.gradle/caches/"
+  - "$HOME/.gradle/wrapper/"
+script:
+- gradle assemble
+- gradle build
+
+deploy:
+  provider: releases
+  api_key:
+    secure: YdbGDLqxUSoy+1ncC3iS5RQZ5K3YsegI9p9/sgrXNFmEhOPIBqTX4IXiWT7nm7abU8UHwu3orNIqqkFz4giSX30/9xNNDOl5JxCEgILgD2ck/H2CVTEufIqxH9f5qKoUznbynjVY3EDR0kA8j6u0ps8g/Sad1c/nMNbsYErpleRFMq5VnENC/oDZZ1Kz+gLu7YsZu5mPdJECBuQu/J/9qdKiI5tcMTK5Gr1Og8AhWKdovMKHHMB7oDC0Wk4Vp+NdSIr5mk3GBuuqQw8g8Rq/G6cSj6UWEmg5LzEDKFMLpg/6ygCnK7SgKcfXg9g7+ItLY/+P37GrHRbA9Y5K4XizSoaiEFI1d4YWc8vwM8xnmBGpwjL7QaWG/3b1Wlr13U8gD9AY0P3yzea/HQyuXEfHFin/3sjseqCqAjdjLGFvLWiubD7kyTXi2j4B1wzdB7Y8cOpviB7jp03IJwSmjkuT/x2HQiPBmlUKHAtyeacNpznxheJxtLRSC13HabfZnKdkadVOFo9GtBtQfbIfWHaSIESykcyikP4A1zZ8kYPD3Re4c6AM5OEYxoYu61IRzGnZNlHh2LdM9uqzJj4wnsjP6fhAAyitJZg3shsWyeERw5ZfF2ic5si6xDxlLpDkFGJvfGCPtl2RjMMqwmMxFROUM7KfzmXhHiUlFHl+6h6MCOY=
+  file: "$HOME/build/libs/labpipe-server-kotlin-*-all.jar
+  on:
+    repo: colin-bz/labpipe-server-public
