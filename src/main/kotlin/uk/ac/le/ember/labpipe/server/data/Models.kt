@@ -3,8 +3,8 @@ package uk.ac.le.ember.labpipe.server.data
 import com.fasterxml.jackson.annotation.JsonProperty
 import java.nio.file.Paths
 
-data class LPConfig (
-    var tempPath: String = Paths.get(System.getProperty("user.home"), "labpipe").toString()) {
+data class LPConfig(var serverPort: Int = 4567) {
+    var tempPath: String = Paths.get(System.getProperty("user.home"), "labpipe").toString()
     var dbHost: String = "localhost"
     var dbPort: Int = 27017
     var dbName: String = "labpipe-dev"
@@ -18,6 +18,8 @@ data class LPConfig (
 
     var notificationEmailName: String = "LabPipe Notification"
     var notificationEmailAddress: String = "no-reply@labpipe.org"
+
+    var debugMode: Boolean = false
 }
 
 data class Parameter(@JsonProperty("param_name") var name: String) {
@@ -46,8 +48,10 @@ data class Operator(@JsonProperty("email") var email: String) {
     var roles: List<String> = mutableListOf()
 }
 
-data class AccessToken(var token: String,
-                       @JsonProperty("keyhash") var keyHash: String) {
+data class AccessToken(
+    var token: String,
+    @JsonProperty("keyhash") var keyHash: String
+) {
     var roles: List<String> = mutableListOf()
 }
 
@@ -71,6 +75,9 @@ data class FormTemplate(var code: String, var name: String) {
 
     @JsonProperty("notification_style")
     var notificationStyle: String = "all"
+
+    @JsonProperty("notification_subject")
+    var notificationSubject: String = ""
 }
 
 data class ElectronFileFilter(var name: String) {
@@ -93,7 +100,7 @@ data class WizardPageFormValidProcess(var processType: String, var dataField: St
     var newField: String? = null
 }
 
-data class WizardPageTemplate(var key:String, var title: String) {
+data class WizardPageTemplate(var key: String, var title: String) {
     var navTitle: String? = ""
     var requireValidForm: Boolean = true
     var order: Int = 1
