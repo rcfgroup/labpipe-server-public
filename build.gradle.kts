@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "uk.ac.le.ember"
-version = "1.0-SNAPSHOT"
+version = "1.0.0"
 
 repositories {
     mavenCentral()
@@ -23,6 +23,11 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
     compile("org.slf4j", "slf4j-simple", "1.7.26")
+
+    // TODO add support for more native detailed logs with debug option can be toggled from commandline
+    // https://mvnrepository.com/artifact/io.github.microutils/kotlin-logging
+    compile("io.github.microutils", "kotlin-logging", "1.6.26")
+
 
     // https://mvnrepository.com/artifact/com.github.ajalt/clikt
     compile("com.github.ajalt", "clikt", "2.0.0")
