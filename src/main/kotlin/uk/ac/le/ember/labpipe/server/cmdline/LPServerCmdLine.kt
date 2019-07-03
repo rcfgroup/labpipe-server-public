@@ -1,85 +1,97 @@
 package uk.ac.le.ember.labpipe.server.cmdline
 
-import uk.ac.le.ember.labpipe.server.auths.AuthManager
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.output.TermUi.echo
-import com.github.ajalt.clikt.parameters.options.Option
 import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
-import com.github.ajalt.clikt.parameters.types.choice
 import com.github.ajalt.clikt.parameters.types.int
-import uk.ac.le.ember.labpipe.server.db.DatabaseUtil
 import org.apache.commons.configuration2.PropertiesConfiguration
 import org.apache.commons.configuration2.builder.fluent.Configurations
 import org.apache.commons.configuration2.ex.ConfigurationException
+import uk.ac.le.ember.labpipe.server.auths.AuthManager
 import uk.ac.le.ember.labpipe.server.data.LPConfig
+import uk.ac.le.ember.labpipe.server.db.DatabaseUtil
 import uk.ac.le.ember.labpipe.server.notification.EmailUtil
 import uk.ac.le.ember.labpipe.server.services.*
-import uk.ac.le.ember.labpipe.server.sessions.StaticValue
-import uk.ac.le.ember.labpipe.server.sessions.RuntimeData
+import uk.ac.le.ember.labpipe.server.sessions.Runtime
+import uk.ac.le.ember.labpipe.server.sessions.Statics
 import java.io.File
 import java.nio.file.Paths
 
-fun updateConfig(path:String? = null, key: String, value: String?) {
-    val configFilePath = path ?: StaticValue.DEFAULT_CONFIG_FILE_NAME
+
+fun updateConfig(path: String? = null, key: String, value: String?) {
+    val configFilePath = path ?: Statics.DEFAULT_CONFIG_FILE_NAME
     val configFile = File(configFilePath)
     configFile.createNewFile()
     val configs = Configurations();
-    try
-    {
+    try {
         val builder = configs.propertiesBuilder(configFile)
         val config = builder.configuration
         if (value != null) {
             config.setProperty(key, value)
             builder.save()
         }
-    }
-    catch (cex: ConfigurationException)
-    {
+    } catch (cex: ConfigurationException) {
         cex.printStackTrace()
     }
 }
 
-fun updateConfig(path:String? = null, key: String, value: Int?) {
-    val configFilePath = path ?: StaticValue.DEFAULT_CONFIG_FILE_NAME
+fun updateConfig(path: String? = null, key: String, value: Int?) {
+    val configFilePath = path ?: Statics.DEFAULT_CONFIG_FILE_NAME
     val configFile = File(configFilePath)
     configFile.createNewFile()
     val configs = Configurations();
-    try
-    {
+    try {
         val builder = configs.propertiesBuilder(configFile)
         val config = builder.configuration
         if (value != null) {
             config.setProperty(key, value)
             builder.save()
         }
+    } catch (cex: ConfigurationException) {
+        cex.printStackTrace()
     }
-    catch (cex: ConfigurationException)
-    {
+}
+
+fun updateConfig(path: String? = null, key: String, value: Boolean) {
+    val configFilePath = path ?: Statics.DEFAULT_CONFIG_FILE_NAME
+    val configFile = File(configFilePath)
+    configFile.createNewFile()
+    val configs = Configurations();
+    try {
+        val builder = configs.propertiesBuilder(configFile)
+        val config = builder.configuration
+        config.setProperty(key, value)
+        builder.save()
+    } catch (cex: ConfigurationException) {
         cex.printStackTrace()
     }
 }
 
 fun readConfig(path: String? = null): PropertiesConfiguration? {
-    val configFilePath = path ?: StaticValue.DEFAULT_CONFIG_FILE_NAME
+    val configFilePath = path ?: Statics.DEFAULT_CONFIG_FILE_NAME
     val configFile = File(configFilePath)
     val configs = Configurations()
     if (!configFile.exists()) {
-        updateConfig(path = path, key = StaticValue.PROPS_FIELD_DB_HOST, value = "localhost")
-        updateConfig(path = path, key = StaticValue.PROPS_FIELD_DB_PORT, value = 27017)
-        updateConfig(path = path, key = StaticValue.PROPS_FIELD_DB_NAME, value = "labpipe-dev")
+        updateConfig(path = path, key = Statics.PROPS_FIELD_SERVER_PORT, value = 4567)
+        updateConfig(path = path, key = Statics.PROPS_FIELD_DB_HOST, value = "localhost")
+        updateConfig(path = path, key = Statics.PROPS_FIELD_DB_PORT, value = 27017)
+        updateConfig(path = path, key = Statics.PROPS_FIELD_DB_NAME, value = "labpipe-dev")
 
-        updateConfig(path = path, key = StaticValue.PROPS_FIELD_EMAIL_HOST, value = "localhost")
-        updateConfig(path = path, key = StaticValue.PROPS_FIELD_EMAIL_PORT, value = 25)
-        updateConfig(path = path, key = StaticValue.PROPS_FIELD_EMAIL_NOTIFICATION_NAME, value = "LabPipe Notification")
-        updateConfig(path = path, key = StaticValue.PROPS_FIELD_EMAIL_NOTIFICATION_ADDR, value = "no-reply@labpipe.org")
+        updateConfig(path = path, key = Statics.PROPS_FIELD_EMAIL_HOST, value = "localhost")
+        updateConfig(path = path, key = Statics.PROPS_FIELD_EMAIL_PORT, value = 25)
+        updateConfig(path = path, key = Statics.PROPS_FIELD_EMAIL_NOTIFICATION_NAME, value = "LabPipe Notification")
+        updateConfig(path = path, key = Statics.PROPS_FIELD_EMAIL_NOTIFICATION_ADDR, value = "no-reply@labpipe.org")
 
         val defaultCacheDir = Paths.get(System.getProperty("user.home"), "labpipe").toString()
-        updateConfig(path = path, key = StaticValue.PROPS_FIELD_PATH_CACHE, value = defaultCacheDir)
+        updateConfig(path = path, key = Statics.PROPS_FIELD_PATH_CACHE, value = defaultCacheDir)
 
         echo("Config file not found at: [$path]")
         echo("Created config file at: [${configFile.absolutePath}]")
         echo("Default settings:")
+        echo("------ Server ------")
+        echo("[PORT]: 4567")
         echo("------ Database ------")
         echo("[HOST]: localhost")
         echo("[PORT]: 27017")
@@ -91,12 +103,9 @@ fun readConfig(path: String? = null): PropertiesConfiguration? {
         echo("------ Cache Directory ------")
         echo("[CACHE]: $defaultCacheDir")
     }
-    return try
-    {
+    return try {
         configs.properties(configFile)
-    }
-    catch (cex: ConfigurationException)
-    {
+    } catch (cex: ConfigurationException) {
         cex.printStackTrace()
         null
     }
@@ -105,111 +114,151 @@ fun readConfig(path: String? = null): PropertiesConfiguration? {
 fun importConfig(configPath: String?) {
     val properties = readConfig(configPath)
     properties?.run {
-        RuntimeData.labPipeConfig = LPConfig(properties.getString(StaticValue.PROPS_FIELD_PATH_CACHE) ?: Paths.get(System.getProperty("user.home"), "labpipe").toString())
-        RuntimeData.labPipeConfig.dbHost = when {
-            properties.containsKey(StaticValue.PROPS_FIELD_DB_HOST) -> properties.getString(StaticValue.PROPS_FIELD_DB_HOST)
+        Runtime.config = LPConfig(
+            when {
+                properties.containsKey(Statics.PROPS_FIELD_SERVER_PORT) -> properties.getInt(Statics.PROPS_FIELD_SERVER_PORT)
+                else -> 4567
+            }
+        )
+        Runtime.config.tempPath = when {
+            properties.containsKey(Statics.PROPS_FIELD_PATH_CACHE) -> properties.getString(Statics.PROPS_FIELD_PATH_CACHE)
+            else -> Paths.get(System.getProperty("user.home"), "labpipe").toString()
+        }
+        Runtime.config.dbHost = when {
+            properties.containsKey(Statics.PROPS_FIELD_DB_HOST) -> properties.getString(Statics.PROPS_FIELD_DB_HOST)
             else -> "localhost"
         }
-        RuntimeData.labPipeConfig.dbPort = when {
-            properties.containsKey(StaticValue.PROPS_FIELD_DB_PORT) -> properties.getInt(StaticValue.PROPS_FIELD_DB_PORT)
+        Runtime.config.dbPort = when {
+            properties.containsKey(Statics.PROPS_FIELD_DB_PORT) -> properties.getInt(Statics.PROPS_FIELD_DB_PORT)
             else -> 27017
         }
-        RuntimeData.labPipeConfig.dbName = when {
-            properties.containsKey(StaticValue.PROPS_FIELD_DB_NAME) -> properties.getString(StaticValue.PROPS_FIELD_DB_NAME)
+        Runtime.config.dbName = when {
+            properties.containsKey(Statics.PROPS_FIELD_DB_NAME) -> properties.getString(Statics.PROPS_FIELD_DB_NAME)
             else -> "labpipe-dev"
         }
-        RuntimeData.labPipeConfig.dbUser = when {
-            properties.containsKey(StaticValue.PROPS_FIELD_DB_USER) -> properties.getString(StaticValue.PROPS_FIELD_DB_USER)
+        Runtime.config.dbUser = when {
+            properties.containsKey(Statics.PROPS_FIELD_DB_USER) -> properties.getString(Statics.PROPS_FIELD_DB_USER)
             else -> null
         }
-        RuntimeData.labPipeConfig.dbPass = when {
-            properties.containsKey(StaticValue.PROPS_FIELD_DB_PASS) -> properties.getString(StaticValue.PROPS_FIELD_DB_PASS)
+        Runtime.config.dbPass = when {
+            properties.containsKey(Statics.PROPS_FIELD_DB_PASS) -> properties.getString(Statics.PROPS_FIELD_DB_PASS)
             else -> null
         }
-        RuntimeData.labPipeConfig.emailHost = when {
-            properties.containsKey(StaticValue.PROPS_FIELD_EMAIL_HOST) -> properties.getString(StaticValue.PROPS_FIELD_EMAIL_HOST)
+        Runtime.config.emailHost = when {
+            properties.containsKey(Statics.PROPS_FIELD_EMAIL_HOST) -> properties.getString(Statics.PROPS_FIELD_EMAIL_HOST)
             else -> "localhost"
         }
-        RuntimeData.labPipeConfig.emailPort = when {
-            properties.containsKey(StaticValue.PROPS_FIELD_EMAIL_PORT) -> properties.getInt(StaticValue.PROPS_FIELD_EMAIL_PORT)
+        Runtime.config.emailPort = when {
+            properties.containsKey(Statics.PROPS_FIELD_EMAIL_PORT) -> properties.getInt(Statics.PROPS_FIELD_EMAIL_PORT)
             else -> 25
         }
-        RuntimeData.labPipeConfig.emailUser = when {
-            properties.containsKey(StaticValue.PROPS_FIELD_EMAIL_USER) -> properties.getString(StaticValue.PROPS_FIELD_EMAIL_USER)
+        Runtime.config.emailUser = when {
+            properties.containsKey(Statics.PROPS_FIELD_EMAIL_USER) -> properties.getString(Statics.PROPS_FIELD_EMAIL_USER)
             else -> null
         }
-        RuntimeData.labPipeConfig.emailPass = when {
-            properties.containsKey(StaticValue.PROPS_FIELD_EMAIL_PASS) -> properties.getString(StaticValue.PROPS_FIELD_EMAIL_PASS)
+        Runtime.config.emailPass = when {
+            properties.containsKey(Statics.PROPS_FIELD_EMAIL_PASS) -> properties.getString(Statics.PROPS_FIELD_EMAIL_PASS)
             else -> null
         }
-        RuntimeData.labPipeConfig.notificationEmailName = when {
-            properties.containsKey(StaticValue.PROPS_FIELD_EMAIL_NOTIFICATION_NAME) -> properties.getString(StaticValue.PROPS_FIELD_EMAIL_NOTIFICATION_NAME)
+        Runtime.config.notificationEmailName = when {
+            properties.containsKey(Statics.PROPS_FIELD_EMAIL_NOTIFICATION_NAME) -> properties.getString(Statics.PROPS_FIELD_EMAIL_NOTIFICATION_NAME)
             else -> "LabPipe Notification"
         }
-        RuntimeData.labPipeConfig.notificationEmailAddress = when {
-            properties.containsKey(StaticValue.PROPS_FIELD_EMAIL_NOTIFICATION_ADDR) -> properties.getString(StaticValue.PROPS_FIELD_EMAIL_NOTIFICATION_ADDR)
+        Runtime.config.notificationEmailAddress = when {
+            properties.containsKey(Statics.PROPS_FIELD_EMAIL_NOTIFICATION_ADDR) -> properties.getString(Statics.PROPS_FIELD_EMAIL_NOTIFICATION_ADDR)
             else -> "no-reply@labpipe.org"
+        }
+        Runtime.config.debugMode = when {
+            properties.containsKey(Statics.PROPS_FIELD_DEBUG_MODE) -> properties.getBoolean(Statics.PROPS_FIELD_DEBUG_MODE)
+            else -> false
         }
     }
 }
 
 fun startServer(port: Int) {
-    DatabaseUtil.connect()
-    EmailUtil.connect()
     AuthManager.setManager()
     GeneralService.routes()
     ParameterService.routes()
     RecordService.routes()
     FormService.routes()
     DevService.routes()
-    RuntimeData.labPipeServer.start(port)
+    Runtime.server.start(port)
 }
 
 class LPServerCmdLine : CliktCommand() {
 
-    val action by option("--action", help = "server actions").choice("start", "stop", "restart")
+    private val runServer by option("-r", "--run", help = "start server").flag()
+    private val runConnectionTest by option(
+        "-t",
+        "--test-connection",
+        help = "test database and email server connection"
+    ).flag()
+    private val debugMode by option("-d", "--debug", help = "debug mode").flag()
 
-    val configPath by option("--config", help = "config file path")
+    private val configPath by option("--config", help = "config file path")
 
-    val serverPort by option("--port", help = "server port").int().default(4567)
+    private val serverPort by option("--port", help = "server port").int().default(4567)
 
-    val dbHost by option("--db-host", help = "database host")
-    val dbPort by option("--db-port", help = "database port").int()
-    val dbName by option("--db-name", help = "database name")
-    val dbUser by option("--db-user", help = "database user")
-    val dbPass by option("--db-pass", help = "database password")
+    private val dbHost by option("--db-host", help = "database host")
+    private val dbPort by option("--db-port", help = "database port").int()
+    private val dbName by option("--db-name", help = "database name")
+    private val dbUser by option("--db-user", help = "database user")
+    private val dbPass by option("--db-pass", help = "database password")
 
-    val emailHost by option("--email-host", help = "email host")
-    val emailPort by option("--email-port", help = "email port").int()
-    val emailUser by option("--email-user", help = "email user")
-    val emailPass by option("--email-pass", help = "email password")
-    val notificationEmailName by option("--email-notification-name", help = "notification email sender name")
-    val notificationEmailAddress by option("--email-notification-address", help = "notification email sender address")
+    private val emailHost by option("--email-host", help = "email host")
+    private val emailPort by option("--email-port", help = "email port").int()
+    private val emailUser by option("--email-user", help = "email user")
+    private val emailPass by option("--email-pass", help = "email password")
+    private val notificationEmailName by option("--email-notification-name", help = "notification email sender name")
+    private val notificationEmailAddress by option(
+        "--email-notification-address",
+        help = "notification email sender address"
+    )
 
-    val cacheDir by option("--cache-dir", help = "cache directory")
+    private val cacheDir by option("--cache-dir", help = "cache directory")
 
     override fun run() {
-        updateConfig(path = configPath, key = StaticValue.PROPS_FIELD_DB_HOST, value = dbHost)
-        updateConfig(path = configPath, key = StaticValue.PROPS_FIELD_DB_PORT, value = dbPort)
-        updateConfig(path = configPath, key = StaticValue.PROPS_FIELD_DB_NAME, value = dbName)
-        updateConfig(path = configPath, key = StaticValue.PROPS_FIELD_DB_USER, value = dbUser)
-        updateConfig(path = configPath, key = StaticValue.PROPS_FIELD_DB_PASS, value = dbPass)
+        updateConfig(path = configPath, key = Statics.PROPS_FIELD_SERVER_PORT, value = serverPort)
 
-        updateConfig(path = configPath, key = StaticValue.PROPS_FIELD_EMAIL_HOST, value = emailHost)
-        updateConfig(path = configPath, key = StaticValue.PROPS_FIELD_EMAIL_PORT, value = emailPort)
-        updateConfig(path = configPath, key = StaticValue.PROPS_FIELD_EMAIL_USER, value = emailUser)
-        updateConfig(path = configPath, key = StaticValue.PROPS_FIELD_EMAIL_PASS, value = emailPass)
-        updateConfig(path = configPath, key = StaticValue.PROPS_FIELD_EMAIL_NOTIFICATION_NAME, value = notificationEmailName)
-        updateConfig(path = configPath, key = StaticValue.PROPS_FIELD_EMAIL_NOTIFICATION_ADDR, value = notificationEmailAddress)
+        updateConfig(path = configPath, key = Statics.PROPS_FIELD_DB_HOST, value = dbHost)
+        updateConfig(path = configPath, key = Statics.PROPS_FIELD_DB_PORT, value = dbPort)
+        updateConfig(path = configPath, key = Statics.PROPS_FIELD_DB_NAME, value = dbName)
+        updateConfig(path = configPath, key = Statics.PROPS_FIELD_DB_USER, value = dbUser)
+        updateConfig(path = configPath, key = Statics.PROPS_FIELD_DB_PASS, value = dbPass)
 
-        updateConfig(path = configPath, key = StaticValue.PROPS_FIELD_PATH_CACHE, value = cacheDir)
+        updateConfig(path = configPath, key = Statics.PROPS_FIELD_EMAIL_HOST, value = emailHost)
+        updateConfig(path = configPath, key = Statics.PROPS_FIELD_EMAIL_PORT, value = emailPort)
+        updateConfig(path = configPath, key = Statics.PROPS_FIELD_EMAIL_USER, value = emailUser)
+        updateConfig(path = configPath, key = Statics.PROPS_FIELD_EMAIL_PASS, value = emailPass)
+        updateConfig(
+            path = configPath,
+            key = Statics.PROPS_FIELD_EMAIL_NOTIFICATION_NAME,
+            value = notificationEmailName
+        )
+        updateConfig(
+            path = configPath,
+            key = Statics.PROPS_FIELD_EMAIL_NOTIFICATION_ADDR,
+            value = notificationEmailAddress
+        )
 
-        when(action) {
-            "start" -> {
-                importConfig(configPath)
-                startServer(serverPort)
-            }
-            else -> echo(action)
+        updateConfig(path = configPath, key = Statics.PROPS_FIELD_PATH_CACHE, value = cacheDir)
+        updateConfig(path = configPath, key = Statics.PROPS_FIELD_DEBUG_MODE, value = debugMode)
+
+        if (runConnectionTest) {
+            importConfig(configPath)
+            DatabaseUtil.connect()
+            EmailUtil.connect()
+            EmailUtil.testConnection()
+            DatabaseUtil.testConnection()
+        }
+
+        if (runServer) {
+            importConfig(configPath)
+            DatabaseUtil.connect()
+            EmailUtil.connect()
+            EmailUtil.testConnection()
+            DatabaseUtil.testConnection()
+            startServer(serverPort)
         }
     }
 
