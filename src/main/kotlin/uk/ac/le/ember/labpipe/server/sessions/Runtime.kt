@@ -3,13 +3,15 @@ package uk.ac.le.ember.labpipe.server.sessions
 import com.mongodb.MongoClient
 import com.mongodb.client.MongoDatabase
 import io.javalin.Javalin
+import mu.KotlinLogging
 import org.simplejavamail.mailer.Mailer
 import uk.ac.le.ember.labpipe.server.data.LPConfig
 
-class RuntimeData {
+class Runtime {
     companion object {
-        var labPipeConfig = LPConfig()
-        var labPipeServer: Javalin = Javalin.create()
+        var logger = KotlinLogging.logger {}
+        var config = LPConfig()
+        var server: Javalin = Javalin.create()
 
         lateinit var mongoClient: MongoClient
         lateinit var mongoDatabase: MongoDatabase
