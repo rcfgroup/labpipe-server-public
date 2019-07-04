@@ -9,8 +9,8 @@ import org.mindrot.jbcrypt.BCrypt
 import uk.ac.le.ember.labpipe.server.data.AccessToken
 import uk.ac.le.ember.labpipe.server.data.ApiRoleAssign
 import uk.ac.le.ember.labpipe.server.data.Operator
+import uk.ac.le.ember.labpipe.server.sessions.RequiredMongoDBCollections
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
-import uk.ac.le.ember.labpipe.server.sessions.Statics
 
 object AuthManager {
     fun setManager() {
@@ -27,16 +27,16 @@ object AuthManager {
 
     fun getUser(ctx: Context): Operator? {
         val basicAuthCredentials = ctx.basicAuthCredentials() ?: return null
-        val col = Runtime.mongoDatabase.getCollection<Operator>(Statics.DB_MONGO_COL_OPERATORS)
+        val col = Runtime.mongoDatabase.getCollection<Operator>(RequiredMongoDBCollections.OPERATORS.value)
         return col.findOne(eq("username", basicAuthCredentials.username))
     }
 
     fun getUserRole(ctx: Context): Role {
         val basicAuthCredentials = ctx.basicAuthCredentials() ?: return ApiRole.PUBLIC
-        val colOperator = Runtime.mongoDatabase.getCollection<Operator>(Statics.DB_MONGO_COL_OPERATORS)
+        val colOperator = Runtime.mongoDatabase.getCollection<Operator>(RequiredMongoDBCollections.OPERATORS.value)
         val operator: Operator? = colOperator.findOne(eq("username", basicAuthCredentials.username))
         if (operator == null) {
-            val colToken = Runtime.mongoDatabase.getCollection<AccessToken>(Statics.DB_MONGO_COL_ACCESS_TOKEN)
+            val colToken = Runtime.mongoDatabase.getCollection<AccessToken>(RequiredMongoDBCollections.ACCESS_TOKEN.value)
             val accessToken: AccessToken? = colToken.findOne(eq("token", basicAuthCredentials.username))
             return if (accessToken == null) {
                 ApiRole.PUBLIC
@@ -70,7 +70,7 @@ object AuthManager {
     }
 
     fun getApiRoles(url: String): List<String> {
-        val col = Runtime.mongoDatabase.getCollection<ApiRoleAssign>(Statics.DB_MONGO_COL_API_ACCESS_ROLES)
+        val col = Runtime.mongoDatabase.getCollection<ApiRoleAssign>(RequiredMongoDBCollections.API_ACCESS_ROLES.value)
         val apiRole: ApiRoleAssign? = col.findOne(eq("url", url))
         return apiRole?.roles ?: listOf()
     }
