@@ -25,7 +25,7 @@ object EmailUtil {
             Runtime.logger.info { "Email server connection successful." }
             true
         } catch (e: Exception) {
-            if (Runtime.config.debugMode) {
+            if (Runtime.debugMode) {
                 Runtime.logger.error(e) { "Cannot connect to email server." }
             } else {
                 Runtime.logger.error { "Cannot connect to email server." }
@@ -55,7 +55,11 @@ object EmailUtil {
                 .buildEmail()
             Runtime.mailer.sendMail(email, async)
         } catch (e: Exception) {
-            Runtime.logger.error(e) { "Error sending email." }
+            if (Runtime.debugMode) {
+                Runtime.logger.error(e) { "Error sending email." }
+            } else {
+                Runtime.logger.error { "Error sending email." }
+            }
         }
     }
 }
