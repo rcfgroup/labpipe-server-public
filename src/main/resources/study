@@ -1,0 +1,58 @@
+{
+  "code": "EXAMPLE",
+  "name": "Example Study",
+  "config": {
+    "participant_id": {
+      "prefix": [
+        "ES"
+      ],
+      "length": 4
+    },
+    "visit_id": [
+      "A",
+      "B"
+    ],
+    "location": [
+      "L1"
+    ],
+    "instrument": [
+      "I1",
+      "I2"
+    ],
+    "collector": [
+      "C1"
+    ],
+    "sample_type": [
+      {
+        "code": "ST1",
+        "name": "Sample Type 1",
+        "available_at": [
+          {
+            "instrument": [
+              "I1"
+            ],
+            "collector": [
+              "C1"
+            ]
+          },
+          {
+            "instrument": [
+              "I1"
+            ]
+          }
+        ]
+      },
+      {
+        "code": "ST2",
+        "name": "Sample Type 2",
+        "available_at": [
+          {
+            "instrument": [
+              "I2"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
