@@ -8,6 +8,7 @@ import org.bson.Document
 import org.bson.types.ObjectId
 import uk.ac.le.ember.labpipe.server.auths.AuthManager
 import uk.ac.le.ember.labpipe.server.notification.NotificationUtil
+import uk.ac.le.ember.labpipe.server.sessions.RequiredMongoDBCollections
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 import uk.ac.le.ember.labpipe.server.sessions.Statics
 import java.time.LocalDateTime
@@ -21,7 +22,7 @@ object RecordService {
         val record = Document.parse(Gson().toJson(jsonObject))
         try {
             val collection = Runtime.mongoDatabase
-                .getCollection("${Statics.DB_MONGO_COL_FORM_DATA_PREFIX}$formCode")
+                .getCollection("${Statics.DB_COL_FORM_DATA_PREFIX}$formCode")
             collection.insertOne(record)
         } catch (e: Exception) {
             Runtime.logger.error(e) { "[Form: $formCode] data cannot be saved." }
