@@ -14,15 +14,15 @@ import uk.ac.le.ember.labpipe.server.data.LPConfig
 import uk.ac.le.ember.labpipe.server.db.DatabaseUtil
 import uk.ac.le.ember.labpipe.server.notification.EmailUtil
 import uk.ac.le.ember.labpipe.server.services.*
+import uk.ac.le.ember.labpipe.server.sessions.RequiredMongoDBCollections
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 import uk.ac.le.ember.labpipe.server.sessions.Statics
 import java.io.File
 import java.nio.file.Paths
 
 
-fun updateConfig(path: String? = null, key: String, value: String?) {
-    val configFilePath = path ?: Statics.DEFAULT_CONFIG_FILE_NAME
-    val configFile = File(configFilePath)
+fun updateConfig(key: String, value: String?) {
+    val configFile = File(Statics.DEFAULT_CONFIG_FILE_NAME)
     configFile.createNewFile()
     val configs = Configurations();
     try {
@@ -37,9 +37,8 @@ fun updateConfig(path: String? = null, key: String, value: String?) {
     }
 }
 
-fun updateConfig(path: String? = null, key: String, value: Int?) {
-    val configFilePath = path ?: Statics.DEFAULT_CONFIG_FILE_NAME
-    val configFile = File(configFilePath)
+fun updateConfig(key: String, value: Int?) {
+    val configFile = File(Statics.DEFAULT_CONFIG_FILE_NAME)
     configFile.createNewFile()
     val configs = Configurations();
     try {
@@ -54,9 +53,8 @@ fun updateConfig(path: String? = null, key: String, value: Int?) {
     }
 }
 
-fun updateConfig(path: String? = null, key: String, value: Boolean) {
-    val configFilePath = path ?: Statics.DEFAULT_CONFIG_FILE_NAME
-    val configFile = File(configFilePath)
+fun updateConfig(key: String, value: Boolean) {
+    val configFile = File(Statics.DEFAULT_CONFIG_FILE_NAME)
     configFile.createNewFile()
     val configs = Configurations();
     try {
@@ -69,26 +67,24 @@ fun updateConfig(path: String? = null, key: String, value: Boolean) {
     }
 }
 
-fun readConfig(path: String? = null): PropertiesConfiguration? {
-    val configFilePath = path ?: Statics.DEFAULT_CONFIG_FILE_NAME
-    val configFile = File(configFilePath)
+fun readConfig(): PropertiesConfiguration? {
+    val configFile = File(Statics.DEFAULT_CONFIG_FILE_NAME)
     val configs = Configurations()
     if (!configFile.exists()) {
-        updateConfig(path = path, key = Statics.PROPS_FIELD_SERVER_PORT, value = 4567)
-        updateConfig(path = path, key = Statics.PROPS_FIELD_DB_HOST, value = "localhost")
-        updateConfig(path = path, key = Statics.PROPS_FIELD_DB_PORT, value = 27017)
-        updateConfig(path = path, key = Statics.PROPS_FIELD_DB_NAME, value = "labpipe-dev")
+        updateConfig(key = Statics.PROPS_FIELD_SERVER_PORT, value = 4567)
+        updateConfig(key = Statics.PROPS_FIELD_DB_HOST, value = "localhost")
+        updateConfig(key = Statics.PROPS_FIELD_DB_PORT, value = 27017)
+        updateConfig(key = Statics.PROPS_FIELD_DB_NAME, value = "labpipe-dev")
 
-        updateConfig(path = path, key = Statics.PROPS_FIELD_EMAIL_HOST, value = "localhost")
-        updateConfig(path = path, key = Statics.PROPS_FIELD_EMAIL_PORT, value = 25)
-        updateConfig(path = path, key = Statics.PROPS_FIELD_EMAIL_NOTIFICATION_NAME, value = "LabPipe Notification")
-        updateConfig(path = path, key = Statics.PROPS_FIELD_EMAIL_NOTIFICATION_ADDR, value = "no-reply@labpipe.org")
+        updateConfig(key = Statics.PROPS_FIELD_EMAIL_HOST, value = "localhost")
+        updateConfig(key = Statics.PROPS_FIELD_EMAIL_PORT, value = 25)
+        updateConfig(key = Statics.PROPS_FIELD_EMAIL_NOTIFICATION_NAME, value = "LabPipe Notification")
+        updateConfig(key = Statics.PROPS_FIELD_EMAIL_NOTIFICATION_ADDR, value = "no-reply@labpipe.org")
 
         val defaultCacheDir = Paths.get(System.getProperty("user.home"), "labpipe").toString()
-        updateConfig(path = path, key = Statics.PROPS_FIELD_PATH_CACHE, value = defaultCacheDir)
+        updateConfig(key = Statics.PROPS_FIELD_PATH_CACHE, value = defaultCacheDir)
 
-        echo("Config file not found at: [$path]")
-        echo("Created config file at: [${configFile.absolutePath}]")
+        echo("Using config file: [${configFile.absolutePath}]")
         echo("Default settings:")
         echo("------ Server ------")
         echo("[PORT]: 4567")
@@ -111,8 +107,8 @@ fun readConfig(path: String? = null): PropertiesConfiguration? {
     }
 }
 
-fun importConfig(configPath: String?) {
-    val properties = readConfig(configPath)
+fun importConfig() {
+    val properties = readConfig()
     properties?.run {
         Runtime.config = LPConfig(
             when {
@@ -168,98 +164,121 @@ fun importConfig(configPath: String?) {
             properties.containsKey(Statics.PROPS_FIELD_EMAIL_NOTIFICATION_ADDR) -> properties.getString(Statics.PROPS_FIELD_EMAIL_NOTIFICATION_ADDR)
             else -> "no-reply@labpipe.org"
         }
-        Runtime.config.debugMode = when {
-            properties.containsKey(Statics.PROPS_FIELD_DEBUG_MODE) -> properties.getBoolean(Statics.PROPS_FIELD_DEBUG_MODE)
-            else -> false
-        }
     }
 }
 
-fun startServer(port: Int) {
+fun startServer() {
     AuthManager.setManager()
     GeneralService.routes()
     ParameterService.routes()
     RecordService.routes()
     FormService.routes()
     DevService.routes()
-    Runtime.server.start(port)
+    Runtime.server.start(Runtime.config.serverPort)
 }
 
-class LPServerCmdLine : CliktCommand() {
+class LPServerCmdLine :
+    CliktCommand(name = "LabPipe Server Commandline Tool", help = "LabPipe Server Commandline Tool") {
+    override fun run() {
+        echo("LabPipe Server")
+    }
 
-    private val runServer by option("-r", "--run", help = "start server").flag()
-    private val runConnectionTest by option(
-        "-t",
-        "--test-connection",
-        help = "test database and email server connection"
-    ).flag()
-    private val debugMode by option("-d", "--debug", help = "debug mode").flag()
+}
 
-    private val configPath by option("--config", help = "config file path")
+class Config : CliktCommand(name = "config", help = "LabPipe Configuration") {
 
-    private val serverPort by option("--port", help = "server port").int().default(4567)
+    override fun run() {
+        echo("LabPipe Configuration")
+    }
+}
 
-    private val dbHost by option("--db-host", help = "database host")
-    private val dbPort by option("--db-port", help = "database port").int()
-    private val dbName by option("--db-name", help = "database name")
-    private val dbUser by option("--db-user", help = "database user")
-    private val dbPass by option("--db-pass", help = "database password")
+class Server : CliktCommand(name = "server", help = "Configure server") {
+    private val port by option("--port", help = "server port").int().default(4567)
+    private val cache by option("--cache", help = "cache directory")
 
-    private val emailHost by option("--email-host", help = "email host")
-    private val emailPort by option("--email-port", help = "email port").int()
-    private val emailUser by option("--email-user", help = "email user")
-    private val emailPass by option("--email-pass", help = "email password")
-    private val notificationEmailName by option("--email-notification-name", help = "notification email sender name")
-    private val notificationEmailAddress by option(
-        "--email-notification-address",
+    override fun run() {
+        updateConfig(key = Statics.PROPS_FIELD_SERVER_PORT, value = port)
+        updateConfig(key = Statics.PROPS_FIELD_PATH_CACHE, value = cache)
+    }
+}
+
+class Database : CliktCommand(name = "db", help = "Configure database server") {
+    private val host by option("--host", help = "database host")
+    private val port by option("--port", help = "database port").int()
+    private val name by option("--name", help = "database name")
+    private val user by option("--user", help = "database user")
+    private val pswd by option("--pass", help = "database password")
+
+    override fun run() {
+        updateConfig(key = Statics.PROPS_FIELD_DB_HOST, value = host)
+        updateConfig(key = Statics.PROPS_FIELD_DB_PORT, value = port)
+        updateConfig(key = Statics.PROPS_FIELD_DB_NAME, value = name)
+        updateConfig(key = Statics.PROPS_FIELD_DB_USER, value = user)
+        updateConfig(key = Statics.PROPS_FIELD_DB_PASS, value = pswd)
+    }
+}
+
+class Email : CliktCommand(name = "email", help = "Configure email server") {
+    private val host by option("--host", help = "email server host")
+    private val port by option("--port", help = "email server port").int()
+    private val user by option("--user", help = "email server user")
+    private val pswd by option("--pass", help = "email server password")
+    private val notifierName by option("--notifier-name", help = "notification email sender name")
+    private val notifierAddr by option(
+        "--notifier-addr",
         help = "notification email sender address"
     )
 
-    private val cacheDir by option("--cache-dir", help = "cache directory")
+    override fun run() {
+        updateConfig(key = Statics.PROPS_FIELD_EMAIL_HOST, value = host)
+        updateConfig(key = Statics.PROPS_FIELD_EMAIL_PORT, value = port)
+        updateConfig(key = Statics.PROPS_FIELD_EMAIL_USER, value = user)
+        updateConfig(key = Statics.PROPS_FIELD_EMAIL_PASS, value = pswd)
+        updateConfig(
+            key = Statics.PROPS_FIELD_EMAIL_NOTIFICATION_NAME,
+            value = notifierName
+        )
+        updateConfig(
+            key = Statics.PROPS_FIELD_EMAIL_NOTIFICATION_ADDR,
+            value = notifierAddr
+        )
+    }
+}
+
+class Check : CliktCommand(name = "check", help = "Check database/email connection") {
+    override fun run() {
+        importConfig()
+        DatabaseUtil.connect()
+        EmailUtil.connect()
+        EmailUtil.testConnection()
+        DatabaseUtil.testConnection()
+    }
+}
+
+class Run : CliktCommand(name = "run", help = "Run server") {
+    private val debugMode by option("-d", "--debug", help = "debug mode").flag()
 
     override fun run() {
-        updateConfig(path = configPath, key = Statics.PROPS_FIELD_SERVER_PORT, value = serverPort)
-
-        updateConfig(path = configPath, key = Statics.PROPS_FIELD_DB_HOST, value = dbHost)
-        updateConfig(path = configPath, key = Statics.PROPS_FIELD_DB_PORT, value = dbPort)
-        updateConfig(path = configPath, key = Statics.PROPS_FIELD_DB_NAME, value = dbName)
-        updateConfig(path = configPath, key = Statics.PROPS_FIELD_DB_USER, value = dbUser)
-        updateConfig(path = configPath, key = Statics.PROPS_FIELD_DB_PASS, value = dbPass)
-
-        updateConfig(path = configPath, key = Statics.PROPS_FIELD_EMAIL_HOST, value = emailHost)
-        updateConfig(path = configPath, key = Statics.PROPS_FIELD_EMAIL_PORT, value = emailPort)
-        updateConfig(path = configPath, key = Statics.PROPS_FIELD_EMAIL_USER, value = emailUser)
-        updateConfig(path = configPath, key = Statics.PROPS_FIELD_EMAIL_PASS, value = emailPass)
-        updateConfig(
-            path = configPath,
-            key = Statics.PROPS_FIELD_EMAIL_NOTIFICATION_NAME,
-            value = notificationEmailName
-        )
-        updateConfig(
-            path = configPath,
-            key = Statics.PROPS_FIELD_EMAIL_NOTIFICATION_ADDR,
-            value = notificationEmailAddress
-        )
-
-        updateConfig(path = configPath, key = Statics.PROPS_FIELD_PATH_CACHE, value = cacheDir)
-        updateConfig(path = configPath, key = Statics.PROPS_FIELD_DEBUG_MODE, value = debugMode)
-
-        if (runConnectionTest) {
-            importConfig(configPath)
-            DatabaseUtil.connect()
-            EmailUtil.connect()
-            EmailUtil.testConnection()
-            DatabaseUtil.testConnection()
-        }
-
-        if (runServer) {
-            importConfig(configPath)
-            DatabaseUtil.connect()
-            EmailUtil.connect()
-            EmailUtil.testConnection()
-            DatabaseUtil.testConnection()
-            startServer(serverPort)
-        }
+        Runtime.debugMode = debugMode
+        importConfig()
+        DatabaseUtil.connect()
+        EmailUtil.connect()
+        EmailUtil.testConnection()
+        DatabaseUtil.testConnection()
     }
+}
 
+class Init : CliktCommand(name = "init", help = "Init server") {
+
+    override fun run() {
+        importConfig()
+        DatabaseUtil.connect()
+        EmailUtil.connect()
+        EmailUtil.testConnection()
+        DatabaseUtil.testConnection()
+        RequiredMongoDBCollections.values().forEach { Runtime.mongoDatabase.createCollection(it.value)}
+        val cols = RequiredMongoDBCollections.values().map { it.value }.toMutableList()
+        cols.removeAll(Runtime.mongoDatabase.listCollectionNames())
+        cols.forEach{ Runtime.mongoDatabase.createCollection(it)}
+    }
 }
