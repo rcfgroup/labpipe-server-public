@@ -1,0 +1,10 @@
+{
+  "param_name": "client_init",
+  "param_value": [
+    "locations",
+    "operators",
+    "studies",
+    "instruments",
+    "collectors"
+  ]
+}

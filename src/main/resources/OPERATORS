@@ -1,0 +1,16 @@
+{
+  "name": "Test User",
+  "passhash": "$2a$10$QC4LEBrdfLvMoy0TetVKWeA2p4tbhv3mPhiYRdSbfjdXMJ3.ErtUC",
+  "username": "test.user",
+  "email": "",
+  "isActive": true,
+  "projects": [
+    "example"
+  ],
+  "notification_group": [
+    "test-email-group"
+  ],
+  "roles": [
+    "public_read"
+  ]
+}
