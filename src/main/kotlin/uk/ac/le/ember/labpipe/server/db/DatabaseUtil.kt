@@ -24,7 +24,7 @@ class DatabaseUtil {
                 Runtime.logger.info { "Database connection successful." }
                 true
             } catch (e: Exception) {
-                if (Runtime.config.debugMode) {
+                if (Runtime.debugMode) {
                     Runtime.logger.error(e) { "Cannot connect to database." }
                 } else {
                     Runtime.logger.error { "Cannot connect to database." }
