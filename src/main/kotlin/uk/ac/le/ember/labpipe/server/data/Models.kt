@@ -18,8 +18,6 @@ data class LPConfig(var serverPort: Int = 4567) {
 
     var notificationEmailName: String = "LabPipe Notification"
     var notificationEmailAddress: String = "no-reply@labpipe.org"
-
-    var debugMode: Boolean = false
 }
 
 data class Parameter(@JsonProperty("param_name") var name: String) {
