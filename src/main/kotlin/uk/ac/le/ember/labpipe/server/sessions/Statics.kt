@@ -14,33 +14,16 @@ class Statics {
         const val PROPS_FIELD_EMAIL_PORT = "mail.port"
         const val PROPS_FIELD_EMAIL_USER = "mail.user"
         const val PROPS_FIELD_EMAIL_PASS = "mail.pass"
-        const val PROPS_FIELD_EMAIL_NOTIFICATION_NAME = "mail.notification.name"
-        const val PROPS_FIELD_EMAIL_NOTIFICATION_ADDR = "mail.notification.addr"
+        const val PROPS_FIELD_EMAIL_NOTIFICATION_NAME = "mail.notifier.name"
+        const val PROPS_FIELD_EMAIL_NOTIFICATION_ADDR = "mail.notifier.addr"
 
         const val PROPS_FIELD_PATH_CACHE = "path.cache"
-        const val PROPS_FIELD_DEBUG_MODE = "mode.debug"
-
-        const val DB_MONGO_COL_ACCESS_TOKEN = "ACCESS_TOKENS"
-        const val DB_MONGO_COL_ROLE = "ROLES"
-        const val DB_MONGO_COL_CLIENT_SETTING = "CLIENT_SETTINGS"
-        const val DB_MONGO_COL_API_ACCESS_ROLES = "API_ACCESS_ROLES"
-        const val DB_MONGO_COL_OPERATORS = "OPERATORS"
-        const val DB_MONGO_COL_STUDIES = "STUDIES"
-        const val DB_MONGO_COL_FORM_TEMPLATES = "FORM_TEMPLATES"
-        const val DB_MONGO_COL_REPORT_TEMPLATES = "REPORT_TEMPLATES"
-        const val DB_MONGO_COL_INSTRUMENTS = "INSTRUMENTS"
-        const val DB_MONGO_COL_LOCATIONS = "LOCATIONS"
-        const val DB_MONGO_COL_EMAIL_GROUPS = "EMAIL_GROUPS"
-
-        const val DB_MONGO_COL_FORM_DATA_PREFIX = "FORM_DATA_"
 
         const val DEFAULT_CONFIG_FILE_NAME = "config.ini"
 
-        const val NOTIFICATION_STYLE_DO_NOT_NOTIFY = "DO_NOT_NOTIFY"
-        const val NOTIFICATION_STYLE_NOTIFY_ALL = "NOTIFY_ALL"
-        const val NOTIFICATION_STYLE_OPERATOR_ONLY = "OPERATOR_ONLY"
-        const val NOTIFICATION_STYLE_ADMIN_ONLY = "ADMIN_ONLY"
-        const val NOTIFICATION_STYLE_MEMBER_ONLY = "MEMBER_ONLY"
+
+        const val DB_COL_FORM_DATA_PREFIX = "FORM_DATA_"
+
 
         const val API_PATH_ROOT = "/api"
         const val API_PATH_FORM_TEMPLATE = "$API_PATH_ROOT/form/template/:formCode"
@@ -53,4 +36,26 @@ class Statics {
         const val API_PATH_PARAM_SERVICE = "$API_PATH_ROOT/parameter"
         const val API_PATH_PARAM_WITH_NAME = "$API_PATH_PARAM_SERVICE/name/:paramName"
     }
+}
+
+enum class RequiredMongoDBCollections(val value: String) {
+    ACCESS_TOKEN("ACCESS_TOKENS"),
+    ROLE("ROLES"),
+    CLIENT_SETTING("CLIENT_SETTINGS"),
+    API_ACCESS_ROLES("API_ACCESS_ROLES"),
+    OPERATORS("OPERATORS"),
+    STUDIES("STUDIES"),
+    FORM_TEMPLATES("FORM_TEMPLATES"),
+    REPORT_TEMPLATES("REPORT_TEMPLATES"),
+    INSTRUMENTS("INSTRUMENTS"),
+    LOCATIONS("LOCATIONS"),
+    EMAIL_GROUPS("EMAIL_GROUPS")
+}
+
+enum class NotificationStyle(val value: String) {
+    DO_NOT_NOTIFY("DO_NOT_NOTIFY"),
+    NOTIFY_ALL("NOTIFY_ALL"),
+    OPERATOR_ONLY("OPERATOR_ONLY"),
+    ADMIN_ONLY("ADMIN_ONLY"),
+    MEMBER_ONLY("MEMBER_ONLY")
 }
