@@ -5,11 +5,11 @@ cache:
   directories:
   - "$HOME/.gradle/caches/"
   - "$HOME/.gradle/wrapper/"
-before_deploy: "cd $HOME/build/libs && ls"
 deploy:
   provider: releases
   api_key: "$GITHUB_RELEASE_TOKEN"
-  file: "$HOME/build/libs/labpipe-server-kotlin-*-all.jar"
+  file_glob: true
+  file: build/libs/*
   draft: true
   on:
     repo: colin-bz/labpipe-server-public
