@@ -7,13 +7,15 @@ import org.simplejavamail.email.Recipient
 import uk.ac.le.ember.labpipe.server.data.EmailGroup
 import uk.ac.le.ember.labpipe.server.data.FormTemplate
 import uk.ac.le.ember.labpipe.server.data.Operator
+import uk.ac.le.ember.labpipe.server.sessions.NotificationStyle
+import uk.ac.le.ember.labpipe.server.sessions.RequiredMongoDBCollections
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 import uk.ac.le.ember.labpipe.server.sessions.Statics
 
 object NotificationUtil {
     fun sendNotificationEmail(operator: Operator, formCode: String) {
         GlobalScope.launch {
-            val recordForm = Runtime.mongoDatabase.getCollection<FormTemplate>(Statics.DB_MONGO_COL_FORM_TEMPLATES)
+            val recordForm = Runtime.mongoDatabase.getCollection<FormTemplate>(RequiredMongoDBCollections.FORM_TEMPLATES.value)
                 .findOne { FormTemplate::code eq formCode }
             recordForm?.run {
                 val recipients = getEmailRecipients(operator, recordForm)
@@ -42,8 +44,8 @@ object NotificationUtil {
         Runtime.logger.info { "Form [${form?.code}] requests notification style: ${form?.notificationStyle}" }
         when (form?.notificationStyle) {
             null -> return null
-            Statics.NOTIFICATION_STYLE_DO_NOT_NOTIFY -> return null
-            Statics.NOTIFICATION_STYLE_OPERATOR_ONLY -> return mutableListOf(
+            NotificationStyle.DO_NOT_NOTIFY.value -> return null
+            NotificationStyle.OPERATOR_ONLY.value -> return mutableListOf(
                 Recipient(
                     operator.name,
                     operator.email,
@@ -52,21 +54,24 @@ object NotificationUtil {
             )
             else -> {
                 val emailGroups =
-                    Runtime.mongoDatabase.getCollection<EmailGroup>(Statics.DB_MONGO_COL_EMAIL_GROUPS)
+                    Runtime.mongoDatabase.getCollection<EmailGroup>(RequiredMongoDBCollections.EMAIL_GROUPS.value)
                         .find(EmailGroup::code `in` operator.notificationGroup, EmailGroup::formCode eq form.code)
                 val adminUsernames = emailGroups.map { g -> g.admin }.flatten()
                 val memberUsernames = emailGroups.map { g -> g.member }.flatten()
                 val adminList =
-                    Runtime.mongoDatabase.getCollection<Operator>(Statics.DB_MONGO_COL_OPERATORS)
+                    Runtime.mongoDatabase.getCollection<Operator>(RequiredMongoDBCollections.OPERATORS.value)
                         .find(Operator::username `in` adminUsernames).toMutableList()
                         .map { o -> Recipient(o.name, o.email, null) }
                 val memberList =
-                    Runtime.mongoDatabase.getCollection<Operator>(Statics.DB_MONGO_COL_OPERATORS)
+                    Runtime.mongoDatabase.getCollection<Operator>(RequiredMongoDBCollections.OPERATORS.value)
                         .find(Operator::username `in` memberUsernames).toMutableList()
                         .map { o -> Recipient(o.name, o.email, null) }
                 return when (form.notificationStyle) {
-                    Statics.NOTIFICATION_STYLE_ADMIN_ONLY -> adminList
-                    Statics.NOTIFICATION_STYLE_MEMBER_ONLY -> memberList
+                    NotificationStyle.ADMIN_ONLY.value -> adminList
+                    NotificationStyle.MEMBER_ONLY.value -> memberList
+                    NotificationStyle.NOTIFY_ALL.value -> {
+                        (adminList + memberList).distinctBy { it.address }
+                    }
                     else -> {
                         (adminList + memberList).distinctBy { it.address }
                     }
