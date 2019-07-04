@@ -6,6 +6,7 @@ import org.litote.kmongo.findOne
 import org.litote.kmongo.getCollection
 import uk.ac.le.ember.labpipe.server.auths.AuthManager
 import uk.ac.le.ember.labpipe.server.data.FormTemplate
+import uk.ac.le.ember.labpipe.server.sessions.RequiredMongoDBCollections
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 import uk.ac.le.ember.labpipe.server.sessions.Statics
 
@@ -20,7 +21,7 @@ object FormService {
 
 
     fun getFormTemplate(formCode: String): FormTemplate? {
-        val col = Runtime.mongoDatabase.getCollection<FormTemplate>(Statics.DB_MONGO_COL_FORM_TEMPLATES)
+        val col = Runtime.mongoDatabase.getCollection<FormTemplate>(RequiredMongoDBCollections.FORM_TEMPLATES.value)
         return col.findOne(FormTemplate::code eq formCode)
     }
 }
