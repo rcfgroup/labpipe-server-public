@@ -8,6 +8,7 @@ cache:
 deploy:
   provider: releases
   api_key: "$GITHUB_RELEASE_TOKEN"
+  skip_cleanup: true
   file_glob: true
   file: build/libs/*
   draft: true
