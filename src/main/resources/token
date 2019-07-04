@@ -1,7 +1,0 @@
-{
-  "token": "token",
-  "keyhash": "$2a$10$C5rf/uKHk0gGQtA4lxgKmePhwufJ7OtUuby9uAU8kQqoQfJDEseva",
-  "roles": [
-    "token_read_only"
-  ]
-}
