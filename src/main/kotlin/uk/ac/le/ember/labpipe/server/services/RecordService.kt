@@ -8,6 +8,7 @@ import org.bson.Document
 import org.bson.types.ObjectId
 import uk.ac.le.ember.labpipe.server.auths.AuthManager
 import uk.ac.le.ember.labpipe.server.notification.NotificationUtil
+import uk.ac.le.ember.labpipe.server.sessions.ApiPath
 import uk.ac.le.ember.labpipe.server.sessions.RequiredMongoDBCollections
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 import uk.ac.le.ember.labpipe.server.sessions.Statics
@@ -35,7 +36,7 @@ object RecordService {
 
     fun routes() {
         println("Add record service routes.")
-        Runtime.server.post(Statics.API_PATH_RECORD_ADD, { ctx ->
+        Runtime.server.post(ApiPath.RECORD_ADD.value, { ctx ->
             val operator = AuthManager.getUser(ctx)
             operator?.run {
                 val jsonParser = JsonParser()
