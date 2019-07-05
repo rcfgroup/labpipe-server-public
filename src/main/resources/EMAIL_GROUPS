@@ -1,9 +1,0 @@
-{
-  "code": "test-email-group",
-  "study_code": "example",
-  "name": "Test Email Group",
-  "admin": [
-    "test.user"
-  ],
-  "member": []
-}
