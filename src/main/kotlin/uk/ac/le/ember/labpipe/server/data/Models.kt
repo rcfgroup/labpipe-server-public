@@ -27,6 +27,10 @@ data class Parameter(@JsonProperty("param_name") var name: String) {
 
 data class CodeName(var code: String, var name: String)
 
+data class ClientSettings(var code: String, var name: String) {
+    var value: List<String> = mutableListOf()
+}
+
 data class Operator(@JsonProperty("email") var email: String) {
     var name: String = ""
     var username: String = ""
