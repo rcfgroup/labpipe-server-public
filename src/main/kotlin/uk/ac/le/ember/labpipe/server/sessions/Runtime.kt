@@ -11,11 +11,11 @@ class Runtime {
     companion object {
         var logger = KotlinLogging.logger {}
         var config = LPConfig()
-        var server: Javalin = Javalin.create()
         var debugMode: Boolean = false
 
         lateinit var mongoClient: MongoClient
         lateinit var mongoDatabase: MongoDatabase
         lateinit var mailer: Mailer
+        lateinit var server: Javalin
     }
 }
