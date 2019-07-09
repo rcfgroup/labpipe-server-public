@@ -45,11 +45,8 @@ dependencies {
     // https://mvnrepository.com/artifact/org.mindrot/jbcrypt
     compile("org.mindrot", "jbcrypt", "0.4")
 
-    // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-html-common
-    compile("org.jetbrains.kotlinx", "kotlinx-html-common", "0.6.12")
-
-    // https://bintray.com/kotlin/kotlinx.html/kotlinx.html/0.6.12
-    compile("org.jetbrains.kotlinx", "kotlinx-html-jvm", "0.6.12")
+    // https://mvnrepository.com/artifact/com.j2html/j2html
+    compile("com.j2html","j2html","1.4.0")
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
     compile("org.apache.commons", "commons-lang3", "3.9")
