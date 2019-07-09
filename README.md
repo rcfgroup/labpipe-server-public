@@ -22,7 +22,7 @@ To build from source code, you will need to install the following components:
 #### Build artifacts and run
 ```
 gradle clean build
-java -jar build/libs/labpipe-server-kotlin-1.0.0-all.jar
+java -jar build/libs/labpipe-server-kotlin-all.jar
 ```
 #### Run from source code
 ```
