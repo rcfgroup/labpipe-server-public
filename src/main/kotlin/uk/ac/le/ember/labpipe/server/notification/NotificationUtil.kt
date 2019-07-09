@@ -1,5 +1,7 @@
 package uk.ac.le.ember.labpipe.server.notification
 
+import com.google.gson.JsonObject
+import j2html.TagCreator.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.litote.kmongo.*
@@ -7,13 +9,14 @@ import org.simplejavamail.email.Recipient
 import uk.ac.le.ember.labpipe.server.data.EmailGroup
 import uk.ac.le.ember.labpipe.server.data.FormTemplate
 import uk.ac.le.ember.labpipe.server.data.Operator
+import uk.ac.le.ember.labpipe.server.data.ReportTemplate
 import uk.ac.le.ember.labpipe.server.sessions.NotificationStyle
 import uk.ac.le.ember.labpipe.server.sessions.RequiredMongoDBCollections
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 import uk.ac.le.ember.labpipe.server.sessions.Statics
 
 object NotificationUtil {
-    fun sendNotificationEmail(operator: Operator, formCode: String) {
+    fun sendNotificationEmail(operator: Operator, formCode: String, record: JsonObject) {
         GlobalScope.launch {
             val recordForm = Runtime.mongoDatabase.getCollection<FormTemplate>(RequiredMongoDBCollections.FORM_TEMPLATES.value)
                 .findOne { FormTemplate::code eq formCode }
@@ -23,6 +26,7 @@ object NotificationUtil {
                     for (r in recipients) {
                         println("Recipient: ${r.name} <${r.address}>")
                     }
+                    var htmlReport = generateReportHtml(operator, recordForm, record)
                     EmailUtil.sendEmail(
                         from = Recipient(
                             Runtime.config.notificationEmailName,
@@ -77,6 +81,53 @@ object NotificationUtil {
                     }
                 }
             }
+        }
+    }
+
+    fun generateReportHtml(operator: Operator, form: FormTemplate, formData: JsonObject) {
+        val reportTemplate = Runtime.mongoDatabase.getCollection<ReportTemplate>(RequiredMongoDBCollections.REPORT_TEMPLATES.value)
+            .findOne (ReportTemplate::formCode eq form.code, ReportTemplate::active eq true )
+        reportTemplate?.run {
+            val elements = reportTemplate.htmlTemplate
+            elements.sortBy { it.order }
+            var report = body()
+            elements.forEach {
+                run {
+                    when (it.type) {
+                        "report_title" -> {
+                            val valueArray = it.value.split("::")
+                            val value: String = when (valueArray[0]) {
+                                "static" -> valueArray[1]
+                                "form_data" -> getFormDataAsString(formData, valueArray[1])
+                                else -> "Invalid format in report config"
+                            }
+                            report.with(h1(value))
+                        }
+                        "section_title" -> {
+                            val valueArray = it.value.split("::")
+                            val value: String = when (valueArray[0]) {
+                                "static" -> valueArray[1]
+                                "form_data" -> getFormDataAsString(formData, valueArray[1])
+                                else -> "Invalid format in report config"
+                            }
+                            report.with(h3(value))
+                        }
+                        "table_keyvalue" -> {
+
+                        }
+                        else -> report.with(p("Invalid format in report config"))
+                    }
+                }
+            }
+        }
+    }
+
+    fun getFormDataAsString(formData: JsonObject, keyString: String): String {
+        if (keyString.contains('.')) {
+            val keyArray = keyString.split(".")
+            return formData.getAsJsonObject(keyArray[0]).get(keyArray[1]).asString
+        } else {
+            return formData.get(keyString).asString
         }
     }
 }
