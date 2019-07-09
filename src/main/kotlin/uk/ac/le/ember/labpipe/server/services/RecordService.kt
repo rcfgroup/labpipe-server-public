@@ -45,10 +45,11 @@ object RecordService {
                 record.addProperty("uploaded_by", operator.username)
                 record.addProperty("created", LocalDateTime.now().toString())
                 println(ctx.body())
+                println(record.get("p_basic.participant_id"))
                 val recordId = saveRecord(record)
                 if (recordId != null) {
                     Runtime.logger.info { "Record saved [$recordId]" }
-                    NotificationUtil.sendNotificationEmail(operator, formCode)
+                    NotificationUtil.sendNotificationEmail(operator, formCode, record)
                     ctx.status(200)
                 } else {
                     ctx.result("Record cannot be saved. Please retry or contact service manager.")
