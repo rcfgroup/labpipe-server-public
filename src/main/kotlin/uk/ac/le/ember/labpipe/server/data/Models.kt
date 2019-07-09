@@ -22,13 +22,13 @@ data class LPConfig(var serverPort: Int = 4567) {
 
 data class Parameter(@JsonProperty("param_name") var name: String) {
     @JsonProperty("param_value")
-    var value: List<Any> = mutableListOf()
+    var value: MutableList<Any> = mutableListOf()
 }
 
 data class CodeName(var code: String, var name: String)
 
 data class ClientSettings(var code: String, var name: String) {
-    var value: List<String> = mutableListOf()
+    var value: MutableList<String> = mutableListOf()
 }
 
 data class Operator(@JsonProperty("email") var email: String) {
@@ -42,28 +42,28 @@ data class Operator(@JsonProperty("email") var email: String) {
     @JsonProperty("isActive")
     var active: Boolean = false
 
-    var projects: List<String> = mutableListOf()
+    var projects: MutableList<String> = mutableListOf()
 
     @JsonProperty("notification_group")
-    var notificationGroup: List<String> = mutableListOf()
+    var notificationGroup: MutableList<String> = mutableListOf()
 
-    var roles: List<String> = mutableListOf()
+    var roles: MutableList<String> = mutableListOf()
 }
 
 data class AccessToken(
     var token: String,
     @JsonProperty("keyhash") var keyHash: String
 ) {
-    var roles: List<String> = mutableListOf()
+    var roles: MutableList<String> = mutableListOf()
 }
 
 data class Location(var code: String, var name: String) {
-    var type: List<String> = mutableListOf()
+    var type: MutableList<String> = mutableListOf()
 }
 
 data class OperatorRole(val code: String, val name: String)
 
-data class ApiRoleAssign(var url: String, var roles: List<String>)
+data class ApiRoleAssign(var url: String, var roles: MutableList<String>)
 
 data class FormTemplate(var code: String, var name: String) {
     @JsonProperty("study_code")
@@ -83,7 +83,7 @@ data class FormTemplate(var code: String, var name: String) {
 }
 
 data class ElectronFileFilter(var name: String) {
-    var extensions: List<String> = mutableListOf()
+    var extensions: MutableList<String> = mutableListOf()
 }
 
 data class QuestionTemplate(var key: String, var label: String, var controlType: String) {
@@ -95,7 +95,7 @@ data class QuestionTemplate(var key: String, var label: String, var controlType:
     var helperText: String = ""
     var target: String? = null
     var multiple: Boolean = false
-    var filter: List<ElectronFileFilter> = mutableListOf()
+    var filter: MutableList<ElectronFileFilter> = mutableListOf()
 }
 
 data class WizardPageFormValidProcess(var processType: String, var dataField: String) {
@@ -106,12 +106,12 @@ data class WizardPageTemplate(var key: String, var title: String) {
     var navTitle: String? = ""
     var requireValidForm: Boolean = true
     var order: Int = 1
-    var questions: List<QuestionTemplate> = mutableListOf()
-    var formValidProcess: List<WizardPageFormValidProcess> = mutableListOf()
+    var questions: MutableList<QuestionTemplate> = mutableListOf()
+    var formValidProcess: MutableList<WizardPageFormValidProcess> = mutableListOf()
 }
 
 data class WizardTemplate(var title: String) {
-    var pages: List<WizardPageTemplate> = mutableListOf()
+    var pages: MutableList<WizardPageTemplate> = mutableListOf()
 }
 
 data class EmailGroup(var code: String) {
@@ -123,8 +123,23 @@ data class EmailGroup(var code: String) {
     @JsonProperty("form_code")
     var formCode: String = ""
 
-    var admin: List<String> = mutableListOf()
-    var member: List<String> = mutableListOf()
+    var admin: MutableList<String> = mutableListOf()
+    var member: MutableList<String> = mutableListOf()
 }
 
+data class ReportTemplate(var code: String) {
+    var name: String = ""
+
+    @JsonProperty("form_code")
+    var formCode: String = ""
+
+    var textTemplate: String = ""
+    var htmlTemplate: MutableList<HtmlElementTemplate> = mutableListOf()
+    var active: Boolean = false
+}
+
+data class HtmlElementTemplate(var type: String) {
+    var value: String = ""
+    var order: Int = 1
+}
 
