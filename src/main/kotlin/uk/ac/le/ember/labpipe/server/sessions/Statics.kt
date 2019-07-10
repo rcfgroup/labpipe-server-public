@@ -8,6 +8,7 @@ class Statics {
 
         const val DB_COL_FORM_DATA_PREFIX = "FORM_DATA_"
 
+        val REPORT_ELEMENT_VALUE_REGEX = Regex("(.*)::(.*)::(.*)")
 
         
     }
@@ -66,4 +67,32 @@ enum class NotificationStyle(val value: String) {
     OPERATOR_ONLY("OPERATOR_ONLY"),
     ADMIN_ONLY("ADMIN_ONLY"),
     MEMBER_ONLY("MEMBER_ONLY")
+}
+
+
+
+enum class ReportElementValueSource(val value: String) {
+    STATIC_VALUE("STATIC"),
+    FORM_DATA("FORMDATA"),
+    FORM_TEMPLATE("FORMCONFIG"),
+}
+
+enum class ReportElementStaticAccessMethod(val value: String) {
+    VALUE("VALUE"),
+    JSON("JSON")
+}
+
+enum class ReportElementTYPE(val value: String) {
+    REPORT_TITLE("REPORT_TITLE"),
+    SECTION_TITLE("SECTION_TITLE"),
+    TEXT("TEXT"),
+    SUB_TEXT("SUB_TEXT"),
+    TABLE_KEYVALUE("TABLE_KEYVALUE"),
+    TABLE_LOOP("TABLE_LOOP"),
+    LIST("LIST")
+}
+
+enum class ReportElementFormDataAccessMethod(val value: String) {
+    PROPERTY("PROPERTY"),
+    SELECT("SELECT")
 }
