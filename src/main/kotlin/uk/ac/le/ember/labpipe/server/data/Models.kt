@@ -80,6 +80,18 @@ data class FormTemplate(var code: String, var name: String) {
 
     @JsonProperty("notification_subject")
     var notificationSubject: String = ""
+
+    fun getProperty(name: String): String? {
+        return when (name) {
+            "study_code" -> studyCode
+            "instrument_code" -> instrumentCode
+            "template" -> template.toString()
+            "url" -> url
+            "notification_style" -> notificationStyle
+            "notification_subject" -> notificationSubject
+            else -> null
+        }
+    }
 }
 
 data class ElectronFileFilter(var name: String) {
@@ -133,7 +145,9 @@ data class ReportTemplate(var code: String) {
     @JsonProperty("form_code")
     var formCode: String = ""
 
+    @JsonProperty("text_template")
     var textTemplate: String = ""
+    @JsonProperty("html_template")
     var htmlTemplate: MutableList<HtmlElementTemplate> = mutableListOf()
     var active: Boolean = false
 }
