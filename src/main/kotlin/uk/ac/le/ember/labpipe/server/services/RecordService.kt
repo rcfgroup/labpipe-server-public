@@ -45,7 +45,6 @@ object RecordService {
                 record.addProperty("uploaded_by", operator.username)
                 record.addProperty("created", LocalDateTime.now().toString())
                 println(ctx.body())
-                println(record.get("p_basic.participant_id"))
                 val recordId = saveRecord(record)
                 if (recordId != null) {
                     Runtime.logger.info { "Record saved [$recordId]" }
