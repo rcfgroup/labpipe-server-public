@@ -28,7 +28,7 @@ java -jar build/libs/labpipe-server-kotlin-all.jar
 ```
 gradle clean run
 ```
-If you are using ```gradle run```, you can pass commandline arguments with ```--args```, e.g. ```--args="run"```.
+If you are using ```gradle run```, you can pass commandline arguments with ```--args```, e.g. ```--args="--help"```.
 
 ## Commandline arguments
 ```
