@@ -139,21 +139,3 @@ data class EmailGroup(var code: String) {
     var member: MutableList<String> = mutableListOf()
 }
 
-data class ReportTemplate(var code: String) {
-    var name: String = ""
-
-    @JsonProperty("form_code")
-    var formCode: String = ""
-
-    @JsonProperty("text_template")
-    var textTemplate: String = ""
-    @JsonProperty("html_template")
-    var htmlTemplate: MutableList<HtmlElementTemplate> = mutableListOf()
-    var active: Boolean = false
-}
-
-data class HtmlElementTemplate(var type: String) {
-    var value: String = ""
-    var order: Int = 1
-}
-
