@@ -98,7 +98,7 @@ object NotificationUtil {
                 run {
                     Runtime.logger.info { "Processing report element: $it" }
                     when (it.type) {
-                        ReportElementTYPE.REPORT_TITLE.value -> {
+                        ReportElementType.REPORT_TITLE.value -> {
                             val valueArray = it.value.split("::")
                             val value: String = when (valueArray[0]) {
                                 ReportElementValueSource.STATIC_VALUE.value -> valueArray[1]
@@ -109,7 +109,7 @@ object NotificationUtil {
                             println("H1: $value")
                             reportBody.with(h1(value))
                         }
-                        ReportElementTYPE.SECTION_TITLE.value -> {
+                        ReportElementType.SECTION_TITLE.value -> {
                             val valueArray = it.value.split("::")
                             val value: String = when (valueArray[0]) {
                                 ReportElementValueSource.STATIC_VALUE.value -> valueArray[1]
@@ -120,7 +120,7 @@ object NotificationUtil {
                             println("H3: $value")
                             reportBody.with(h3(value))
                         }
-                        ReportElementTYPE.TABLE_KEYVALUE.value -> {
+                        ReportElementType.TABLE_KEYVALUE.value -> {
                             val valueArray = it.value.split("::")
                             val value: JsonObject? = when (valueArray[0]) {
                                 ReportElementValueSource.FORM_DATA.value -> formData.getAsJsonObject(valueArray[1])
@@ -143,11 +143,11 @@ object NotificationUtil {
                             }
                             reportBody.with(table)
                         }
-                        ReportElementTYPE.TABLE_LOOP.value -> {
+                        ReportElementType.TABLE_LOOP.value -> {
                             println("To be implemented")
                             // TODO
                         }
-                        ReportElementTYPE.LIST.value -> {
+                        ReportElementType.LIST.value -> {
                             val valueArray = it.value.split("::")
                             val value: JsonArray? = when (valueArray[0]) {
                                 ReportElementValueSource.FORM_DATA.value -> ReportUtil.getFormDataAsArray(formData, valueArray[1])
