@@ -92,10 +92,22 @@ object ReportUtil {
                                             reportBody.with(h1(formData.get(element.value).asString))
                                         }
                                         ElementMethod.PROPERTY_NESTED -> {
-
+                                            val data = getNestedFormData(formData, element.value)
+                                            if (data != null) {
+                                                reportBody.with(h1(data.asString))
+                                            } else {
+                                                reportBody.with(div().withClasses("alert", "alert-danger").with(
+                                                    h5("ERROR").withClasses("alert-heading"),
+                                                    p("Form data does not have property [${element.value}]")
+                                                ))
+                                            }
                                         }
                                         ElementMethod.SELECT -> {
-
+                                            // TODO
+                                            reportBody.with(div().withClasses("alert", "alert-danger").with(
+                                                h5("ERROR").withClasses("alert-heading"),
+                                                p("Element source [${ElementSource.FORM_DATA.value}] does not support access method [${method?.value}]")
+                                            ))
                                         }
                                         else -> reportBody.with(
                                             div().withClasses("alert", "alert-danger").with(
