@@ -106,7 +106,7 @@ object ReportUtil {
                                             // TODO
                                             reportBody.with(div().withClasses("alert", "alert-danger").with(
                                                 h5("ERROR").withClasses("alert-heading"),
-                                                p("Element source [${ElementSource.FORM_DATA.value}] does not support access method [${method?.value}]")
+                                                p("Element source [${ElementSource.FORM_DATA.value}] does not support access method [${method.value}]")
                                             ))
                                         }
                                         else -> reportBody.with(
