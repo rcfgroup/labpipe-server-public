@@ -10,11 +10,11 @@ class Statics {
 
         val REPORT_ELEMENT_VALUE_REGEX = Regex("(.*)::(.*)::(.*)", RegexOption.IGNORE_CASE)
 
-        
+
     }
 }
 
-enum class ApiPath(val value:String) {
+enum class ApiPath(val value: String) {
     ROOT("/api"),
     FORM_TEMPLATE_WITH_FORMCODE("${ROOT.value}/form/template/code/:formCode"),
     FORM_TEMPLATE_WITH_STUDYCODE_INSTRUMENTCODE("${ROOT.value}/form/template/study/:studyCode/instrument/:instrumentCode"),
