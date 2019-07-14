@@ -4,7 +4,6 @@ import io.javalin.core.security.SecurityUtil.roles
 import uk.ac.le.ember.labpipe.server.auths.AuthManager
 import uk.ac.le.ember.labpipe.server.sessions.ApiPath
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
-import uk.ac.le.ember.labpipe.server.sessions.Statics
 
 object GeneralService {
     fun routes() {
