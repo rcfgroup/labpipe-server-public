@@ -9,7 +9,6 @@ import org.bson.types.ObjectId
 import uk.ac.le.ember.labpipe.server.auths.AuthManager
 import uk.ac.le.ember.labpipe.server.notification.NotificationUtil
 import uk.ac.le.ember.labpipe.server.sessions.ApiPath
-import uk.ac.le.ember.labpipe.server.sessions.RequiredMongoDBCollections
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 import uk.ac.le.ember.labpipe.server.sessions.Statics
 import java.time.LocalDateTime
