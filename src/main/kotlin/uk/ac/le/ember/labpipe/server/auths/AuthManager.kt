@@ -3,7 +3,8 @@ package uk.ac.le.ember.labpipe.server.auths
 import com.mongodb.client.model.Filters.eq
 import io.javalin.core.security.Role
 import io.javalin.http.Context
-import org.litote.kmongo.*
+import org.litote.kmongo.findOne
+import org.litote.kmongo.getCollection
 import org.mindrot.jbcrypt.BCrypt
 import uk.ac.le.ember.labpipe.server.data.AccessToken
 import uk.ac.le.ember.labpipe.server.data.ApiRoleAssign
@@ -35,7 +36,8 @@ object AuthManager {
         val colOperator = Runtime.mongoDatabase.getCollection<Operator>(RequiredMongoDBCollections.OPERATORS.value)
         val operator: Operator? = colOperator.findOne(eq("username", basicAuthCredentials.username))
         if (operator == null) {
-            val colToken = Runtime.mongoDatabase.getCollection<AccessToken>(RequiredMongoDBCollections.ACCESS_TOKENS.value)
+            val colToken =
+                Runtime.mongoDatabase.getCollection<AccessToken>(RequiredMongoDBCollections.ACCESS_TOKENS.value)
             val accessToken: AccessToken? = colToken.findOne(eq("token", basicAuthCredentials.username))
             return if (accessToken == null) {
                 ApiRole.PUBLIC
