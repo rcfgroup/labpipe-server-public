@@ -7,7 +7,6 @@ import org.litote.kmongo.project
 import uk.ac.le.ember.labpipe.server.auths.AuthManager
 import uk.ac.le.ember.labpipe.server.sessions.ApiPath
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
-import uk.ac.le.ember.labpipe.server.sessions.Statics
 
 object ParameterService {
 
