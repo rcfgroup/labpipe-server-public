@@ -11,20 +11,15 @@ import org.apache.commons.configuration2.PropertiesConfiguration
 import org.apache.commons.configuration2.builder.fluent.Configurations
 import org.apache.commons.configuration2.ex.ConfigurationException
 import uk.ac.le.ember.labpipe.server.auths.AuthManager
-import uk.ac.le.ember.labpipe.server.data.AccessToken
 import uk.ac.le.ember.labpipe.server.data.LPConfig
 import uk.ac.le.ember.labpipe.server.db.DatabaseUtil
 import uk.ac.le.ember.labpipe.server.notification.EmailUtil
 import uk.ac.le.ember.labpipe.server.services.*
 import uk.ac.le.ember.labpipe.server.sessions.PropertyFields
-import uk.ac.le.ember.labpipe.server.sessions.RequiredMongoDBCollections
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 import uk.ac.le.ember.labpipe.server.sessions.Statics
 import java.io.File
 import java.nio.file.Paths
-import org.litote.kmongo.*
-import org.mindrot.jbcrypt.BCrypt
-import uk.ac.le.ember.labpipe.server.data.ClientSettings
 
 
 fun updateConfig(key: String, value: String?) {
