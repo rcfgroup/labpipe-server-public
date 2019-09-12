@@ -75,4 +75,4 @@ config email --notifier-addr    notification sender email address
 ## Roadmap
 
 ## License
-This project is open  under Non-Profit Open Software License 3.0 (NPOSL-3.0).
+This project is open source under Non-Profit Open Software License 3.0 (NPOSL-3.0).
