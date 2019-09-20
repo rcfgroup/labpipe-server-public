@@ -1,7 +1,8 @@
 package uk.ac.le.ember.labpipe.server.services
 
 import io.javalin.core.security.SecurityUtil.roles
-import uk.ac.le.ember.labpipe.server.auths.AuthManager
+import uk.ac.le.ember.labpipe.server.AuthManager
+import uk.ac.le.ember.labpipe.server.Constants
 import uk.ac.le.ember.labpipe.server.sessions.ApiPath
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 
@@ -9,18 +10,18 @@ object GeneralService {
     fun routes() {
         println("Add general service routes.")
         Runtime.server.get(
-            ApiPath.GENERAL_CONNECT_PUBLIC.value,
-            { ctx -> ctx.result("API server connected successfully.") },
+            Constants.API.GENERAL.CONN_PUBLIC,
+            { ctx -> ctx.result(Constants.MSG.CONN_PUBLIC_SUCCESS) },
             roles(AuthManager.ApiRole.PUBLIC)
         )
         Runtime.server.get(
-            ApiPath.GENERAL_CONNECT_AUTH.value,
-            { ctx -> ctx.result("API server connected successfully with authentication.") },
+            Constants.API.GENERAL.CONN_AUTH,
+            { ctx -> ctx.result(Constants.MSG.CONN_AUTH_SUCCESS) },
             roles(AuthManager.ApiRole.AUTHORISED)
         )
         Runtime.server.get(
-            ApiPath.GENERAL_CONNECT_TOKEN.value,
-            { ctx -> ctx.result("API server connected successfully with token.") },
+            Constants.API.GENERAL.CONN_TOKEN,
+            { ctx -> ctx.result(Constants.MSG.CONN_TOKEN_SUCCESS) },
             roles(AuthManager.ApiRole.TOKEN_AUTHORISED)
         )
     }

@@ -1,4 +1,4 @@
-package uk.ac.le.ember.labpipe.server.auths
+package uk.ac.le.ember.labpipe.server
 
 import com.mongodb.client.model.Filters.eq
 import io.javalin.core.security.Role
@@ -20,7 +20,7 @@ object AuthManager {
                 handler.handle(ctx)
             } else {
                 ctx.status(401)
-                    .result("Unauthorized. Please make sure correct authentication credentials are provided in the request.")
+                    .result(Constants.MSG.UNAUTHORIZED)
             }
         }
     }
@@ -43,7 +43,8 @@ object AuthManager {
                 ApiRole.PUBLIC
             } else {
                 if (BCrypt.checkpw(basicAuthCredentials.password, accessToken.keyHash)) {
-                    val apiRoles: MutableSet<String> = getApiRoles(ctx.matchedPath()).toMutableSet()
+                    val apiRoles: MutableSet<String> = getApiRoles(ctx.matchedPath())
+                        .toMutableSet()
                     if (apiRoles.isNullOrEmpty()) {
                         ApiRole.PUBLIC
                     } else {
@@ -55,7 +56,8 @@ object AuthManager {
             }
         } else {
             return if (BCrypt.checkpw(basicAuthCredentials.password, operator.passwordHash)) {
-                val apiRoles: MutableSet<String> = getApiRoles(ctx.matchedPath()).toMutableSet()
+                val apiRoles: MutableSet<String> = getApiRoles(ctx.matchedPath())
+                    .toMutableSet()
                 if (apiRoles.isNullOrEmpty()) {
                     ApiRole.PUBLIC
                 } else {
@@ -75,8 +77,7 @@ object AuthManager {
     }
 
     fun getApiRoles(url: String): List<String> {
-        val col = Runtime.mongoDatabase.getCollection<ApiRoleAssign>(RequiredMongoDBCollections.API_ACCESS_ROLES.value)
-        val apiRole: ApiRoleAssign? = col.findOne(eq("url", url))
+        val apiRole: ApiRoleAssign? = Runtime.mongoDatabase.getCollection<ApiRoleAssign>(RequiredMongoDBCollections.API_ACCESS_ROLES.value).findOne(eq("url", url))
         return apiRole?.roles ?: listOf()
     }
 }

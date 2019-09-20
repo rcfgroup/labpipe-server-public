@@ -6,7 +6,8 @@ import com.google.gson.JsonParser
 import io.javalin.core.security.SecurityUtil
 import org.bson.Document
 import org.bson.types.ObjectId
-import uk.ac.le.ember.labpipe.server.auths.AuthManager
+import uk.ac.le.ember.labpipe.server.AuthManager
+import uk.ac.le.ember.labpipe.server.Constants
 import uk.ac.le.ember.labpipe.server.notification.NotificationUtil
 import uk.ac.le.ember.labpipe.server.sessions.ApiPath
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
@@ -35,7 +36,7 @@ object RecordService {
 
     fun routes() {
         println("Add record service routes.")
-        Runtime.server.post(ApiPath.RECORD_ADD.value, { ctx ->
+        Runtime.server.post(Constants.API.RECORD.ADD, { ctx ->
             val operator = AuthManager.getUser(ctx)
             operator?.run {
                 val jsonParser = JsonParser()

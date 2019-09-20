@@ -5,9 +5,9 @@ import org.litote.kmongo.eq
 import org.litote.kmongo.find
 import org.litote.kmongo.findOne
 import org.litote.kmongo.getCollection
-import uk.ac.le.ember.labpipe.server.auths.AuthManager
+import uk.ac.le.ember.labpipe.server.AuthManager
+import uk.ac.le.ember.labpipe.server.Constants
 import uk.ac.le.ember.labpipe.server.data.FormTemplate
-import uk.ac.le.ember.labpipe.server.sessions.ApiPath
 import uk.ac.le.ember.labpipe.server.sessions.RequiredMongoDBCollections
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 
@@ -15,12 +15,12 @@ object FormService {
     fun routes() {
         println("Add form service routes")
         Runtime.server.get(
-            ApiPath.FORM_TEMPLATE_WITH_FORMCODE.value,
+            Constants.API.FORM.FROM_CODE,
             { ctx -> getFormTemplate(ctx.pathParam("formCode"))?.let { ctx.json(it) } },
             SecurityUtil.roles(AuthManager.ApiRole.PUBLIC, AuthManager.ApiRole.AUTHORISED)
         )
         Runtime.server.get(
-            ApiPath.FORM_TEMPLATE_WITH_STUDYCODE_INSTRUMENTCODE.value,
+            Constants.API.FORM.FROM_STUDY_INSTRUMENT,
             { ctx -> ctx.json(getFormTemplate(ctx.pathParam("studyCode"), ctx.pathParam("instrumentCode"))) },
             SecurityUtil.roles(AuthManager.ApiRole.PUBLIC, AuthManager.ApiRole.AUTHORISED)
         )

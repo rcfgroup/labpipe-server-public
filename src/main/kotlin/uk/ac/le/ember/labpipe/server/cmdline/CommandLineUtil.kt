@@ -10,7 +10,7 @@ import io.javalin.Javalin
 import org.apache.commons.configuration2.PropertiesConfiguration
 import org.apache.commons.configuration2.builder.fluent.Configurations
 import org.apache.commons.configuration2.ex.ConfigurationException
-import uk.ac.le.ember.labpipe.server.auths.AuthManager
+import uk.ac.le.ember.labpipe.server.AuthManager
 import uk.ac.le.ember.labpipe.server.data.LPConfig
 import uk.ac.le.ember.labpipe.server.db.DatabaseUtil
 import uk.ac.le.ember.labpipe.server.notification.EmailUtil
@@ -25,7 +25,7 @@ import java.nio.file.Paths
 fun updateConfig(key: String, value: String?) {
     val configFile = File(Statics.DEFAULT_CONFIG_FILE_NAME)
     configFile.createNewFile()
-    val configs = Configurations();
+    val configs = Configurations()
     try {
         val builder = configs.propertiesBuilder(configFile)
         val config = builder.configuration
@@ -41,7 +41,7 @@ fun updateConfig(key: String, value: String?) {
 fun updateConfig(key: String, value: Int?) {
     val configFile = File(Statics.DEFAULT_CONFIG_FILE_NAME)
     configFile.createNewFile()
-    val configs = Configurations();
+    val configs = Configurations()
     try {
         val builder = configs.propertiesBuilder(configFile)
         val config = builder.configuration
@@ -57,7 +57,7 @@ fun updateConfig(key: String, value: Int?) {
 fun updateConfig(key: String, value: Boolean) {
     val configFile = File(Statics.DEFAULT_CONFIG_FILE_NAME)
     configFile.createNewFile()
-    val configs = Configurations();
+    val configs = Configurations()
     try {
         val builder = configs.propertiesBuilder(configFile)
         val config = builder.configuration
@@ -161,8 +161,9 @@ fun startServer() {
     ParameterService.routes()
     RecordService.routes()
     FormService.routes()
-    DevService.routes()
+    QueryService.routes()
     Runtime.server.start(Runtime.config.serverPort)
+    echo("Server running at " + Runtime.config.serverPort)
 }
 
 class LPServerCmdLine :
@@ -244,7 +245,8 @@ class Check : CliktCommand(name = "check", help = "Check database/email connecti
 }
 
 class Run : CliktCommand(name = "run", help = "Run server") {
-    private val debugMode by option("-d", "--debug", help = "debug mode").flag()
+    private val debugMode by option("--debug", help = "debug mode").flag()
+//    private val daemonMode by option("--daemon", help = "daemon mode").flag()
 
     override fun run() {
         Runtime.debugMode = debugMode
@@ -261,25 +263,5 @@ class Init : CliktCommand(name = "init", help = "Init server") {
 
     override fun run() {
         echo("The init function will be available in next release.")
-//        importConfig()
-//        DatabaseUtil.connect()
-//        EmailUtil.connect()
-//        EmailUtil.testConnection()
-//        DatabaseUtil.testConnection()
-//        val cols = RequiredMongoDBCollections.values().map { it.value }.toMutableList()
-//        cols.removeAll(Runtime.mongoDatabase.listCollectionNames())
-//        cols.forEach { Runtime.mongoDatabase.createCollection(it) }
-//        Runtime.mongoDatabase.getCollection<AccessToken>(RequiredMongoDBCollections.ACCESS_TOKENS.value)
-//            .insertOne(AccessToken(token = "token", keyHash = BCrypt.hashpw("key", BCrypt.gensalt())))
-//        val clientSettings = ClientSettings(code = "client_init", name = "Parameter list for client init")
-//        clientSettings.value = mutableListOf(
-//            RequiredMongoDBCollections.LOCATIONS.value,
-//            RequiredMongoDBCollections.OPERATORS.value,
-//            RequiredMongoDBCollections.STUDIES.value,
-//            RequiredMongoDBCollections.INSTRUMENTS.value,
-//            RequiredMongoDBCollections.COLLECTORS.value
-//        )
-//        Runtime.mongoDatabase.getCollection<ClientSettings>(RequiredMongoDBCollections.CLIENT_SETTINGS.value)
-//            .insertOne(clientSettings)
     }
 }
