@@ -20,7 +20,7 @@ object AuthManager {
                 handler.handle(ctx)
             } else {
                 ctx.status(401)
-                    .result(Constants.MSG.UNAUTHORIZED)
+                    .result(Constants.MESSAGES.UNAUTHORIZED)
             }
         }
     }
