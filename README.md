@@ -8,7 +8,9 @@ Server to work with LabPipe Client to assist with data collection.
 - Light-weight: single jar file to run
 - RESTful: streamline with your current solutions with APIs
 
-**More documentations are being added**
+## Documentation
+The documentation is available [here](https://github.com/colin-bz/labpipe-server-public/wiki).
+
 
 ## Build from source code
 ### Prerequisite
