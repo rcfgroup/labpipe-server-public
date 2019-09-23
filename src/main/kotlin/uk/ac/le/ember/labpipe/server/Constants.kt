@@ -35,6 +35,7 @@ object Constants {
     }
 
     object MESSAGES {
+        const val SERVER_RUNNING: String = "LabPipe Server is running."
         const val UNAUTHORIZED: String = "Unauthorised. Invalid authentication credentials in request."
         const val CONN_PUBLIC_SUCCESS = "Access to public resources authorised."
         const val CONN_AUTH_SUCCESS = "Access to resources authorised with credentials."
