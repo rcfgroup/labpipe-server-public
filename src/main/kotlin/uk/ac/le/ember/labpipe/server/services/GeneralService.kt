@@ -9,6 +9,11 @@ object GeneralService {
     fun routes() {
         println("Add general service routes.")
         Runtime.server.get(
+            Constants.API.ROOT,
+            { ctx -> ctx.result(Constants.MESSAGES.SERVER_RUNNING) },
+            roles(AuthManager.ApiRole.PUBLIC, AuthManager.ApiRole.AUTHORISED, AuthManager.ApiRole.TOKEN_AUTHORISED, AuthManager.ApiRole.UNAUTHORISED)
+        )
+        Runtime.server.get(
             Constants.API.GENERAL.CONN_PUBLIC,
             { ctx -> ctx.result(Constants.MESSAGES.CONN_PUBLIC_SUCCESS) },
             roles(AuthManager.ApiRole.PUBLIC)
