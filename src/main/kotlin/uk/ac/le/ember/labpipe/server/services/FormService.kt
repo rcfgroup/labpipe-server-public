@@ -28,13 +28,13 @@ object FormService {
 
 
     fun getFormTemplate(formCode: String): FormTemplate? {
-        val col = Runtime.mongoDatabase.getCollection<FormTemplate>(RequiredMongoDBCollections.FORM_TEMPLATES.value)
+        val col = Runtime.mongoDatabase.getCollection<FormTemplate>(RequiredMongoDBCollections.FORMS.value)
         return col.findOne(FormTemplate::code eq formCode)
     }
 
 
     fun getFormTemplate(studyCode: String, instrumentCode: String): List<FormTemplate> {
-        val col = Runtime.mongoDatabase.getCollection<FormTemplate>(RequiredMongoDBCollections.FORM_TEMPLATES.value)
+        val col = Runtime.mongoDatabase.getCollection<FormTemplate>(RequiredMongoDBCollections.FORMS.value)
         return col.find(FormTemplate::studyCode eq studyCode, FormTemplate::instrumentCode eq instrumentCode)
             .toMutableList()
     }

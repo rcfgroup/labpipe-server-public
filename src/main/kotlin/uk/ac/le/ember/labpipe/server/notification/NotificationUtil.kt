@@ -16,7 +16,7 @@ object NotificationUtil {
     fun sendNotificationEmail(operator: Operator, formCode: String, record: JsonObject) {
         GlobalScope.launch {
             val recordForm =
-                Runtime.mongoDatabase.getCollection<FormTemplate>(RequiredMongoDBCollections.FORM_TEMPLATES.value)
+                Runtime.mongoDatabase.getCollection<FormTemplate>(RequiredMongoDBCollections.FORMS.value)
                     .findOne { FormTemplate::code eq formCode }
             recordForm?.run {
                 val recipients = getEmailRecipients(operator, recordForm)

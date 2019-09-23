@@ -26,7 +26,7 @@ object QueryService {
                 colNameList.map { Runtime.mongoDatabase.getCollection(it).aggregate<Any>(project(excludeId())).toMutableList() }.flatten()
             }
             else -> {
-                val colNames = Runtime.mongoDatabase.getCollection(RequiredMongoDBCollections.FORM_TEMPLATES.value).aggregate<FormTemplate>(project(excludeId())).toMutableList().filter { it.studyCode.equals(study, true) }.map { "FORM_DATA_${it.code}" }
+                val colNames = Runtime.mongoDatabase.getCollection(RequiredMongoDBCollections.FORMS.value).aggregate<FormTemplate>(project(excludeId())).toMutableList().filter { it.studyCode.equals(study, true) }.map { "FORM_DATA_${it.code}" }
                 colNames.map { Runtime.mongoDatabase.getCollection(it).aggregate<Any>(project(excludeId())).toMutableList() }.flatten()
             }
         }
