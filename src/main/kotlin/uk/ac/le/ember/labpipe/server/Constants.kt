@@ -35,14 +35,22 @@ object Constants {
             const val ALL = "$QR_ROOT/list/all"
             const val ALL_BY_STUDY = "$QR_ROOT/list/all/:studyCode"
         }
+
+        object CREATE {
+            private const val CR_ROOT = "$ROOT/create"
+            const val OPERATOR = "$CR_ROOT/operator"
+            const val TOKEN = "$CR_ROOT/token"
+        }
     }
 
     object MESSAGES {
         const val SERVER_RUNNING: String = "LabPipe Server is running."
         const val UNAUTHORIZED: String = "Unauthorised. Invalid authentication credentials in request."
         const val CONN_PUBLIC_SUCCESS = "Access to public resources authorised."
-        const val CONN_AUTH_SUCCESS = "Access to resources authorised with credentials."
+        const val CONN_AUTH_SUCCESS = "Access to resources authorised with operator credentials."
         const val CONN_TOKEN_SUCCESS = "Access to resources authorised with token."
+        const val OPERATOR_CREATED = "Operator created. Please check your inbox."
+        const val TOKEN_CREATED = "Access token created. Please check your inbox."
     }
 
     object CONFIGS {
@@ -91,4 +99,39 @@ object Constants {
             const val MEMBER_ONLY = "MEMBER_ONLY"
         }
     }
+}
+
+object EmailTemplates {
+    const val CREATE_OPERATOR_TEXT =
+        "A LabPipe account has been created for you.\n\n" +
+                "Name: %s\n" +
+                "Email: %s\n" +
+                "Password: %s\n\n " +
+                "Please note that your email is your username to use LabPipe Client. " +
+                "It is recommended that you change your password as soon as possible."
+    const val CREATE_OPERATOR_HTML =
+        "<p>A LabPipe account has been created for you.<p>" +
+                "<br>" +
+                "<p><strong>Name:</strong></p>" +
+                "<p>%s</p>" +
+                "<p><strong>Email:</strong></p>" +
+                "<p>%s</p>" +
+                "<p><strong>Password:</strong></p>" +
+                "<p>%s</p>" +
+                "Please note that your email is your username to use LabPipe Client. " +
+                "It is recommended that you change your password as soon as possible."
+    const val CREATE_TOKEN_TEXT =
+        "A LabPipe access token has been created for you.\n\n" +
+                "Token: %s\n" +
+                "Key: %s\n" +
+                "Password: %s"
+    const val CREATE_TOKEN_HTML =
+        "<p>A LabPipe access token has been created for you.<p>" +
+                "<br>" +
+                "<p><strong>Token:</strong></p>" +
+                "<p>%s</p>" +
+                "<p><strong>Key:</strong></p>" +
+                "<p>%s</p>" +
+                "<p><strong>Password:</strong></p>" +
+                "<p>%s</p>"
 }

@@ -16,8 +16,10 @@ import org.litote.kmongo.eq
 import org.litote.kmongo.findOne
 import org.litote.kmongo.getCollection
 import org.mindrot.jbcrypt.BCrypt
+import org.simplejavamail.email.Recipient
 import uk.ac.le.ember.labpipe.server.AuthManager
 import uk.ac.le.ember.labpipe.server.Constants
+import uk.ac.le.ember.labpipe.server.EmailTemplates
 import uk.ac.le.ember.labpipe.server.data.AccessToken
 import uk.ac.le.ember.labpipe.server.data.LPConfig
 import uk.ac.le.ember.labpipe.server.data.Operator
@@ -170,6 +172,7 @@ fun startServer() {
     RecordService.routes()
     FormService.routes()
     QueryService.routes()
+    CreateService.routes()
     Runtime.server.start(Runtime.config.serverPort)
     echo("Server running at " + Runtime.config.serverPort)
 }
@@ -254,7 +257,7 @@ class Check : CliktCommand(name = "check", help = "Check database/email connecti
 
 class Run : CliktCommand(name = "run", help = "Run server") {
     private val debugMode by option("--debug", help = "debug mode").flag()
-//    private val daemonMode by option("--daemon", help = "daemon mode").flag()
+    // TODO enable daemon mode
 
     override fun run() {
         Runtime.debugMode = debugMode
@@ -299,6 +302,24 @@ class CreateOperator : CliktCommand(name = "operator", help = "Create new operat
             operator.active = true
             Runtime.mongoDatabase.getCollection<Operator>(Constants.MONGO.REQUIRED_COLLECTIONS.OPERATORS).insertOne(operator)
             echo("Operator is created with temporary password: $tempPassword")
+            EmailUtil.sendEmail(
+                from = Recipient(
+                    Runtime.config.notificationEmailName,
+                    Runtime.config.notificationEmailAddress,
+                    null
+                ),
+                to = listOf(
+                    Recipient(
+                        operator.name,
+                        operator.email,
+                        null
+                    )
+                ),
+                subject = "Your LabPipe Operator Account",
+                text = String.format(EmailTemplates.CREATE_OPERATOR_TEXT, operator.name, operator.email, tempPassword),
+                html = String.format(EmailTemplates.CREATE_OPERATOR_HTML, operator.name, operator.email, tempPassword),
+                async = true
+            )
         }
 
     }
