@@ -28,6 +28,7 @@ object RecordService {
             return null
         }
         Runtime.logger.info { "[Form: $formCode] data is saved." }
+        // TODO post record process plugin here in next release
         val id = record.get("_id") as ObjectId
         return id.toString()
     }
@@ -42,7 +43,6 @@ object RecordService {
                 val formCode = record.get("form_code").asString
                 record.addProperty("uploaded_by", operator.username)
                 record.addProperty("created", LocalDateTime.now().toString())
-                println(ctx.body())
                 val recordId = saveRecord(record)
                 if (recordId != null) {
                     Runtime.logger.info { "Record saved [$recordId]" }
