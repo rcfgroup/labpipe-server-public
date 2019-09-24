@@ -93,11 +93,11 @@ object CreateService {
         println("Add parameter service routes.")
         Runtime.server.get(
             Constants.API.CREATE.OPERATOR, { ctx -> ctx.result(createOperator(ctx.queryParam("name"), ctx.queryParam("email"))) },
-            roles(AuthManager.ApiRole.PUBLIC, AuthManager.ApiRole.AUTHORISED, AuthManager.ApiRole.TOKEN_AUTHORISED)
+            roles(AuthManager.ApiRole.AUTHORISED, AuthManager.ApiRole.TOKEN_AUTHORISED)
         )
         Runtime.server.get(
             Constants.API.CREATE.TOKEN, { ctx -> ctx.result(createToken(AuthManager.getUser(ctx))) },
-            roles(AuthManager.ApiRole.PUBLIC, AuthManager.ApiRole.AUTHORISED, AuthManager.ApiRole.TOKEN_AUTHORISED)
+            roles(AuthManager.ApiRole.AUTHORISED, AuthManager.ApiRole.TOKEN_AUTHORISED)
         )
     }
 }

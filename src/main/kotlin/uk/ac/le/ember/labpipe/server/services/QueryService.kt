@@ -47,16 +47,14 @@ object QueryService {
             Constants.API.QUERY.ALL, { ctx -> ctx.json(all()) },
             SecurityUtil.roles(
                 AuthManager.ApiRole.AUTHORISED,
-                AuthManager.ApiRole.TOKEN_AUTHORISED,
-                AuthManager.ApiRole.PUBLIC
+                AuthManager.ApiRole.TOKEN_AUTHORISED
             )
         )
         Runtime.server.get(
             Constants.API.QUERY.ALL_BY_STUDY, { ctx -> ctx.json(all(ctx.pathParam("studyCode"))) },
             SecurityUtil.roles(
                 AuthManager.ApiRole.AUTHORISED,
-                AuthManager.ApiRole.TOKEN_AUTHORISED,
-                AuthManager.ApiRole.PUBLIC
+                AuthManager.ApiRole.TOKEN_AUTHORISED
             )
         )
     }

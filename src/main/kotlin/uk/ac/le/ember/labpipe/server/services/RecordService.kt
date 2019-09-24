@@ -53,6 +53,6 @@ object RecordService {
                     ctx.status(500)
                 }
             }
-        }, SecurityUtil.roles(AuthManager.ApiRole.AUTHORISED))
+        }, SecurityUtil.roles(AuthManager.ApiRole.AUTHORISED, AuthManager.ApiRole.TOKEN_AUTHORISED))
     }
 }

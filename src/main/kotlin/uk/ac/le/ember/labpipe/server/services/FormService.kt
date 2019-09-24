@@ -16,12 +16,12 @@ object FormService {
         Runtime.server.get(
             Constants.API.FORM.FROM_CODE,
             { ctx -> getFormTemplate(ctx.pathParam("formCode"))?.let { ctx.json(it) } },
-            SecurityUtil.roles(AuthManager.ApiRole.PUBLIC, AuthManager.ApiRole.AUTHORISED)
+            SecurityUtil.roles(AuthManager.ApiRole.AUTHORISED, AuthManager.ApiRole.TOKEN_AUTHORISED)
         )
         Runtime.server.get(
             Constants.API.FORM.FROM_STUDY_INSTRUMENT,
             { ctx -> ctx.json(getFormTemplate(ctx.pathParam("studyCode"), ctx.pathParam("instrumentCode"))) },
-            SecurityUtil.roles(AuthManager.ApiRole.PUBLIC, AuthManager.ApiRole.AUTHORISED)
+            SecurityUtil.roles(AuthManager.ApiRole.AUTHORISED, AuthManager.ApiRole.TOKEN_AUTHORISED)
         )
     }
 
