@@ -11,7 +11,12 @@ object GeneralService {
         Runtime.server.get(
             Constants.API.ROOT,
             { ctx -> ctx.result(Constants.MESSAGES.SERVER_RUNNING) },
-            roles(AuthManager.ApiRole.PUBLIC, AuthManager.ApiRole.AUTHORISED, AuthManager.ApiRole.TOKEN_AUTHORISED, AuthManager.ApiRole.UNAUTHORISED)
+            roles(
+                AuthManager.ApiRole.PUBLIC,
+                AuthManager.ApiRole.AUTHORISED,
+                AuthManager.ApiRole.TOKEN_AUTHORISED,
+                AuthManager.ApiRole.UNAUTHORISED
+            )
         )
         Runtime.server.get(
             Constants.API.GENERAL.CONN_PUBLIC,

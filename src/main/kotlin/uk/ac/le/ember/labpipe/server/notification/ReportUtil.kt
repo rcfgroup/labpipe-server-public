@@ -10,9 +10,9 @@ import j2html.TagCreator.*
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOne
 import org.litote.kmongo.getCollection
+import uk.ac.le.ember.labpipe.server.Constants
 import uk.ac.le.ember.labpipe.server.data.FormTemplate
 import uk.ac.le.ember.labpipe.server.data.Operator
-import uk.ac.le.ember.labpipe.server.sessions.RequiredMongoDBCollections
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 
 data class ReportTemplate(var code: String) {
@@ -61,7 +61,7 @@ enum class ElementSource(val value: String) {
 object ReportUtil {
     fun generateHtml(operator: Operator, form: FormTemplate, formData: JsonObject): String? {
         val reportTemplate =
-            Runtime.mongoDatabase.getCollection<ReportTemplate>(RequiredMongoDBCollections.REPORT_TEMPLATES.value)
+            Runtime.mongoDatabase.getCollection<ReportTemplate>(Constants.MONGO.REQUIRED_COLLECTIONS.REPORT_TEMPLATES)
                 .findOne(ReportTemplate::formCode eq form.code, ReportTemplate::active eq true)
         reportTemplate?.run {
             Runtime.logger.info { "Report template found." }

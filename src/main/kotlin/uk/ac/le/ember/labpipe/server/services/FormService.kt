@@ -8,7 +8,6 @@ import org.litote.kmongo.getCollection
 import uk.ac.le.ember.labpipe.server.AuthManager
 import uk.ac.le.ember.labpipe.server.Constants
 import uk.ac.le.ember.labpipe.server.data.FormTemplate
-import uk.ac.le.ember.labpipe.server.sessions.RequiredMongoDBCollections
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 
 object FormService {
@@ -28,13 +27,13 @@ object FormService {
 
 
     fun getFormTemplate(formCode: String): FormTemplate? {
-        val col = Runtime.mongoDatabase.getCollection<FormTemplate>(RequiredMongoDBCollections.FORMS.value)
+        val col = Runtime.mongoDatabase.getCollection<FormTemplate>(Constants.MONGO.REQUIRED_COLLECTIONS.FORMS)
         return col.findOne(FormTemplate::code eq formCode)
     }
 
 
     fun getFormTemplate(studyCode: String, instrumentCode: String): List<FormTemplate> {
-        val col = Runtime.mongoDatabase.getCollection<FormTemplate>(RequiredMongoDBCollections.FORMS.value)
+        val col = Runtime.mongoDatabase.getCollection<FormTemplate>(Constants.MONGO.REQUIRED_COLLECTIONS.FORMS)
         return col.find(FormTemplate::studyCode eq studyCode, FormTemplate::instrumentCode eq instrumentCode)
             .toMutableList()
     }
