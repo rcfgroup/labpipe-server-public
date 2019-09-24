@@ -1,5 +1,6 @@
 package uk.ac.le.ember.labpipe.server.db
 
+import com.mongodb.MongoClientOptions
 import com.mongodb.MongoClientURI
 import org.litote.kmongo.KMongo
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
@@ -10,9 +11,9 @@ class DatabaseUtil {
 
         fun connect() {
             val mongoConnectionString = if (Runtime.config.dbUser != null && Runtime.config.dbPass != null)
-                "mongodb://${Runtime.config.dbUser}:${Runtime.config.dbPass}@${Runtime.config.dbHost}:${Runtime.config.dbPort}/${Runtime.config.dbName}"
+                "mongodb://${Runtime.config.dbUser}:${Runtime.config.dbPass}@${Runtime.config.dbHost}:${Runtime.config.dbPort}/${Runtime.config.dbName}?retryWrites=false"
             else
-                "mongodb://${Runtime.config.dbHost}:${Runtime.config.dbPort}/${Runtime.config.dbName}"
+                "mongodb://${Runtime.config.dbHost}:${Runtime.config.dbPort}/${Runtime.config.dbName}?retryWrites=false"
             val mongoUri = MongoClientURI(mongoConnectionString)
             Runtime.mongoClient = KMongo.createClient(mongoUri)
             Runtime.mongoDatabase = Runtime.mongoClient.getDatabase(Runtime.config.dbName)
