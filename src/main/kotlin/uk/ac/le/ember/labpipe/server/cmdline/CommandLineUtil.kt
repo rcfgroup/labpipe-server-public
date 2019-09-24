@@ -5,25 +5,33 @@ import com.github.ajalt.clikt.output.TermUi.echo
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.prompt
 import com.github.ajalt.clikt.parameters.types.int
 import io.javalin.Javalin
 import org.apache.commons.configuration2.PropertiesConfiguration
 import org.apache.commons.configuration2.builder.fluent.Configurations
 import org.apache.commons.configuration2.ex.ConfigurationException
+import org.apache.commons.lang3.RandomStringUtils
+import org.litote.kmongo.eq
+import org.litote.kmongo.findOne
+import org.litote.kmongo.getCollection
+import org.mindrot.jbcrypt.BCrypt
 import uk.ac.le.ember.labpipe.server.AuthManager
+import uk.ac.le.ember.labpipe.server.Constants
+import uk.ac.le.ember.labpipe.server.data.AccessToken
 import uk.ac.le.ember.labpipe.server.data.LPConfig
+import uk.ac.le.ember.labpipe.server.data.Operator
 import uk.ac.le.ember.labpipe.server.db.DatabaseUtil
 import uk.ac.le.ember.labpipe.server.notification.EmailUtil
 import uk.ac.le.ember.labpipe.server.services.*
-import uk.ac.le.ember.labpipe.server.sessions.PropertyFields
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
-import uk.ac.le.ember.labpipe.server.sessions.Statics
 import java.io.File
 import java.nio.file.Paths
+import java.util.*
 
 
 fun updateConfig(key: String, value: String?) {
-    val configFile = File(Statics.DEFAULT_CONFIG_FILE_NAME)
+    val configFile = File(Constants.DEFAULT_CONFIG_FILE_NAME)
     configFile.createNewFile()
     val configs = Configurations()
     try {
@@ -39,7 +47,7 @@ fun updateConfig(key: String, value: String?) {
 }
 
 fun updateConfig(key: String, value: Int?) {
-    val configFile = File(Statics.DEFAULT_CONFIG_FILE_NAME)
+    val configFile = File(Constants.DEFAULT_CONFIG_FILE_NAME)
     configFile.createNewFile()
     val configs = Configurations()
     try {
@@ -55,7 +63,7 @@ fun updateConfig(key: String, value: Int?) {
 }
 
 fun updateConfig(key: String, value: Boolean) {
-    val configFile = File(Statics.DEFAULT_CONFIG_FILE_NAME)
+    val configFile = File(Constants.DEFAULT_CONFIG_FILE_NAME)
     configFile.createNewFile()
     val configs = Configurations()
     try {
@@ -69,21 +77,21 @@ fun updateConfig(key: String, value: Boolean) {
 }
 
 fun readConfig(): PropertiesConfiguration? {
-    val configFile = File(Statics.DEFAULT_CONFIG_FILE_NAME)
+    val configFile = File(Constants.DEFAULT_CONFIG_FILE_NAME)
     val configs = Configurations()
     if (!configFile.exists()) {
-        updateConfig(key = PropertyFields.SERVER_PORT.value, value = 4567)
-        updateConfig(key = PropertyFields.DB_HOST.value, value = "localhost")
-        updateConfig(key = PropertyFields.DB_PORT.value, value = 27017)
-        updateConfig(key = PropertyFields.DB_NAME.value, value = "labpipe-dev")
+        updateConfig(key = Constants.CONFIGS.SERVER_PORT, value = 4567)
+        updateConfig(key = Constants.CONFIGS.DB_HOST, value = "localhost")
+        updateConfig(key = Constants.CONFIGS.DB_PORT, value = 27017)
+        updateConfig(key = Constants.CONFIGS.DB_NAME, value = "labpipe-dev")
 
-        updateConfig(key = PropertyFields.EMAIL_HOST.value, value = "localhost")
-        updateConfig(key = PropertyFields.EMAIL_PORT.value, value = 25)
-        updateConfig(key = PropertyFields.EMAIL_NOTIFIER_NAME.value, value = "LabPipe Notification")
-        updateConfig(key = PropertyFields.EMAIL_NOTIFIER_ADDR.value, value = "no-reply@labpipe.org")
+        updateConfig(key = Constants.CONFIGS.MAIL_HOST, value = "localhost")
+        updateConfig(key = Constants.CONFIGS.MAIL_PORT, value = 25)
+        updateConfig(key = Constants.CONFIGS.MAIL_NAME, value = "LabPipe Notification")
+        updateConfig(key = Constants.CONFIGS.MAIL_ADDR, value = "no-reply@labpipe.org")
 
         val defaultCacheDir = Paths.get(System.getProperty("user.home"), "labpipe").toString()
-        updateConfig(key = PropertyFields.PATH_CACHE.value, value = defaultCacheDir)
+        updateConfig(key = Constants.CONFIGS.PATH_CACHE, value = defaultCacheDir)
 
         echo("Using config file: [${configFile.absolutePath}]")
         echo("Default settings:")
@@ -112,44 +120,44 @@ fun importConfig() {
     val properties = readConfig()
     properties?.run {
         Runtime.config = LPConfig(
-            serverPort = if (properties.containsKey(PropertyFields.SERVER_PORT.value)) properties.getInt(PropertyFields.SERVER_PORT.value)
+            serverPort = if (properties.containsKey(Constants.CONFIGS.SERVER_PORT)) properties.getInt(Constants.CONFIGS.SERVER_PORT)
             else 4567
         )
         Runtime.config.tempPath =
-            if (properties.containsKey(PropertyFields.PATH_CACHE.value)) properties.getString(PropertyFields.PATH_CACHE.value)
+            if (properties.containsKey(Constants.CONFIGS.PATH_CACHE)) properties.getString(Constants.CONFIGS.PATH_CACHE)
             else Paths.get(System.getProperty("user.home"), "labpipe").toString()
         Runtime.config.dbHost =
-            if (properties.containsKey(PropertyFields.DB_HOST.value)) properties.getString(PropertyFields.DB_HOST.value)
+            if (properties.containsKey(Constants.CONFIGS.DB_HOST)) properties.getString(Constants.CONFIGS.DB_HOST)
             else "localhost"
         Runtime.config.dbPort =
-            if (properties.containsKey(PropertyFields.DB_PORT.value)) properties.getInt(PropertyFields.DB_PORT.value)
+            if (properties.containsKey(Constants.CONFIGS.DB_PORT)) properties.getInt(Constants.CONFIGS.DB_PORT)
             else 27017
         Runtime.config.dbName =
-            if (properties.containsKey(PropertyFields.DB_NAME.value)) properties.getString(PropertyFields.DB_NAME.value)
+            if (properties.containsKey(Constants.CONFIGS.DB_NAME)) properties.getString(Constants.CONFIGS.DB_NAME)
             else "labpipe"
         Runtime.config.dbUser =
-            if (properties.containsKey(PropertyFields.DB_USER.value)) properties.getString(PropertyFields.DB_USER.value)
+            if (properties.containsKey(Constants.CONFIGS.DB_USER)) properties.getString(Constants.CONFIGS.DB_USER)
             else null
         Runtime.config.dbPass =
-            if (properties.containsKey(PropertyFields.DB_PASS.value)) properties.getString(PropertyFields.DB_PASS.value)
+            if (properties.containsKey(Constants.CONFIGS.DB_PASS)) properties.getString(Constants.CONFIGS.DB_PASS)
             else null
         Runtime.config.emailHost =
-            if (properties.containsKey(PropertyFields.EMAIL_HOST.value)) properties.getString(PropertyFields.EMAIL_HOST.value)
+            if (properties.containsKey(Constants.CONFIGS.MAIL_HOST)) properties.getString(Constants.CONFIGS.MAIL_HOST)
             else "localhost"
         Runtime.config.emailPort =
-            if (properties.containsKey(PropertyFields.EMAIL_PORT.value)) properties.getInt(PropertyFields.EMAIL_PORT.value)
+            if (properties.containsKey(Constants.CONFIGS.MAIL_PORT)) properties.getInt(Constants.CONFIGS.MAIL_PORT)
             else 25
         Runtime.config.emailUser =
-            if (properties.containsKey(PropertyFields.EMAIL_USER.value)) properties.getString(PropertyFields.EMAIL_USER.value)
+            if (properties.containsKey(Constants.CONFIGS.MAIL_USER)) properties.getString(Constants.CONFIGS.MAIL_USER)
             else null
         Runtime.config.emailPass =
-            if (properties.containsKey(PropertyFields.EMAIL_PASS.value)) properties.getString(PropertyFields.EMAIL_PASS.value)
+            if (properties.containsKey(Constants.CONFIGS.MAIL_PASS)) properties.getString(Constants.CONFIGS.MAIL_PASS)
             else null
         Runtime.config.notificationEmailName =
-            if (properties.containsKey(PropertyFields.EMAIL_NOTIFIER_NAME.value)) properties.getString(PropertyFields.EMAIL_NOTIFIER_NAME.value)
+            if (properties.containsKey(Constants.CONFIGS.MAIL_NAME)) properties.getString(Constants.CONFIGS.MAIL_NAME)
             else "LabPipe Notification"
         Runtime.config.notificationEmailAddress =
-            if (properties.containsKey(PropertyFields.EMAIL_NOTIFIER_ADDR.value)) properties.getString(PropertyFields.EMAIL_NOTIFIER_ADDR.value)
+            if (properties.containsKey(Constants.CONFIGS.MAIL_ADDR)) properties.getString(Constants.CONFIGS.MAIL_ADDR)
             else "no-reply@labpipe.org"
     }
 }
@@ -186,8 +194,8 @@ class Server : CliktCommand(name = "server", help = "Configure server") {
     private val cache by option("--cache", help = "cache directory")
 
     override fun run() {
-        updateConfig(key = PropertyFields.SERVER_PORT.value, value = port)
-        updateConfig(key = PropertyFields.PATH_CACHE.value, value = cache)
+        updateConfig(key = Constants.CONFIGS.SERVER_PORT, value = port)
+        updateConfig(key = Constants.CONFIGS.PATH_CACHE, value = cache)
     }
 }
 
@@ -199,11 +207,11 @@ class Database : CliktCommand(name = "db", help = "Configure database server") {
     private val pswd by option("--pass", help = "database password")
 
     override fun run() {
-        updateConfig(key = PropertyFields.DB_HOST.value, value = host)
-        updateConfig(key = PropertyFields.DB_PORT.value, value = port)
-        updateConfig(key = PropertyFields.DB_NAME.value, value = name)
-        updateConfig(key = PropertyFields.DB_USER.value, value = user)
-        updateConfig(key = PropertyFields.DB_PASS.value, value = pswd)
+        updateConfig(key = Constants.CONFIGS.DB_HOST, value = host)
+        updateConfig(key = Constants.CONFIGS.DB_PORT, value = port)
+        updateConfig(key = Constants.CONFIGS.DB_NAME, value = name)
+        updateConfig(key = Constants.CONFIGS.DB_USER, value = user)
+        updateConfig(key = Constants.CONFIGS.DB_PASS, value = pswd)
     }
 }
 
@@ -219,16 +227,16 @@ class Email : CliktCommand(name = "email", help = "Configure email server") {
     )
 
     override fun run() {
-        updateConfig(key = PropertyFields.EMAIL_HOST.value, value = host)
-        updateConfig(key = PropertyFields.EMAIL_PORT.value, value = port)
-        updateConfig(key = PropertyFields.EMAIL_USER.value, value = user)
-        updateConfig(key = PropertyFields.EMAIL_PASS.value, value = pswd)
+        updateConfig(key = Constants.CONFIGS.MAIL_HOST, value = host)
+        updateConfig(key = Constants.CONFIGS.MAIL_PORT, value = port)
+        updateConfig(key = Constants.CONFIGS.MAIL_USER, value = user)
+        updateConfig(key = Constants.CONFIGS.MAIL_PASS, value = pswd)
         updateConfig(
-            key = PropertyFields.EMAIL_NOTIFIER_NAME.value,
+            key = Constants.CONFIGS.MAIL_NAME,
             value = notifierName
         )
         updateConfig(
-            key = PropertyFields.EMAIL_NOTIFIER_ADDR.value,
+            key = Constants.CONFIGS.MAIL_ADDR,
             value = notifierAddr
         )
     }
@@ -256,6 +264,65 @@ class Run : CliktCommand(name = "run", help = "Run server") {
         EmailUtil.testConnection()
         DatabaseUtil.testConnection()
         startServer()
+    }
+}
+
+class Create : CliktCommand(name = "create", help = "Create new record") {
+
+    override fun run() {
+        echo("Create new record")
+    }
+}
+
+class CreateOperator : CliktCommand(name = "operator", help = "Create new operator") {
+    private val name by option("--name", help = "operator name").prompt(text = "Please enter operator name")
+    private val email by option("--email", help = "operator email").prompt(text = "Please enter operator email")
+    override fun run() {
+        echo("Operator name: $name")
+        echo("Operator email: $email")
+        importConfig()
+        DatabaseUtil.connect()
+        EmailUtil.connect()
+        EmailUtil.testConnection()
+        DatabaseUtil.testConnection()
+        var currentOperator =
+            Runtime.mongoDatabase.getCollection<Operator>(Constants.MONGO.REQUIRED_COLLECTIONS.OPERATORS)
+                .findOne(Operator::email eq email)
+        if (currentOperator != null) {
+            echo("Operator with email [$email] already exists.")
+        } else {
+            var operator = Operator(email = email)
+            operator.name = name
+            operator.username = email
+            val tempPassword = RandomStringUtils.randomAlphanumeric(8)
+            operator.passwordHash = BCrypt.hashpw(tempPassword, BCrypt.gensalt())
+            operator.active = true
+            Runtime.mongoDatabase.getCollection<Operator>(Constants.MONGO.REQUIRED_COLLECTIONS.OPERATORS).insertOne(operator)
+            echo("Operator is created with temporary password: $tempPassword")
+        }
+
+    }
+}
+
+class CreateAccessToken : CliktCommand(name = "token", help = "Create new access token") {
+    override fun run() {
+        importConfig()
+        DatabaseUtil.connect()
+        EmailUtil.connect()
+        EmailUtil.testConnection()
+        DatabaseUtil.testConnection()
+        var token = UUID.randomUUID().toString()
+        while (Runtime.mongoDatabase.getCollection<AccessToken>(Constants.MONGO.REQUIRED_COLLECTIONS.ACCESS_TOKENS)
+                .findOne(AccessToken::token eq token) != null) {
+            token = UUID.randomUUID().toString()
+        }
+        var key = RandomStringUtils.randomAlphanumeric(16)
+        var accessToken = AccessToken(token = token, keyHash = BCrypt.hashpw(key, BCrypt.gensalt()))
+            Runtime.mongoDatabase.getCollection<AccessToken>(Constants.MONGO.REQUIRED_COLLECTIONS.ACCESS_TOKENS).insertOne(accessToken)
+            echo("Access token created.")
+        echo("Token: $token")
+        echo("Key: $key")
+
     }
 }
 

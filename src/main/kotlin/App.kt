@@ -9,6 +9,7 @@ fun main(args: Array<String>) {
     }
     LPServerCmdLine().subcommands(
         Config().subcommands(Server(), Database(), Email()),
-        Check(), Run(), Init()
+        Check(), Run(), Init(),
+        Create().subcommands(CreateOperator(), CreateAccessToken())
     ).main(argArray)
 }
