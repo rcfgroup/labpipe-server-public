@@ -25,13 +25,23 @@ object AuthManager {
     }
 
     fun getUser(ctx: Context): Operator? {
-        val basicAuthCredentials = ctx.basicAuthCredentials() ?: return null
+        try {
+            ctx.basicAuthCredentials()
+        } catch (e: IllegalArgumentException) {
+            return null
+        }
+        val basicAuthCredentials = ctx.basicAuthCredentials()
         val col = Runtime.mongoDatabase.getCollection<Operator>(Constants.MONGO.REQUIRED_COLLECTIONS.OPERATORS)
         return col.findOne(eq("username", basicAuthCredentials.username))
     }
 
     fun getUserRole(ctx: Context): Role {
-        val basicAuthCredentials = ctx.basicAuthCredentials() ?: return ApiRole.PUBLIC
+        try {
+            ctx.basicAuthCredentials()
+        } catch (e: IllegalArgumentException) {
+            return ApiRole.PUBLIC
+        }
+        val basicAuthCredentials = ctx.basicAuthCredentials()
         val colOperator = Runtime.mongoDatabase.getCollection<Operator>(Constants.MONGO.REQUIRED_COLLECTIONS.OPERATORS)
         val operator: Operator? = colOperator.findOne(eq("username", basicAuthCredentials.username))
         if (operator == null) {
