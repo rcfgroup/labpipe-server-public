@@ -1,6 +1,9 @@
 package uk.ac.le.ember.labpipe.server
 
 object Constants {
+    const val DEFAULT_CONFIG_FILE_NAME = "config.ini"
+    const val DB_COL_FORM_DATA_PREFIX = "FORM_DATA_"
+
     object API {
         const val ROOT: String = "/api"
 
@@ -62,6 +65,30 @@ object Constants {
     }
 
     object MONGO {
+        object REQUIRED_COLLECTIONS {
+            const val ACCESS_TOKENS = "ACCESS_TOKENS"
+            const val ROLES = "ROLES"
+            const val CLIENT_SETTINGS = "CLIENT_SETTINGS"
+            const val API_ACCESS_ROLES = "API_ACCESS_ROLES"
+            const val OPERATORS = "OPERATORS"
+            const val STUDIES = "STUDIES"
+            const val FORMS = "FORMS"
+            const val REPORT_TEMPLATES = "REPORT_TEMPLATES"
+            const val INSTRUMENTS = "INSTRUMENTS"
+            const val COLLECTORS = "COLLECTORS"
+            const val SAMPLE_TYPES = "SAMPLE_TYPES"
+            const val LOCATIONS = "LOCATIONS"
+            const val EMAIL_GROUPS = "EMAIL_GROUPS"
+        }
+    }
 
+    object NOTIFICATION {
+        object STYLE {
+            const val DO_NOT_NOTIFY = "DO_NOT_NOTIFY"
+            const val NOTIFY_ALL = "NOTIFY_ALL"
+            const val OPERATOR_ONLY = "OPERATOR_ONLY"
+            const val ADMIN_ONLY = "ADMIN_ONLY"
+            const val MEMBER_ONLY = "MEMBER_ONLY"
+        }
     }
 }
