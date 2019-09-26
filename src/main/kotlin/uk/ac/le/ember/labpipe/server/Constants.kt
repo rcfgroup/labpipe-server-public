@@ -36,10 +36,14 @@ object Constants {
             const val ALL_BY_STUDY = "$QR_ROOT/list/all/:studyCode"
         }
 
-        object CREATE {
-            private const val CR_ROOT = "$ROOT/create"
-            const val OPERATOR = "$CR_ROOT/operator"
-            const val TOKEN = "$CR_ROOT/token"
+        object MANAGE {
+            private const val MG_ROOT = "$ROOT/manage"
+
+            object CREATE {
+                private const val CR_ROOT = "$MG_ROOT/create"
+                const val OPERATOR = "$CR_ROOT/operator"
+                const val TOKEN = "$CR_ROOT/token"
+            }
         }
     }
 
