@@ -14,7 +14,7 @@ jobs:
     - name: Show tag
       env:
         GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-      if: github.event_name == 'create' %% github.event.ref_type == 'tag'
+      if: github.event_name == 'create' && github.event.ref_type == 'tag'
       run: |
         ./gradlew build
         curl --data $'{"tag_name":"${{github.event.ref}}","target_commitish": "master","name": "${{github.event.ref}}","body": "Release ${{github.event.ref}}","draft": true,"prerelease": false}' https://api.github.com/repos/colin-bz/labpipe-server-public/releases\?access_token=$GITHUB_TOKEN
