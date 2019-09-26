@@ -10,7 +10,7 @@ Server to work with LabPipe Client to assist with data collection.
 
 ## Installation
 
-Pre-compiled binary releases can be downloaded from the [releases](/releases) page. Build from source code option is also available. Read more about installation [here](https://github.com/colin-bz/labpipe-server-public/wiki/Installation).
+Pre-compiled binary releases can be downloaded from the [releases](../../releases) page. Build from source code option is also available. Read more about installation [here](https://github.com/colin-bz/labpipe-server-public/wiki/Installation).
 
 ```
 java -jar labpipe-server-all.jar
