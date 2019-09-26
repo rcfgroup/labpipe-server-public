@@ -11,7 +11,7 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
-    - name: Show tag
+    - name: Create GitHub Release
       env:
         GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
       if: github.event_name == 'create' && github.event.ref_type == 'tag'
