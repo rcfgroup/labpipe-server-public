@@ -21,4 +21,4 @@ jobs:
         RELEASE_ID=$(curl https://api.github.com/repos/$GITHUB_REPOSITORY/releases/tags/${{github.event.ref}}?access_token=$GITHUB_TOKEN | jq '.id')
         echo "Release id: $RELEASE_ID"
         sleep 10
-        for filename in build/libs/*; curl --data-binary "@$filename" -H "Content-Type: application/java-archive" "https://uploads.github.com/repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID/assets?name=$(basename $filename)&access_token=$GITHUB_TOKEN" ; done
+        for filename in build/libs/*; do curl --data-binary "@$filename" -H "Content-Type: application/java-archive" "https://uploads.github.com/repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID/assets?name=$(basename $filename)&access_token=$GITHUB_TOKEN" ; done
