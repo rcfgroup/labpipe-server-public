@@ -172,7 +172,7 @@ fun startServer() {
     RecordService.routes()
     FormService.routes()
     QueryService.routes()
-    CreateService.routes()
+    ManageService.routes()
     Runtime.server.start(Runtime.config.serverPort)
     echo("Server running at " + Runtime.config.serverPort)
 }
