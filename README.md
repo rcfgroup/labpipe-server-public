@@ -1,8 +1,7 @@
-## LabPipe Server
-
-[![Build Status](https://travis-ci.com/colin-bz/labpipe-server-public.svg?branch=master)](https://travis-ci.com/colin-bz/labpipe-server-public)
 
 ![LabPipe Login](labpipe-logo-light.png)
+
+[![Build Status](https://travis-ci.com/colin-bz/labpipe-server-public.svg?branch=master)](https://travis-ci.com/colin-bz/labpipe-server-public)
 
 Server to work with LabPipe Client to assist with data collection.
 
