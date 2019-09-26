@@ -19,4 +19,4 @@ jobs:
         ./gradlew build
         curl --data $'{"tag_name":"${{github.event.ref}}","target_commitish": "master","name": "${{github.event.ref}}","body": "Release ${{github.event.ref}}","draft": true,"prerelease": false}' https://api.github.com/repos/$GITHUB_REPOSITORY/releases\?access_token=$GITHUB_TOKEN
         RELEASE_ID=$(curl https://api.github.com/repos/$GITHUB_REPOSITORY/releases/tags/${{github.event.ref}}?access_token=$GITHUB_TOKEN | jq '.id')
-        for filename in build/libs; do echo $filename && curl --data-binary "@$filename" -H "Content-Type: application/java-archive" https://api.github.com/repos/$GITHUB_REPOSITORY/releases/${{github.event.ref}}/assets?name=$(basename $filename) ; done
+        for filename in build/libs/*; do echo $filename && curl --data-binary "@$filename" -H "Content-Type: application/java-archive" https://api.github.com/repos/$GITHUB_REPOSITORY/releases/${{github.event.ref}}/assets?name=$(basename $filename) ; done
