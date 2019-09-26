@@ -1,6 +1,7 @@
 package uk.ac.le.ember.labpipe.server.services
 
 import io.javalin.core.security.SecurityUtil.roles
+import io.javalin.http.Context
 import org.apache.commons.lang3.RandomStringUtils
 import org.litote.kmongo.*
 import org.mindrot.jbcrypt.BCrypt
@@ -14,15 +15,18 @@ import uk.ac.le.ember.labpipe.server.notification.EmailUtil
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 import java.util.*
 
-object CreateService {
-    private fun createOperator(name: String?, email: String?): String {
+object ManageService {
+    private fun createOperator(ctx: Context): Context {
+        val email = ctx.queryParam("email")
+        val name = ctx.queryParam("name")
         email?.run {
             name?.run {
                 var currentOperator =
                     Runtime.mongoDatabase.getCollection<Operator>(Constants.MONGO.REQUIRED_COLLECTIONS.OPERATORS)
                         .findOne(Operator::email eq email)
                 if (currentOperator != null) {
-                    return "Operator with email [$email] already exists."
+                    ctx.status(400)
+                    return ctx.result("Operator with email [$email] already exists.")
                 } else {
                     var operator = Operator(email = email)
                     operator.name = name
@@ -49,14 +53,17 @@ object CreateService {
                         html = String.format(EmailTemplates.CREATE_OPERATOR_HTML, operator.name, operator.email, tempPassword),
                         async = true
                     )
-                    return Constants.MESSAGES.OPERATOR_CREATED
+                    ctx.status(200)
+                    return ctx.result(Constants.MESSAGES.OPERATOR_CREATED)
                 }
             }
         }
-        return "Please make sure you have provided name and email."
+        ctx.status(400)
+        return ctx.result("Please make sure you have provided name and email.")
     }
 
-    private fun createToken(operator: Operator?): String {
+    private fun createToken(ctx: Context): Context {
+        val operator = AuthManager.getUser(ctx)
         operator?.run {
             var token = UUID.randomUUID().toString()
             while (Runtime.mongoDatabase.getCollection<AccessToken>(Constants.MONGO.REQUIRED_COLLECTIONS.ACCESS_TOKENS)
@@ -84,20 +91,22 @@ object CreateService {
                 html = String.format(EmailTemplates.CREATE_TOKEN_HTML, accessToken, key),
                 async = true
             )
-            return "Access token created. Please check your inbox."
+            ctx.status(200)
+            return ctx.result(Constants.MESSAGES.TOKEN_CREATED)
         }
-        return Constants.MESSAGES.UNAUTHORIZED
+        ctx.status(401)
+        return ctx.result(Constants.MESSAGES.UNAUTHORIZED)
     }
 
     fun routes() {
         println("Add parameter service routes.")
         Runtime.server.get(
-            Constants.API.CREATE.OPERATOR, { ctx -> ctx.result(createOperator(ctx.queryParam("name"), ctx.queryParam("email"))) },
-            roles(AuthManager.ApiRole.AUTHORISED, AuthManager.ApiRole.TOKEN_AUTHORISED)
+            Constants.API.MANAGE.CREATE.OPERATOR, { ctx -> createOperator(ctx) },
+            roles(AuthManager.ApiRole.AUTHORISED)
         )
         Runtime.server.get(
-            Constants.API.CREATE.TOKEN, { ctx -> ctx.result(createToken(AuthManager.getUser(ctx))) },
-            roles(AuthManager.ApiRole.AUTHORISED, AuthManager.ApiRole.TOKEN_AUTHORISED)
+            Constants.API.MANAGE.CREATE.TOKEN, { ctx -> createToken(ctx) },
+            roles(AuthManager.ApiRole.AUTHORISED)
         )
     }
 }
