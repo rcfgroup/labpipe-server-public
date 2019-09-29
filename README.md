@@ -1,7 +1,7 @@
 
 ![LabPipe Login](labpipe-logo-light.png)
 
-![](https://github.com/colin-bz/labpipe-server-public/workflows/Gradle%20CI/badge.svg)
+![](../../workflows/Gradle%20CI/badge.svg)
 
 Server to work with LabPipe Client to assist with data collection.
 
