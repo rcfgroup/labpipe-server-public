@@ -14,6 +14,7 @@ import uk.ac.le.ember.labpipe.server.sessions.Runtime
 object AuthManager {
     fun setManager() {
         Runtime.server.config.accessManager { handler, ctx, permittedRoles ->
+            println(ctx.path())
             val userRole = getUserRole(ctx)
             if (permittedRoles.contains(userRole)) {
                 handler.handle(ctx)
@@ -39,18 +40,21 @@ object AuthManager {
         try {
             ctx.basicAuthCredentials()
         } catch (e: IllegalArgumentException) {
+            print("No basic auth.")
             return ApiRole.PUBLIC
         }
         val basicAuthCredentials = ctx.basicAuthCredentials()
         val colOperator = Runtime.mongoDatabase.getCollection<Operator>(Constants.MONGO.REQUIRED_COLLECTIONS.OPERATORS)
         val operator: Operator? = colOperator.findOne(eq("username", basicAuthCredentials.username))
         if (operator == null) {
+            print("No operator auth")
             val colToken =
                 Runtime.mongoDatabase.getCollection<AccessToken>(Constants.MONGO.REQUIRED_COLLECTIONS.ACCESS_TOKENS)
             val accessToken: AccessToken? = colToken.findOne(eq("token", basicAuthCredentials.username))
             return if (accessToken == null) {
                 ApiRole.PUBLIC
             } else {
+                print(accessToken)
                 if (BCrypt.checkpw(basicAuthCredentials.password, accessToken.keyHash)) {
                     val apiRoles: MutableSet<String> = getApiRoles(ctx.matchedPath())
                         .toMutableSet()
@@ -64,6 +68,7 @@ object AuthManager {
                 } else ApiRole.UNAUTHORISED
             }
         } else {
+            print(operator.name)
             return if (BCrypt.checkpw(basicAuthCredentials.password, operator.passwordHash)) {
                 val apiRoles: MutableSet<String> = getApiRoles(ctx.matchedPath())
                     .toMutableSet()

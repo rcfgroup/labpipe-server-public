@@ -1,6 +1,7 @@
-## LabPipe Server
 
-[![Build Status](https://travis-ci.com/colin-bz/labpipe-server-public.svg?branch=master)](https://travis-ci.com/colin-bz/labpipe-server-public)
+![LabPipe Login](labpipe-logo-light.png)
+
+![](../../workflows/Gradle%20CI/badge.svg)
 
 Server to work with LabPipe Client to assist with data collection.
 
@@ -10,14 +11,14 @@ Server to work with LabPipe Client to assist with data collection.
 
 ## Installation
 
-Pre-compiled binary releases can be downloaded from the [releases](https://github.com/colin-bz/labpipe-server-public/releases) page. Build from source code option is also available. Read more about installation [here](https://github.com/colin-bz/labpipe-server-public/wiki/Installation).
+Pre-compiled binary releases can be downloaded from the [releases](../../releases) page. Build from source code option is also available. Read more about installation [here](../../wiki/Installation).
 
 ```
 java -jar labpipe-server-all.jar
 ```
 
 ## Documentation
-The documentation is available [here](https://github.com/colin-bz/labpipe-server-public/wiki).
+The documentation is available [here](http://docs.labpipe.org).
 
 ## Roadmap
 - [ ] To support running as daemon process
