@@ -3,6 +3,7 @@
 
 [![Build Status](https://travis-ci.com/colin-bz/labpipe-server-public.svg?branch=master)](https://travis-ci.com/colin-bz/labpipe-server-public)
 
+![](../../workflows/.github/workflows/gradle-release.yml/badge.svg)
 Server to work with LabPipe Client to assist with data collection.
 
 - Configurable: build your own study scaffold
@@ -18,7 +19,7 @@ java -jar labpipe-server-all.jar
 ```
 
 ## Documentation
-The documentation is available [here](../../wiki).
+The documentation is available [here](http://docs.labpipe.org).
 
 ## Roadmap
 - [ ] To support running as daemon process
