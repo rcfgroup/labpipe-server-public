@@ -8,6 +8,7 @@ import org.bson.Document
 import org.bson.types.ObjectId
 import uk.ac.le.ember.labpipe.server.AuthManager
 import uk.ac.le.ember.labpipe.server.Constants
+import uk.ac.le.ember.labpipe.server.data.Message
 import uk.ac.le.ember.labpipe.server.notification.NotificationUtil
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 import java.time.LocalDateTime
@@ -49,8 +50,9 @@ object RecordService {
                     NotificationUtil.sendNotificationEmail(operator, formCode, record)
                     ctx.status(200)
                 } else {
-                    ctx.result("Record cannot be saved. Please retry or contact service manager.")
                     ctx.status(500)
+                    ctx.json(
+                        Message("Record cannot be saved. Please retry or contact service manager."))
                 }
             }
         }, SecurityUtil.roles(AuthManager.ApiRole.AUTHORISED, AuthManager.ApiRole.TOKEN_AUTHORISED))

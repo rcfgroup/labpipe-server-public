@@ -10,6 +10,7 @@ import uk.ac.le.ember.labpipe.server.AuthManager
 import uk.ac.le.ember.labpipe.server.Constants
 import uk.ac.le.ember.labpipe.server.EmailTemplates
 import uk.ac.le.ember.labpipe.server.data.AccessToken
+import uk.ac.le.ember.labpipe.server.data.Message
 import uk.ac.le.ember.labpipe.server.data.Operator
 import uk.ac.le.ember.labpipe.server.notification.EmailUtil
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
@@ -26,7 +27,7 @@ object ManageService {
                         .findOne(Operator::email eq email)
                 if (currentOperator != null) {
                     ctx.status(400)
-                    return ctx.result("Operator with email [$email] already exists.")
+                    return ctx.json(Message("""Operator with email [$email] already exists."""))
                 } else {
                     var operator = Operator(email = email)
                     operator.name = name
@@ -54,12 +55,12 @@ object ManageService {
                         async = true
                     )
                     ctx.status(200)
-                    return ctx.result(Constants.MESSAGES.OPERATOR_CREATED)
+                    return ctx.json(Message(Constants.MESSAGES.OPERATOR_CREATED))
                 }
             }
         }
         ctx.status(400)
-        return ctx.result("Please make sure you have provided name and email.")
+        return ctx.json(Message("Please make sure you have provided name and email."))
     }
 
     private fun createToken(ctx: Context): Context {
@@ -87,15 +88,15 @@ object ManageService {
                     )
                 ),
                 subject = "Your LabPipe Operator Account",
-                text = String.format(EmailTemplates.CREATE_TOKEN_TEXT, accessToken, key),
-                html = String.format(EmailTemplates.CREATE_TOKEN_HTML, accessToken, key),
+                text = String.format(EmailTemplates.CREATE_TOKEN_TEXT, token, key),
+                html = String.format(EmailTemplates.CREATE_TOKEN_HTML, token, key),
                 async = true
             )
             ctx.status(200)
-            return ctx.result(Constants.MESSAGES.TOKEN_CREATED)
+            return ctx.json(Message(Constants.MESSAGES.TOKEN_CREATED))
         }
         ctx.status(401)
-        return ctx.result(Constants.MESSAGES.UNAUTHORIZED)
+        return ctx.json(Message(Constants.MESSAGES.UNAUTHORIZED))
     }
 
     fun routes() {

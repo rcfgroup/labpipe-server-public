@@ -127,15 +127,12 @@ object EmailTemplates {
     const val CREATE_TOKEN_TEXT =
         "A LabPipe access token has been created for you.\n\n" +
                 "Token: %s\n" +
-                "Key: %s\n" +
-                "Password: %s"
+                "Key: %s"
     const val CREATE_TOKEN_HTML =
         "<p>A LabPipe access token has been created for you.<p>" +
                 "<br>" +
                 "<p><strong>Token:</strong></p>" +
                 "<p>%s</p>" +
                 "<p><strong>Key:</strong></p>" +
-                "<p>%s</p>" +
-                "<p><strong>Password:</strong></p>" +
                 "<p>%s</p>"
 }
