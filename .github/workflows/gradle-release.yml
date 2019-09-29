@@ -1,4 +1,4 @@
-name: Gradle Release
+name: Gradle CI
 
 on: [push, create]
 jobs:
