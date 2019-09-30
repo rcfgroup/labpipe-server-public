@@ -13,6 +13,11 @@ Server to work with LabPipe Client to assist with data collection.
 The documentation is available [here](http://docs.labpipe.org).
 
 ## Quick start
+
+### Prerequisite
+* JRE 8 or above
+* MongoDB 4.0.3 or above
+
 Download latest stable release [here](../../releases). Once you have downloaded the jar file, you can run it with:
 
 ```
