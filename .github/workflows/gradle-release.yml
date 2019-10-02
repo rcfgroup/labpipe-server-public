@@ -33,7 +33,7 @@ jobs:
       if: github.event_name == 'create' && github.event.ref_type == 'tag'
       uses: appleboy/scp-action@master
       with:
-        host: $LABPIPE_TEST_SERVER_IP
+        host: $LABPIPE_TEST_HOST
         username: $LABPIPE_TEST_SERVER_USER
         password: $LABPIPE_TEST_SERVER_CREDENTIAL
         source: "build/libs/labpipe-server-${{github.event.ref}}.jar"
@@ -42,7 +42,7 @@ jobs:
       if: github.event_name == 'create' && github.event.ref_type == 'tag'
       uses: appleboy/ssh-action@master
       with:
-        host: $LABPIPE_TEST_SERVER_IP
+        host: $LABPIPE_TEST_HOST
         username: $LABPIPE_TEST_SERVER_USER
         password: $LABPIPE_TEST_SERVER_CREDENTIAL
         script: |
