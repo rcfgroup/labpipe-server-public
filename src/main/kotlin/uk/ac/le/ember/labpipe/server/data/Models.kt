@@ -112,6 +112,8 @@ data class QuestionTemplate(var key: String, var label: String, var controlType:
 
 data class WizardPageFormValidProcess(var processType: String, var parameters: MutableList<String>) {
     var newField: String? = null
+    var auto: Boolean = false
+    var onSave: Boolean = false
 }
 
 data class WizardPageTemplate(var key: String, var title: String) {
