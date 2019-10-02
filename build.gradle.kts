@@ -1,3 +1,4 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -8,6 +9,7 @@ plugins {
 }
 
 group = "uk.ac.le.ember"
+version = "0.0.0"
 
 repositories {
     mavenCentral()
@@ -79,4 +81,10 @@ tasks.withType<KotlinCompile> {
 
 application {
     mainClassName = "AppKt"
+}
+
+tasks {
+    named<ShadowJar>("shadowJar") {
+        classifier = null
+    }
 }
