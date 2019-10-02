@@ -110,7 +110,7 @@ data class QuestionTemplate(var key: String, var label: String, var controlType:
     var filter: MutableList<ElectronFileFilter> = mutableListOf()
 }
 
-data class WizardPageFormValidProcess(var processType: String, var dataField: String) {
+data class WizardPageFormValidProcess(var processType: String, var parameters: MutableList<String>) {
     var newField: String? = null
 }
 
