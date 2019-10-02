@@ -12,8 +12,14 @@ jobs:
       with:
         java-version: 1.8
     - name: Build
+      if: github.event_name == 'push'
       run: ./gradlew build
-    - name: Create GitHub Release
+    - name: Build for release [tag only]
+      if: github.event_name == 'create' && github.event.ref_type == 'tag'
+      run: sed "s/0.0.0/$TAG/g" build.gradle.kts > _build.gradle.kts && mv _build.gradle.kts build.gradle.kts &&./gradlew build -x jar
+      env:
+        TAG: ${{github.event.ref}}
+    - name: Create GitHub release [tag only]
       env:
         GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
       if: github.event_name == 'create' && github.event.ref_type == 'tag'
