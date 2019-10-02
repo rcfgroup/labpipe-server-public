@@ -38,6 +38,7 @@ jobs:
         password: ${{secrets.LABPIPE_TEST_SERVER_CREDENTIAL}}
         source: "build/libs/labpipe-server-${{github.event.ref}}.jar"
         target: "labpipe"
+        strip_components: 2
     - name: Deploy to test server [tag only]
       if: github.event_name == 'create' && github.event.ref_type == 'tag'
       uses: appleboy/ssh-action@master
