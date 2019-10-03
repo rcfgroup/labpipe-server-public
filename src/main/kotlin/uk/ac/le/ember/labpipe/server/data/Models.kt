@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import java.nio.file.Paths
 
 data class LPConfig(var serverPort: Int = 4567) {
-    var tempPath: String = Paths.get(System.getProperty("user.home"), "labpipe").toString()
+    var cachePath: String = Paths.get(System.getProperty("user.home"), "labpipe").toString()
+    var uploadedPath: String = Paths.get(System.getProperty("user.home"), "labpipe", "uploaded").toString()
     var dbHost: String = "localhost"
     var dbPort: Int = 27017
     var dbName: String = "labpipe-dev"
@@ -110,10 +111,11 @@ data class QuestionTemplate(var key: String, var label: String, var controlType:
     var filter: MutableList<ElectronFileFilter> = mutableListOf()
 }
 
-data class WizardPageFormValidProcess(var processType: String, var parameters: MutableList<String>) {
+data class WizardPageFormValidProcess(var order: Int, var processType: String, var parameters: MutableList<String>) {
     var newField: String? = null
     var auto: Boolean = false
     var onSave: Boolean = false
+    var allowCopy: Boolean = false
 }
 
 data class WizardPageTemplate(var key: String, var title: String) {

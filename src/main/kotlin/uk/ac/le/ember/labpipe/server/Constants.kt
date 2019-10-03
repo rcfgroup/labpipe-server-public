@@ -74,6 +74,7 @@ object Constants {
         const val MAIL_ADDR = "mail.notifier.addr"
 
         const val PATH_CACHE = "path.cache"
+        const val PATH_UPLOADED = "path.uploaded"
     }
 
     object MONGO {

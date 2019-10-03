@@ -6,6 +6,7 @@ import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.prompt
+import com.github.ajalt.clikt.parameters.types.file
 import com.github.ajalt.clikt.parameters.types.int
 import io.javalin.Javalin
 import org.apache.commons.configuration2.PropertiesConfiguration
@@ -95,6 +96,9 @@ fun readConfig(): PropertiesConfiguration? {
         val defaultCacheDir = Paths.get(System.getProperty("user.home"), "labpipe").toString()
         updateConfig(key = Constants.CONFIGS.PATH_CACHE, value = defaultCacheDir)
 
+        val defaultUploadedDir = Paths.get(System.getProperty("user.home"), "labpipe", "uploaded").toString()
+        updateConfig(key = Constants.CONFIGS.PATH_UPLOADED, value = defaultUploadedDir)
+
         echo("Using config file: [${configFile.absolutePath}]")
         echo("Default settings:")
         echo("------ Server ------")
@@ -107,8 +111,9 @@ fun readConfig(): PropertiesConfiguration? {
         echo("[HOST]: localhost")
         echo("[PORT]: 25")
         echo("[NOTIFY FROM]: LabPipe Notification <no-reply@labpipe.org>")
-        echo("------ Cache Directory ------")
+        echo("------ Directory ------")
         echo("[CACHE]: $defaultCacheDir")
+        echo("[UPLOADED]: $defaultUploadedDir")
     }
     return try {
         configs.properties(configFile)
@@ -125,9 +130,12 @@ fun importConfig() {
             serverPort = if (properties.containsKey(Constants.CONFIGS.SERVER_PORT)) properties.getInt(Constants.CONFIGS.SERVER_PORT)
             else 4567
         )
-        Runtime.config.tempPath =
+        Runtime.config.cachePath =
             if (properties.containsKey(Constants.CONFIGS.PATH_CACHE)) properties.getString(Constants.CONFIGS.PATH_CACHE)
             else Paths.get(System.getProperty("user.home"), "labpipe").toString()
+        Runtime.config.uploadedPath =
+            if (properties.containsKey(Constants.CONFIGS.PATH_UPLOADED)) properties.getString(Constants.CONFIGS.PATH_UPLOADED)
+            else Paths.get(System.getProperty("user.home"), "labpipe", "uploaded").toString()
         Runtime.config.dbHost =
             if (properties.containsKey(Constants.CONFIGS.DB_HOST)) properties.getString(Constants.CONFIGS.DB_HOST)
             else "localhost"
@@ -195,10 +203,12 @@ class Config : CliktCommand(name = "config", help = "LabPipe Configuration") {
 class Server : CliktCommand(name = "server", help = "Configure server") {
     private val port by option("--port", help = "server port").int().default(4567)
     private val cache by option("--cache", help = "cache directory")
+    private val uploaded by option("--uploaded", help = "uploaded directory")
 
     override fun run() {
         updateConfig(key = Constants.CONFIGS.SERVER_PORT, value = port)
         updateConfig(key = Constants.CONFIGS.PATH_CACHE, value = cache)
+        updateConfig(key = Constants.CONFIGS.PATH_UPLOADED, value = uploaded)
     }
 }
 
@@ -344,6 +354,15 @@ class CreateAccessToken : CliktCommand(name = "token", help = "Create new access
         echo("Token: $token")
         echo("Key: $key")
 
+    }
+}
+
+class Import : CliktCommand(name = "import", help = "Import record") {
+    private val study by option("--study").file(exists = true, fileOkay = true, folderOkay = true, readable = true)
+
+
+    override fun run() {
+        echo("Import record")
     }
 }
 
