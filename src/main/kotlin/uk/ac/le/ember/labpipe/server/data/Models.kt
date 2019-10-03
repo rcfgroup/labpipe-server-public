@@ -143,4 +143,8 @@ data class EmailGroup(var code: String) {
     var member: MutableList<String> = mutableListOf()
 }
 
-data class Message(var message: String){}
+data class FormFileUpload(var identifier: String) {
+    var files: MutableList<String> = mutableListOf()
+}
+
+data class Message(var message: String)

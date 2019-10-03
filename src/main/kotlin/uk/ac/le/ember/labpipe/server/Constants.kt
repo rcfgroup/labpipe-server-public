@@ -25,6 +25,11 @@ object Constants {
             const val ADD = "$RC_ROOT/add"
         }
 
+        object UPLOAD {
+            private const val UP_ROOT = "$ROOT/upload"
+            const val FORM_FILE = "$UP_ROOT/file/form"
+        }
+
         object PARAMETER {
             private const val PM_ROOT = "$ROOT/parameter"
             const val FROM_NAME = "$PM_ROOT/name/:paramName"
@@ -92,6 +97,7 @@ object Constants {
             const val SAMPLE_TYPES = "SAMPLE_TYPES"
             const val LOCATIONS = "LOCATIONS"
             const val EMAIL_GROUPS = "EMAIL_GROUPS"
+            const val UPLOADED = "UPLOADED"
         }
     }
 
