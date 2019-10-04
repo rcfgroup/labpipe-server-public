@@ -36,7 +36,7 @@ object QueryService {
             else -> {
                 val colNames = Runtime.mongoDatabase.getCollection(Constants.MONGO.REQUIRED_COLLECTIONS.FORMS)
                     .aggregate<FormTemplate>(project(excludeId())).toMutableList()
-                    .filter { it.studyCode.equals(study, true) }.map { "${Constants.DB_COL_FORM_DATA_PREFIX}${it.code}" }
+                    .filter { it.studyIdentifier.equals(study, true) }.map { "${Constants.DB_COL_FORM_DATA_PREFIX}${it.identifier}" }
                 colNames.map {
                     Runtime.mongoDatabase.getCollection(it).aggregate<Any>(project(excludeId())).toMutableList()
                 }.flatten()
@@ -49,8 +49,8 @@ object QueryService {
     }
 
     private fun findOneStudy(ctx: Context): Context {
-        val code = ctx.queryParam("code")
-        val study = Runtime.mongoDatabase.getCollection(Constants.MONGO.REQUIRED_COLLECTIONS.STUDIES).findOne("{code: '${code}'}")
+        val identifier = ctx.queryParam("identifier")
+        val study = Runtime.mongoDatabase.getCollection(Constants.MONGO.REQUIRED_COLLECTIONS.STUDIES).findOne("{identifier: '${identifier}'}")
         study?.run {
             return ctx.status(200).json(study)
         }
@@ -62,8 +62,8 @@ object QueryService {
     }
 
     private fun findOneInstrument(ctx: Context): Context {
-        val code = ctx.queryParam("code")
-        val instrument = Runtime.mongoDatabase.getCollection(Constants.MONGO.REQUIRED_COLLECTIONS.INSTRUMENTS).findOne("{code: '${code}'}")
+        val identifier = ctx.queryParam("identifier")
+        val instrument = Runtime.mongoDatabase.getCollection(Constants.MONGO.REQUIRED_COLLECTIONS.INSTRUMENTS).findOne("{identifier: '${identifier}'}")
         instrument?.run {
             return ctx.status(200).json(instrument)
         }
@@ -80,7 +80,7 @@ object QueryService {
             )
         )
         Runtime.server.get(
-            Constants.API.QUERY.STUDY_RECORDS, { ctx -> ctx.json(listRecords(ctx.pathParam("studyCode"))) },
+            Constants.API.QUERY.STUDY_RECORDS, { ctx -> ctx.json(listRecords(ctx.pathParam("studyIdentifier"))) },
             SecurityUtil.roles(
                 AuthManager.ApiRole.AUTHORISED,
                 AuthManager.ApiRole.TOKEN_AUTHORISED

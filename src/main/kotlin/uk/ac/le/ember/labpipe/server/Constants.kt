@@ -16,8 +16,8 @@ object Constants {
 
         object FORM {
             private const val FT_ROOT = "$ROOT/form/template"
-            const val FROM_CODE = "$FT_ROOT/code/:formCode"
-            const val FROM_STUDY_INSTRUMENT = "$FT_ROOT/study/:studyCode/instrument/:instrumentCode"
+            const val FROM_IDENTIFIER = "$FT_ROOT/identifier/:identifier"
+            const val FROM_STUDY_INSTRUMENT = "$FT_ROOT/study/:studyIdentifier/instrument/:instrumentIdentifier"
         }
 
         object RECORD {
@@ -32,13 +32,13 @@ object Constants {
 
         object PARAMETER {
             private const val PM_ROOT = "$ROOT/parameter"
-            const val FROM_NAME = "$PM_ROOT/name/:paramName"
+            const val FROM_NAME = "$PM_ROOT/identifier/:identifier"
         }
 
         object QUERY {
             private const val QR_ROOT = "$ROOT/query"
             const val RECORDS = "$QR_ROOT/record/all"
-            const val STUDY_RECORDS = "$QR_ROOT/record/all/:studyCode"
+            const val STUDY_RECORDS = "$QR_ROOT/record/all/:studyIdentifier"
             const val STUDIES = "$QR_ROOT/study/all"
             const val STUDY = "$QR_ROOT/study/one"
             const val INSTRUMENTS = "$QR_ROOT/instrument/all"

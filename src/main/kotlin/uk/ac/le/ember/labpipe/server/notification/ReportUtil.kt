@@ -15,16 +15,12 @@ import uk.ac.le.ember.labpipe.server.data.FormTemplate
 import uk.ac.le.ember.labpipe.server.data.Operator
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 
-data class ReportTemplate(var code: String) {
+data class ReportTemplate(var identifier: String) {
     var name: String = ""
+    var formIdentifier: String = ""
 
-    @JsonProperty("form_code")
-    var formCode: String = ""
-
-    @JsonProperty("text_template")
-    var textTemplate: String = ""
-    @JsonProperty("html_template")
-    var htmlTemplate: MutableList<Element> = mutableListOf()
+    var text: String = ""
+    var html: MutableList<Element> = mutableListOf()
     var active: Boolean = false
 }
 
@@ -62,11 +58,11 @@ object ReportUtil {
     fun generateHtml(operator: Operator, form: FormTemplate, formData: JsonObject): String? {
         val reportTemplate =
             Runtime.mongoDatabase.getCollection<ReportTemplate>(Constants.MONGO.REQUIRED_COLLECTIONS.REPORT_TEMPLATES)
-                .findOne(ReportTemplate::formCode eq form.code, ReportTemplate::active eq true)
+                .findOne(ReportTemplate::formIdentifier eq form.identifier, ReportTemplate::active eq true)
         reportTemplate?.run {
             Runtime.logger.info { "Report template found." }
-            Runtime.logger.info { reportTemplate.htmlTemplate.size }
-            val elements = reportTemplate.htmlTemplate
+            Runtime.logger.info { reportTemplate.html.size }
+            val elements = reportTemplate.html
             elements.sortedWith(compareBy { it.order })
             var reportBody = body()
             elements.forEach { element ->

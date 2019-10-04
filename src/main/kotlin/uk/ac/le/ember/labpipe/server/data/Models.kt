@@ -1,6 +1,5 @@
 package uk.ac.le.ember.labpipe.server.data
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import java.nio.file.Paths
 
 data class LPConfig(var serverPort: Int = 4567) {
@@ -21,31 +20,21 @@ data class LPConfig(var serverPort: Int = 4567) {
     var notificationEmailAddress: String = "no-reply@labpipe.org"
 }
 
-data class Parameter(@JsonProperty("param_name") var name: String) {
-    @JsonProperty("param_value")
+data class Parameter(var identifier: String) {
     var value: MutableList<Any> = mutableListOf()
 }
 
-data class CodeName(var code: String, var name: String)
-
-data class ClientSettings(var code: String, var name: String) {
+data class ClientSettings(var identifier: String, var name: String) {
     var value: MutableList<String> = mutableListOf()
 }
 
-data class Operator(@JsonProperty("email") var email: String) {
+data class Operator(var email: String) {
     var name: String = ""
     var username: String = ""
-
-    @JsonProperty("passhash")
     var passwordHash: String = ""
-
-
-    @JsonProperty("isActive")
     var active: Boolean = false
 
     var projects: MutableList<String> = mutableListOf()
-
-    @JsonProperty("notification_group")
     var notificationGroup: MutableList<String> = mutableListOf()
 
     var roles: MutableList<String> = mutableListOf()
@@ -53,43 +42,39 @@ data class Operator(@JsonProperty("email") var email: String) {
 
 data class AccessToken(
     var token: String,
-    @JsonProperty("keyhash") var keyHash: String
+    var keyHash: String
 ) {
     var roles: MutableList<String> = mutableListOf()
 }
 
-data class Location(var code: String, var name: String) {
+data class Location(var identifier: String, var name: String) {
     var type: MutableList<String> = mutableListOf()
 }
 
-data class OperatorRole(val code: String, val name: String)
+data class OperatorRole(val identifier: String, val name: String)
 
 data class ApiRoleAssign(var url: String, var roles: MutableList<String>)
 
-data class FormTemplate(var code: String, var name: String) {
-    @JsonProperty("study_code")
-    var studyCode: String = ""
+data class FormTemplate(var identifier: String, var name: String) {
+    var studyIdentifier: String = ""
 
-    @JsonProperty("instrument_code")
-    var instrumentCode: String = ""
+    var instrumentIdentifier: String = ""
 
     var template: WizardTemplate = WizardTemplate("Default Wizard Template")
     var url: String? = null
 
-    @JsonProperty("notification_style")
     var notificationStyle: String = "all"
 
-    @JsonProperty("notification_subject")
     var notificationSubject: String = ""
 
     fun getProperty(name: String): String? {
         return when (name) {
-            "study_code" -> studyCode
-            "instrument_code" -> instrumentCode
+            "studyIdentifier" -> studyIdentifier
+            "instrumentIdentifier" -> instrumentIdentifier
             "template" -> template.toString()
             "url" -> url
-            "notification_style" -> notificationStyle
-            "notification_subject" -> notificationSubject
+            "notificationStyle" -> notificationStyle
+            "notificationSubject" -> notificationSubject
             else -> null
         }
     }
@@ -130,14 +115,12 @@ data class WizardTemplate(var title: String) {
     var pages: MutableList<WizardPageTemplate> = mutableListOf()
 }
 
-data class EmailGroup(var code: String) {
+data class EmailGroup(var identifier: String) {
     var name: String = ""
 
-    @JsonProperty("study_code")
-    var studyCode: String = ""
+    var studyIdentifier: String = ""
 
-    @JsonProperty("form_code")
-    var formCode: String = ""
+    var formIdentifier: String = ""
 
     var admin: MutableList<String> = mutableListOf()
     var member: MutableList<String> = mutableListOf()

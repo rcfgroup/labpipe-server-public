@@ -12,11 +12,11 @@ import uk.ac.le.ember.labpipe.server.data.Operator
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 
 object NotificationUtil {
-    fun sendNotificationEmail(operator: Operator, formCode: String, record: JsonObject) {
+    fun sendNotificationEmail(operator: Operator, formIdentifier: String, record: JsonObject) {
         GlobalScope.launch {
             val recordForm =
                 Runtime.mongoDatabase.getCollection<FormTemplate>(Constants.MONGO.REQUIRED_COLLECTIONS.FORMS)
-                    .findOne { FormTemplate::code eq formCode }
+                    .findOne { FormTemplate::identifier eq formIdentifier }
             recordForm?.run {
                 val recipients = getEmailRecipients(operator, recordForm)
                 recipients?.run {
@@ -33,7 +33,7 @@ object NotificationUtil {
                         to = recipients,
                         subject = recordForm.notificationSubject,
                         text = "TEXT TEMPLATE",
-                        html = htmlReport ?: "Unable to generate html code",
+                        html = htmlReport ?: "Unable to generate html",
                         async = true
                     )
                 }
@@ -42,7 +42,7 @@ object NotificationUtil {
     }
 
     fun getEmailRecipients(operator: Operator, form: FormTemplate?): List<Recipient>? {
-        Runtime.logger.info { "Form [${form?.code}] requests notification style: ${form?.notificationStyle}" }
+        Runtime.logger.info { "Form [${form?.identifier}] requests notification style: ${form?.notificationStyle}" }
         when (form?.notificationStyle) {
             null -> return null
             Constants.NOTIFICATION.STYLE.DO_NOT_NOTIFY -> return null
@@ -56,7 +56,7 @@ object NotificationUtil {
             else -> {
                 val emailGroups =
                     Runtime.mongoDatabase.getCollection<EmailGroup>(Constants.MONGO.REQUIRED_COLLECTIONS.EMAIL_GROUPS)
-                        .find(EmailGroup::code `in` operator.notificationGroup, EmailGroup::formCode eq form.code)
+                        .find(EmailGroup::identifier `in` operator.notificationGroup, EmailGroup::formIdentifier eq form.identifier)
                         .toMutableList()
                 println("Email Groups: $emailGroups")
                 val adminUsernames = emailGroups.map { g -> g.admin }.flatten()

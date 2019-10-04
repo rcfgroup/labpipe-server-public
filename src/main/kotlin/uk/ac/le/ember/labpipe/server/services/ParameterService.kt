@@ -19,7 +19,7 @@ object ParameterService {
     fun routes() {
         println("Add parameter service routes.")
         Runtime.server.get(
-            Constants.API.PARAMETER.FROM_NAME, { ctx -> ctx.json(getWithParameterName(ctx.pathParam("paramName"))) },
+            Constants.API.PARAMETER.FROM_NAME, { ctx -> ctx.json(getWithParameterName(ctx.pathParam("identifier"))) },
             roles(AuthManager.ApiRole.AUTHORISED, AuthManager.ApiRole.TOKEN_AUTHORISED)
         )
     }
