@@ -37,8 +37,12 @@ object Constants {
 
         object QUERY {
             private const val QR_ROOT = "$ROOT/query"
-            const val ALL = "$QR_ROOT/list/all"
-            const val ALL_BY_STUDY = "$QR_ROOT/list/all/:studyCode"
+            const val RECORDS = "$QR_ROOT/record/all"
+            const val STUDY_RECORDS = "$QR_ROOT/record/all/:studyCode"
+            const val STUDIES = "$QR_ROOT/study/all"
+            const val STUDY = "$QR_ROOT/study/one"
+            const val INSTRUMENTS = "$QR_ROOT/instrument/all"
+            const val INSTRUMENT = "$QR_ROOT/instrument/one"
         }
 
         object MANAGE {
