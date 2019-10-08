@@ -12,6 +12,7 @@ import uk.ac.le.ember.labpipe.server.EmailTemplates
 import uk.ac.le.ember.labpipe.server.data.AccessToken
 import uk.ac.le.ember.labpipe.server.data.Message
 import uk.ac.le.ember.labpipe.server.data.Operator
+import uk.ac.le.ember.labpipe.server.data.OperatorRole
 import uk.ac.le.ember.labpipe.server.notification.EmailUtil
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 import java.util.*
@@ -22,14 +23,14 @@ object ManageService {
         val name = ctx.queryParam("name")
         email?.run {
             name?.run {
-                var currentOperator =
+                val currentOperator =
                     Runtime.mongoDatabase.getCollection<Operator>(Constants.MONGO.REQUIRED_COLLECTIONS.OPERATORS)
                         .findOne(Operator::email eq email)
                 if (currentOperator != null) {
                     ctx.status(400)
                     return ctx.json(Message("""Operator with email [$email] already exists."""))
                 } else {
-                    var operator = Operator(email = email)
+                    val operator = Operator(email = email)
                     operator.name = name
                     operator.username = email
                     val tempPassword = RandomStringUtils.randomAlphanumeric(8)
@@ -71,8 +72,8 @@ object ManageService {
                     .findOne(AccessToken::token eq token) != null) {
                 token = UUID.randomUUID().toString()
             }
-            var key = RandomStringUtils.randomAlphanumeric(16)
-            var accessToken = AccessToken(token = token, keyHash = BCrypt.hashpw(key, BCrypt.gensalt()))
+            val key = RandomStringUtils.randomAlphanumeric(16)
+            val accessToken = AccessToken(token = token, keyHash = BCrypt.hashpw(key, BCrypt.gensalt()))
             Runtime.mongoDatabase.getCollection<AccessToken>(Constants.MONGO.REQUIRED_COLLECTIONS.ACCESS_TOKENS).insertOne(accessToken)
             EmailUtil.sendEmail(
                 from = Recipient(
@@ -99,14 +100,62 @@ object ManageService {
         return ctx.json(Message(Constants.MESSAGES.UNAUTHORIZED))
     }
 
+    private fun createRole(ctx: Context): Context {
+        val identifier = ctx.queryParam("identifier")
+        val name = ctx.queryParam("name")
+        identifier?.run {
+            name?.run {
+                val currentRole =
+                    Runtime.mongoDatabase.getCollection<Operator>(Constants.MONGO.REQUIRED_COLLECTIONS.ROLES)
+                        .findOne(OperatorRole::identifier eq identifier)
+                if (currentRole != null) {
+                    ctx.status(400)
+                    return ctx.json(Message("""Role with identifier [$identifier] already exists."""))
+                } else {
+                    val operator = AuthManager.getUser(ctx)
+                    val role = OperatorRole(identifier = identifier, name = name)
+                    Runtime.mongoDatabase.getCollection<OperatorRole>(Constants.MONGO.REQUIRED_COLLECTIONS.ROLES).insertOne(role)
+                    operator?.run {
+                        EmailUtil.sendEmail(
+                            from = Recipient(
+                                Runtime.config.notificationEmailName,
+                                Runtime.config.notificationEmailAddress,
+                                null
+                            ),
+                            to = listOf(
+                                Recipient(
+                                    operator.name,
+                                    operator.email,
+                                    null
+                                )
+                            ),
+                            subject = "LabPipe Role Created",
+                            text = String.format(EmailTemplates.CREATE_ROLE_TEXT, identifier, name),
+                            html = String.format(EmailTemplates.CREATE_ROLE_HTML, identifier, name),
+                            async = true
+                        )
+                    }
+                    ctx.status(200)
+                    return ctx.json(Message(Constants.MESSAGES.ROLE_CREATED))
+                }
+            }
+        }
+        ctx.status(400)
+        return ctx.json(Message("Please make sure you have provided name and email."))
+    }
+
     fun routes() {
-        println("Add parameter service routes.")
+        println("Add manage service routes.")
         Runtime.server.get(
             Constants.API.MANAGE.CREATE.OPERATOR, { ctx -> createOperator(ctx) },
             roles(AuthManager.ApiRole.AUTHORISED)
         )
         Runtime.server.get(
             Constants.API.MANAGE.CREATE.TOKEN, { ctx -> createToken(ctx) },
+            roles(AuthManager.ApiRole.AUTHORISED)
+        )
+        Runtime.server.get(
+            Constants.API.MANAGE.CREATE.ROLE, { ctx -> createRole(ctx) },
             roles(AuthManager.ApiRole.AUTHORISED)
         )
     }

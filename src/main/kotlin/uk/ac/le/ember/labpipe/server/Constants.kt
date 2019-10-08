@@ -52,6 +52,7 @@ object Constants {
                 private const val CR_ROOT = "$MG_ROOT/create"
                 const val OPERATOR = "$CR_ROOT/operator"
                 const val TOKEN = "$CR_ROOT/token"
+                const val ROLE = "$CR_ROOT/role"
             }
         }
     }
@@ -64,6 +65,7 @@ object Constants {
         const val CONN_TOKEN_SUCCESS = "Access to resources authorised with token."
         const val OPERATOR_CREATED = "Operator created. Please check your inbox."
         const val TOKEN_CREATED = "Access token created. Please check your inbox."
+        const val ROLE_CREATED = "Role created."
     }
 
     object CONFIGS {
@@ -145,5 +147,16 @@ object EmailTemplates {
                 "<p><strong>Token:</strong></p>" +
                 "<p>%s</p>" +
                 "<p><strong>Key:</strong></p>" +
+                "<p>%s</p>"
+    const val CREATE_ROLE_TEXT =
+        "A LabPipe role has been created by you.\n\n" +
+                "Identifier: %s\n" +
+                "Name: %s"
+    const val CREATE_ROLE_HTML =
+        "<p>A LabPipe role has been created by you.<p>" +
+                "<br>" +
+                "<p><strong>Identifier:</strong></p>" +
+                "<p>%s</p>" +
+                "<p><strong>Name:</strong></p>" +
                 "<p>%s</p>"
 }
