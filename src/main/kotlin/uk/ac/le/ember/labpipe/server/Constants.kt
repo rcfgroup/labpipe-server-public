@@ -53,6 +53,8 @@ object Constants {
                 const val OPERATOR = "$CR_ROOT/operator"
                 const val TOKEN = "$CR_ROOT/token"
                 const val ROLE = "$CR_ROOT/role"
+                const val EMAIL_GROUP = "$CR_ROOT/emailgroup"
+                const val INSTRUMENT = "$CR_ROOT/instrument"
             }
         }
     }
@@ -66,6 +68,8 @@ object Constants {
         const val OPERATOR_CREATED = "Operator created. Please check your inbox."
         const val TOKEN_CREATED = "Access token created. Please check your inbox."
         const val ROLE_CREATED = "Role created."
+        const val EMAIL_GROUP_CREATED = "Email group created."
+        const val INSTRUMENT_CREATED = "Instrument created."
     }
 
     object CONFIGS {
@@ -154,6 +158,31 @@ object EmailTemplates {
                 "Name: %s"
     const val CREATE_ROLE_HTML =
         "<p>A LabPipe role has been created by you.<p>" +
+                "<br>" +
+                "<p><strong>Identifier:</strong></p>" +
+                "<p>%s</p>" +
+                "<p><strong>Name:</strong></p>" +
+                "<p>%s</p>"
+    const val CREATE_EMAILGROUP_TEXT =
+        "A LabPipe email group has been created by you.\n\n" +
+                "Identifier: %s\n" +
+                "Name: %s\n" +
+                "Form: %s"
+    const val CREATE_EMAILGROUP_HTML =
+        "<p>A LabPipe role has been created by you.<p>" +
+                "<br>" +
+                "<p><strong>Identifier:</strong></p>" +
+                "<p>%s</p>" +
+                "<p><strong>Name:</strong></p>" +
+                "<p>%s</p>" +
+                "<p><strong>Form:</strong></p>" +
+                "<p>%s</p>"
+    const val CREATE_INSTRUMENT_TEXT =
+        "A LabPipe instrument has been created by you.\n\n" +
+                "Identifier: %s\n" +
+                "Name: %s"
+    const val CREATE_INSTRUMENT_HTML =
+        "<p>A LabPipe instrument has been created by you.<p>" +
                 "<br>" +
                 "<p><strong>Identifier:</strong></p>" +
                 "<p>%s</p>" +

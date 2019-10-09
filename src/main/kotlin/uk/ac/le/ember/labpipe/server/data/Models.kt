@@ -131,3 +131,10 @@ data class FormFileUpload(var identifier: String) {
 }
 
 data class Message(var message: String)
+
+data class ResultMessage(var status: Int, var message: Message)
+
+data class Instrument(var identifier: String, var name: String) {
+    var realtime: Boolean = false
+    var fileType: MutableList<String> = mutableListOf()
+}
