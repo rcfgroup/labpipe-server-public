@@ -5,32 +5,21 @@ import com.github.ajalt.clikt.output.TermUi.echo
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
-import com.github.ajalt.clikt.parameters.options.prompt
 import com.github.ajalt.clikt.parameters.types.file
 import com.github.ajalt.clikt.parameters.types.int
 import io.javalin.Javalin
 import org.apache.commons.configuration2.PropertiesConfiguration
 import org.apache.commons.configuration2.builder.fluent.Configurations
 import org.apache.commons.configuration2.ex.ConfigurationException
-import org.apache.commons.lang3.RandomStringUtils
-import org.litote.kmongo.eq
-import org.litote.kmongo.findOne
-import org.litote.kmongo.getCollection
-import org.mindrot.jbcrypt.BCrypt
-import org.simplejavamail.email.Recipient
 import uk.ac.le.ember.labpipe.server.AuthManager
 import uk.ac.le.ember.labpipe.server.Constants
-import uk.ac.le.ember.labpipe.server.EmailTemplates
-import uk.ac.le.ember.labpipe.server.data.AccessToken
 import uk.ac.le.ember.labpipe.server.data.LPConfig
-import uk.ac.le.ember.labpipe.server.data.Operator
 import uk.ac.le.ember.labpipe.server.db.DatabaseUtil
 import uk.ac.le.ember.labpipe.server.notification.EmailUtil
 import uk.ac.le.ember.labpipe.server.services.*
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 import java.io.File
 import java.nio.file.Paths
-import java.util.*
 
 
 fun updateConfig(key: String, value: String?) {
@@ -175,13 +164,13 @@ fun importConfig() {
 fun startServer() {
     Runtime.server = Javalin.create()
     AuthManager.setManager()
-    GeneralService.routes()
-    ParameterService.routes()
-    RecordService.routes()
-    FormService.routes()
-    QueryService.routes()
-    ManageService.routes()
-    UploadService.routes()
+    generalRoutes()
+    parameterRoutes()
+    recordRoutes()
+    formRoutes()
+    queryRoutes()
+    manageRoutes()
+    uploadRoutes()
     Runtime.server.start(Runtime.config.serverPort)
     echo("Server running at " + Runtime.config.serverPort)
 }

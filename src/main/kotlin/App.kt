@@ -14,7 +14,10 @@ fun main(args: Array<String>) {
             AddOperator(),
             AddAccessToken(),
             AddRole(),
-            AddEmailGroup()
+            AddEmailGroup(),
+            AddInstrument(),
+            AddLocation(),
+            AddStudy()
         )
     ).main(argArray)
 }
