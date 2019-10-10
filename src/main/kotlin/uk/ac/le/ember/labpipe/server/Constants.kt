@@ -55,6 +55,8 @@ object Constants {
                 const val ROLE = "$CR_ROOT/role"
                 const val EMAIL_GROUP = "$CR_ROOT/emailgroup"
                 const val INSTRUMENT = "$CR_ROOT/instrument"
+                const val LOCATION = "$CR_ROOT/location"
+                const val STUDY = "$CR_ROOT/study"
             }
         }
     }
@@ -65,11 +67,13 @@ object Constants {
         const val CONN_PUBLIC_SUCCESS = "Access to public resources authorised."
         const val CONN_AUTH_SUCCESS = "Access to resources authorised with operator credentials."
         const val CONN_TOKEN_SUCCESS = "Access to resources authorised with token."
-        const val OPERATOR_CREATED = "Operator created. Please check your inbox."
-        const val TOKEN_CREATED = "Access token created. Please check your inbox."
-        const val ROLE_CREATED = "Role created."
-        const val EMAIL_GROUP_CREATED = "Email group created."
-        const val INSTRUMENT_CREATED = "Instrument created."
+        const val OPERATOR_ADDED = "Operator added."
+        const val TOKEN_ADDED = "Access token added."
+        const val ROLE_ADDED = "Role added."
+        const val EMAIL_GROUP_ADDED = "Email group added."
+        const val INSTRUMENT_ADDED = "Instrument added."
+        const val LOCATION_ADDED = "Location added."
+        const val STUDY_ADDED = "Study added."
     }
 
     object CONFIGS {
@@ -183,6 +187,28 @@ object EmailTemplates {
                 "Name: %s"
     const val CREATE_INSTRUMENT_HTML =
         "<p>A LabPipe instrument has been created by you.<p>" +
+                "<br>" +
+                "<p><strong>Identifier:</strong></p>" +
+                "<p>%s</p>" +
+                "<p><strong>Name:</strong></p>" +
+                "<p>%s</p>"
+    const val CREATE_LOCATION_TEXT =
+        "A LabPipe location has been added by you.\n\n" +
+                "Identifier: %s\n" +
+                "Name: %s"
+    const val CREATE_LOCATION_HTML =
+        "<p>A LabPipe location has been added by you.<p>" +
+                "<br>" +
+                "<p><strong>Identifier:</strong></p>" +
+                "<p>%s</p>" +
+                "<p><strong>Name:</strong></p>" +
+                "<p>%s</p>"
+    const val CREATE_STUDY_TEXT =
+        "A LabPipe study has been added by you.\n\n" +
+                "Identifier: %s\n" +
+                "Name: %s"
+    const val CREATE_STUDY_HTML =
+        "<p>A LabPipe study has been added by you.<p>" +
                 "<br>" +
                 "<p><strong>Identifier:</strong></p>" +
                 "<p>%s</p>" +

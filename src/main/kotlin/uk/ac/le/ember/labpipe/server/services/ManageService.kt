@@ -1,5 +1,6 @@
 package uk.ac.le.ember.labpipe.server.services
 
+import com.github.ajalt.clikt.output.TermUi.echo
 import io.javalin.core.security.SecurityUtil.roles
 import io.javalin.http.Context
 import org.apache.commons.lang3.RandomStringUtils
@@ -27,8 +28,7 @@ object ManageService {
         val tempPassword = RandomStringUtils.randomAlphanumeric(8)
         operator.passwordHash = BCrypt.hashpw(tempPassword, BCrypt.gensalt())
         operator.active = true
-        Runtime.mongoDatabase.getCollection<Operator>(Constants.MONGO.REQUIRED_COLLECTIONS.OPERATORS)
-            .insertOne(operator)
+        col.insertOne(operator)
         if (notify) {
             EmailUtil.sendEmail(
                 from = Recipient(
@@ -59,32 +59,70 @@ object ManageService {
                 async = true
             )
         }
-        return ResultMessage(200, Message(Constants.MESSAGES.OPERATOR_CREATED))
+        return ResultMessage(200, Message(Constants.MESSAGES.OPERATOR_ADDED))
+    }
+
+    fun addOperator(operator: Operator, notify: Boolean = true): ResultMessage {
+        val col = Runtime.mongoDatabase.getCollection<Operator>(Constants.MONGO.REQUIRED_COLLECTIONS.OPERATORS)
+        val current = col.findOne(Operator::email eq operator.email)
+        current?.run {
+            return ResultMessage(400, Message("""Operator with email [$email] already exists."""))
+        }
+        val tempPassword = RandomStringUtils.randomAlphanumeric(8)
+        operator.passwordHash = BCrypt.hashpw(tempPassword, BCrypt.gensalt())
+        operator.active = true
+        col.insertOne(operator)
+        if (notify) {
+            EmailUtil.sendEmail(
+                from = Recipient(
+                    Runtime.config.notificationEmailName,
+                    Runtime.config.notificationEmailAddress,
+                    null
+                ),
+                to = listOf(
+                    Recipient(
+                        operator.name,
+                        operator.email,
+                        null
+                    )
+                ),
+                subject = "Your LabPipe Operator Account",
+                text = String.format(
+                    EmailTemplates.CREATE_OPERATOR_TEXT,
+                    operator.name,
+                    operator.email,
+                    tempPassword
+                ),
+                html = String.format(
+                    EmailTemplates.CREATE_OPERATOR_HTML,
+                    operator.name,
+                    operator.email,
+                    tempPassword
+                ),
+                async = true
+            )
+        }
+        return ResultMessage(200, Message(Constants.MESSAGES.OPERATOR_ADDED))
     }
 
     private fun addOperator(ctx: Context): Context {
-        val email = ctx.queryParam("email")
-        val name = ctx.queryParam("name")
-        email?.run {
-            name?.run {
-                val result = addOperator(email = email, name = name, notify = true)
-                return ctx.status(result.status).json(result.message)
-            }
-        }
-        return ctx.status(400).json(Message("Please make sure you have provided name and email."))
+        val operator = ctx.body<Operator>()
+        val result = addOperator(operator, true)
+        return ctx.status(result.status).json(result.message)
     }
 
     fun addToken(operator: Operator? = null, notify: Boolean = true): ResultMessage {
+        val col = Runtime.mongoDatabase.getCollection<AccessToken>(Constants.MONGO.REQUIRED_COLLECTIONS.ACCESS_TOKENS)
         var token = UUID.randomUUID().toString()
-        while (Runtime.mongoDatabase.getCollection<AccessToken>(Constants.MONGO.REQUIRED_COLLECTIONS.ACCESS_TOKENS)
-                .findOne(AccessToken::token eq token) != null
+        while (col.findOne(AccessToken::token eq token) != null
         ) {
             token = UUID.randomUUID().toString()
         }
         val key = RandomStringUtils.randomAlphanumeric(16)
         val accessToken = AccessToken(token = token, keyHash = BCrypt.hashpw(key, BCrypt.gensalt()))
-        Runtime.mongoDatabase.getCollection<AccessToken>(Constants.MONGO.REQUIRED_COLLECTIONS.ACCESS_TOKENS)
-            .insertOne(accessToken)
+        col.insertOne(accessToken)
+        echo("""[Token] $token""")
+        echo("""[Key] $key""")
         operator?.run {
             if (notify) {
                 EmailUtil.sendEmail(
@@ -107,7 +145,7 @@ object ManageService {
                 )
             }
         }
-        return ResultMessage(200, Message(Constants.MESSAGES.TOKEN_CREATED))
+        return ResultMessage(200, Message(Constants.MESSAGES.TOKEN_ADDED))
     }
 
     private fun addToken(ctx: Context): Context {
@@ -148,7 +186,7 @@ object ManageService {
                 )
             }
         }
-        return ResultMessage(200, Message(Constants.MESSAGES.ROLE_CREATED))
+        return ResultMessage(200, Message(Constants.MESSAGES.ROLE_ADDED))
     }
 
     private fun addRole(ctx: Context): Context {
@@ -168,7 +206,7 @@ object ManageService {
         identifier: String,
         name: String,
         formIdentifier: String,
-        operator: Operator?,
+        operator: Operator? = null,
         notify: Boolean = true
     ): ResultMessage {
         val col = Runtime.mongoDatabase.getCollection<EmailGroup>(Constants.MONGO.REQUIRED_COLLECTIONS.EMAIL_GROUPS)
@@ -179,8 +217,7 @@ object ManageService {
         val group = EmailGroup(identifier = identifier)
         group.name = name
         group.formIdentifier = formIdentifier
-        Runtime.mongoDatabase.getCollection<EmailGroup>(Constants.MONGO.REQUIRED_COLLECTIONS.EMAIL_GROUPS)
-            .insertOne(group)
+        col.insertOne(group)
         operator?.run {
             if (notify) {
                 EmailUtil.sendEmail(
@@ -203,7 +240,7 @@ object ManageService {
                 )
             }
         }
-        return ResultMessage(200, Message(Constants.MESSAGES.EMAIL_GROUP_CREATED))
+        return ResultMessage(200, Message(Constants.MESSAGES.EMAIL_GROUP_ADDED))
     }
 
     private fun addEmailGroup(ctx: Context): Context {
@@ -222,7 +259,7 @@ object ManageService {
         return ctx.status(400).json(Message("Missing required parameter."))
     }
 
-    fun addInstrument(identifier: String, name: String, realtime: Boolean = false, fileType: MutableList<String> = mutableListOf(), operator: Operator?, notify: Boolean = true): ResultMessage {
+    fun addInstrument(identifier: String, name: String, realtime: Boolean = false, fileType: MutableList<String> = mutableListOf(), operator: Operator? = null, notify: Boolean = true): ResultMessage {
         val col = Runtime.mongoDatabase.getCollection<Instrument>(Constants.MONGO.REQUIRED_COLLECTIONS.INSTRUMENTS)
         val current = col.findOne(Instrument::identifier eq identifier)
         current?.run {
@@ -247,14 +284,130 @@ object ManageService {
                             null
                         )
                     ),
-                    subject = "LabPipe Role Created",
+                    subject = "LabPipe Instrument Added",
                     text = String.format(EmailTemplates.CREATE_INSTRUMENT_TEXT, identifier, name),
                     html = String.format(EmailTemplates.CREATE_INSTRUMENT_HTML, identifier, name),
                     async = true
                 )
             }
         }
-        return ResultMessage(200, Message(Constants.MESSAGES.INSTRUMENT_CREATED))
+        return ResultMessage(200, Message(Constants.MESSAGES.INSTRUMENT_ADDED))
+    }
+
+    fun addInstrument(instrument: Instrument, operator: Operator? = null, notify: Boolean = true): ResultMessage {val col = Runtime.mongoDatabase.getCollection<Instrument>(Constants.MONGO.REQUIRED_COLLECTIONS.INSTRUMENTS)
+        val current = col.findOne(Instrument::identifier eq instrument.identifier)
+        current?.run {
+            return ResultMessage(400, Message("""Instrument with identifier [${instrument.identifier}] already exists."""))
+        }
+        col.insertOne(instrument)
+        operator?.run {
+            if (notify) {
+                EmailUtil.sendEmail(
+                    from = Recipient(
+                        Runtime.config.notificationEmailName,
+                        Runtime.config.notificationEmailAddress,
+                        null
+                    ),
+                    to = listOf(
+                        Recipient(
+                            operator.name,
+                            operator.email,
+                            null
+                        )
+                    ),
+                    subject = "LabPipe Instrument Added",
+                    text = String.format(EmailTemplates.CREATE_INSTRUMENT_TEXT, instrument.identifier, name),
+                    html = String.format(EmailTemplates.CREATE_INSTRUMENT_HTML, instrument.identifier, name),
+                    async = true
+                )
+            }
+        }
+        return ResultMessage(200, Message(Constants.MESSAGES.INSTRUMENT_ADDED))
+    }
+
+    private fun addInstrument(ctx: Context): Context {
+        val instrument = ctx.body<Instrument>()
+        val operator = AuthManager.getUser(ctx)
+        val result = addInstrument(instrument, operator, true)
+        return ctx.status(result.status).json(result.message)
+    }
+
+    fun addLocation(location: Location, operator: Operator?, notify: Boolean = true): ResultMessage {
+        val col = Runtime.mongoDatabase.getCollection<Location>(Constants.MONGO.REQUIRED_COLLECTIONS.LOCATIONS)
+        val current = col.findOne(Location::identifier eq location.identifier)
+        current?.run {
+            return ResultMessage(400, Message("""Location with identifier [${location.identifier}] already exists."""))
+        }
+        col.insertOne(location)
+        operator?.run {
+            if (notify) {
+                EmailUtil.sendEmail(
+                    from = Recipient(
+                        Runtime.config.notificationEmailName,
+                        Runtime.config.notificationEmailAddress,
+                        null
+                    ),
+                    to = listOf(
+                        Recipient(
+                            operator.name,
+                            operator.email,
+                            null
+                        )
+                    ),
+                    subject = "LabPipe Location Added",
+                    text = String.format(EmailTemplates.CREATE_LOCATION_TEXT, location.identifier, name),
+                    html = String.format(EmailTemplates.CREATE_LOCATION_HTML, location.identifier, name),
+                    async = true
+                )
+            }
+        }
+        return ResultMessage(200, Message(Constants.MESSAGES.LOCATION_ADDED))
+    }
+
+    private fun addLocation(ctx: Context): Context {
+        val location = ctx.body<Location>()
+        val operator = AuthManager.getUser(ctx)
+        val result = addLocation(location, operator, true)
+        return ctx.status(result.status).json(result.message)
+    }
+
+    fun addStudy(study: Study, operator: Operator?, notify: Boolean = true): ResultMessage {
+        val col = Runtime.mongoDatabase.getCollection<Study>(Constants.MONGO.REQUIRED_COLLECTIONS.STUDIES)
+        val current = col.findOne(Study::identifier eq study.identifier)
+        current?.run {
+            return ResultMessage(400, Message("""Study with identifier [${study.identifier}] already exists."""))
+        }
+        col.insertOne(study)
+        operator?.run {
+            if (notify) {
+                EmailUtil.sendEmail(
+                    from = Recipient(
+                        Runtime.config.notificationEmailName,
+                        Runtime.config.notificationEmailAddress,
+                        null
+                    ),
+                    to = listOf(
+                        Recipient(
+                            operator.name,
+                            operator.email,
+                            null
+                        )
+                    ),
+                    subject = "LabPipe Study Added",
+                    text = String.format(EmailTemplates.CREATE_STUDY_TEXT, study.identifier, name),
+                    html = String.format(EmailTemplates.CREATE_STUDY_HTML, study.identifier, name),
+                    async = true
+                )
+            }
+        }
+        return ResultMessage(200, Message(Constants.MESSAGES.STUDY_ADDED))
+    }
+
+    private fun addStudy(ctx: Context): Context {
+        val study = ctx.body<Study>()
+        val operator = AuthManager.getUser(ctx)
+        val result = addStudy(study, operator, true)
+        return ctx.status(result.status).json(result.message)
     }
 
     fun routes() {
@@ -273,6 +426,18 @@ object ManageService {
         )
         Runtime.server.get(
             Constants.API.MANAGE.CREATE.EMAIL_GROUP, { ctx -> addEmailGroup(ctx) },
+            roles(AuthManager.ApiRole.AUTHORISED)
+        )
+        Runtime.server.post(
+            Constants.API.MANAGE.CREATE.INSTRUMENT, { ctx -> addInstrument(ctx) },
+            roles(AuthManager.ApiRole.AUTHORISED)
+        )
+        Runtime.server.post(
+            Constants.API.MANAGE.CREATE.LOCATION, { ctx -> addLocation(ctx) },
+            roles(AuthManager.ApiRole.AUTHORISED)
+        )
+        Runtime.server.post(
+            Constants.API.MANAGE.CREATE.STUDY, { ctx -> addStudy(ctx) },
             roles(AuthManager.ApiRole.AUTHORISED)
         )
     }

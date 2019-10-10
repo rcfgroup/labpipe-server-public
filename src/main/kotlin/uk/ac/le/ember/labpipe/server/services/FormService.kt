@@ -25,6 +25,11 @@ object FormService {
         )
     }
 
+    fun listFormIdentifiers(): List<String> {
+        val col = Runtime.mongoDatabase.getCollection<FormTemplate>(Constants.MONGO.REQUIRED_COLLECTIONS.FORMS)
+        return col.find().toMutableList().map { it -> it.identifier }
+    }
+
 
     fun getFormTemplate(identifier: String): FormTemplate? {
         val col = Runtime.mongoDatabase.getCollection<FormTemplate>(Constants.MONGO.REQUIRED_COLLECTIONS.FORMS)
