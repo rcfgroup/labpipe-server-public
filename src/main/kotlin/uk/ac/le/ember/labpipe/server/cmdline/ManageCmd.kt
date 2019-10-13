@@ -9,7 +9,6 @@ import com.github.ajalt.clikt.parameters.types.choice
 import com.github.ajalt.clikt.parameters.types.file
 import com.google.gson.Gson
 import com.google.gson.JsonParser
-import com.google.gson.stream.JsonReader
 import uk.ac.le.ember.labpipe.server.data.*
 import uk.ac.le.ember.labpipe.server.db.DatabaseUtil
 import uk.ac.le.ember.labpipe.server.notification.EmailUtil
@@ -46,8 +45,11 @@ class AddAccessToken : CliktCommand(name = "token", help = "Add new access token
     }
 }
 
-class AddRole: CliktCommand(name = "role", help = "Add new role") {
-    private val identifier by option("--identifier", help = "role identifier").prompt(text = "Please enter role identifier")
+class AddRole : CliktCommand(name = "role", help = "Add new role") {
+    private val identifier by option(
+        "--identifier",
+        help = "role identifier"
+    ).prompt(text = "Please enter role identifier")
     private val name by option("--name", help = "role name").prompt(text = "Please enter role name")
 
     override fun run() {
@@ -59,10 +61,16 @@ class AddRole: CliktCommand(name = "role", help = "Add new role") {
     }
 }
 
-class AddEmailGroup: CliktCommand(name = "email-group", help = "Add new email group") {
-    private val identifier by option("--identifier", help = "email group identifier").prompt(text = "Please enter email group identifier")
+class AddEmailGroup : CliktCommand(name = "email-group", help = "Add new email group") {
+    private val identifier by option(
+        "--identifier",
+        help = "email group identifier"
+    ).prompt(text = "Please enter email group identifier")
     private val name by option("--name", help = "email group name").prompt(text = "Please enter email group name")
-    private val formIdentifier by option("--form-identifier", help = "email group form identifier").prompt(text = "Please enter email group form identifier")
+    private val formIdentifier by option(
+        "--form-identifier",
+        help = "email group form identifier"
+    ).prompt(text = "Please enter email group form identifier")
 
     override fun run() {
         importConfig()
@@ -73,10 +81,16 @@ class AddEmailGroup: CliktCommand(name = "email-group", help = "Add new email gr
     }
 }
 
-class AddInstrument: CliktCommand(name = "instrument", help = "Add new instrument") {
-    private val identifier by option("--identifier", help = "instrument identifier").prompt(text = "Please enter instrument identifier")
+class AddInstrument : CliktCommand(name = "instrument", help = "Add new instrument") {
+    private val identifier by option(
+        "--identifier",
+        help = "instrument identifier"
+    ).prompt(text = "Please enter instrument identifier")
     private val name by option("--name", help = "instrument name").prompt(text = "Please enter instrument name")
-    private val realtime by option("--realtime", help = "real-time processing instrument").flag("--non-realtime", default = false)
+    private val realtime by option("--realtime", help = "real-time processing instrument").flag(
+        "--non-realtime",
+        default = false
+    )
     private val fileType by option("--file-type", help = "instrument generated file types").split(",")
 
     override fun run() {
@@ -87,8 +101,11 @@ class AddInstrument: CliktCommand(name = "instrument", help = "Add new instrumen
     }
 }
 
-class AddLocation: CliktCommand(name = "location", help = "Add new location") {
-    private val identifier by option("--identifier", help = "location identifier").prompt(text = "Please enter location identifier")
+class AddLocation : CliktCommand(name = "location", help = "Add new location") {
+    private val identifier by option(
+        "--identifier",
+        help = "location identifier"
+    ).prompt(text = "Please enter location identifier")
     private val name by option("--name", help = "location name").prompt(text = "Please enter location name")
     private val type by option("--type", help = "location types").split(",")
 
@@ -102,8 +119,11 @@ class AddLocation: CliktCommand(name = "location", help = "Add new location") {
     }
 }
 
-class AddStudy: CliktCommand(name = "study", help = "Add new study") {
-    private val identifier by option("--identifier", help = "study identifier").prompt(text = "Please enter study identifier")
+class AddStudy : CliktCommand(name = "study", help = "Add new study") {
+    private val identifier by option(
+        "--identifier",
+        help = "study identifier"
+    ).prompt(text = "Please enter study identifier")
     private val name by option("--name", help = "study name").prompt(text = "Please enter study name")
     private val config by option("--config")
 
@@ -120,9 +140,21 @@ class AddStudy: CliktCommand(name = "study", help = "Add new study") {
     }
 }
 
-class ImportCmd: CliktCommand(name = "import", help = "Import record(s) from file") {
-    private val target by option("--target", help = "import to").choice("operator", "role", "email-group", "instrument", "location", "study")
-    private val source by option("--source", help = "file of operator(s)").file(exists = true, fileOkay = true, folderOkay = false, readable = true)
+class ImportCmd : CliktCommand(name = "import", help = "Import record(s) from file") {
+    private val target by option("--target", help = "import to").choice(
+        "operator",
+        "role",
+        "email-group",
+        "instrument",
+        "location",
+        "study"
+    )
+    private val source by option("--source", help = "file of operator(s)").file(
+        exists = true,
+        fileOkay = true,
+        folderOkay = false,
+        readable = true
+    )
 
     override fun run() {
         importConfig()
@@ -131,7 +163,7 @@ class ImportCmd: CliktCommand(name = "import", help = "Import record(s) from fil
         val gson = Gson()
         target?.run {
             source?.run {
-                when(target) {
+                when (target) {
                     "operator" -> {
                         val reader = FileReader(source)
                         val data = gson.fromJson(reader, Array<Operator>::class.java)
