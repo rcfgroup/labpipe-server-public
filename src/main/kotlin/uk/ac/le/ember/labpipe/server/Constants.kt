@@ -16,8 +16,8 @@ object Constants {
 
         object FORM {
             private const val FT_ROOT = "$ROOT/form/template"
-            const val FROM_CODE = "$FT_ROOT/code/:formCode"
-            const val FROM_STUDY_INSTRUMENT = "$FT_ROOT/study/:studyCode/instrument/:instrumentCode"
+            const val FROM_IDENTIFIER = "$FT_ROOT/identifier/:identifier"
+            const val FROM_STUDY_INSTRUMENT = "$FT_ROOT/study/:studyIdentifier/instrument/:instrumentIdentifier"
         }
 
         object RECORD {
@@ -25,15 +25,24 @@ object Constants {
             const val ADD = "$RC_ROOT/add"
         }
 
+        object UPLOAD {
+            private const val UP_ROOT = "$ROOT/upload"
+            const val FORM_FILE = "$UP_ROOT/file/form"
+        }
+
         object PARAMETER {
             private const val PM_ROOT = "$ROOT/parameter"
-            const val FROM_NAME = "$PM_ROOT/name/:paramName"
+            const val FROM_NAME = "$PM_ROOT/identifier/:identifier"
         }
 
         object QUERY {
             private const val QR_ROOT = "$ROOT/query"
-            const val ALL = "$QR_ROOT/list/all"
-            const val ALL_BY_STUDY = "$QR_ROOT/list/all/:studyCode"
+            const val RECORDS = "$QR_ROOT/record/all"
+            const val STUDY_RECORDS = "$QR_ROOT/record/all/:studyIdentifier"
+            const val STUDIES = "$QR_ROOT/study/all"
+            const val STUDY = "$QR_ROOT/study/one"
+            const val INSTRUMENTS = "$QR_ROOT/instrument/all"
+            const val INSTRUMENT = "$QR_ROOT/instrument/one"
         }
 
         object MANAGE {
@@ -43,6 +52,11 @@ object Constants {
                 private const val CR_ROOT = "$MG_ROOT/create"
                 const val OPERATOR = "$CR_ROOT/operator"
                 const val TOKEN = "$CR_ROOT/token"
+                const val ROLE = "$CR_ROOT/role"
+                const val EMAIL_GROUP = "$CR_ROOT/emailgroup"
+                const val INSTRUMENT = "$CR_ROOT/instrument"
+                const val LOCATION = "$CR_ROOT/location"
+                const val STUDY = "$CR_ROOT/study"
             }
         }
     }
@@ -53,8 +67,13 @@ object Constants {
         const val CONN_PUBLIC_SUCCESS = "Access to public resources authorised."
         const val CONN_AUTH_SUCCESS = "Access to resources authorised with operator credentials."
         const val CONN_TOKEN_SUCCESS = "Access to resources authorised with token."
-        const val OPERATOR_CREATED = "Operator created. Please check your inbox."
-        const val TOKEN_CREATED = "Access token created. Please check your inbox."
+        const val OPERATOR_ADDED = "Operator added."
+        const val TOKEN_ADDED = "Access token added."
+        const val ROLE_ADDED = "Role added."
+        const val EMAIL_GROUP_ADDED = "Email group added."
+        const val INSTRUMENT_ADDED = "Instrument added."
+        const val LOCATION_ADDED = "Location added."
+        const val STUDY_ADDED = "Study added."
     }
 
     object CONFIGS {
@@ -74,6 +93,7 @@ object Constants {
         const val MAIL_ADDR = "mail.notifier.addr"
 
         const val PATH_CACHE = "path.cache"
+        const val PATH_UPLOADED = "path.uploaded"
     }
 
     object MONGO {
@@ -91,6 +111,7 @@ object Constants {
             const val SAMPLE_TYPES = "SAMPLE_TYPES"
             const val LOCATIONS = "LOCATIONS"
             const val EMAIL_GROUPS = "EMAIL_GROUPS"
+            const val UPLOADED = "UPLOADED"
         }
     }
 
@@ -134,5 +155,63 @@ object EmailTemplates {
                 "<p><strong>Token:</strong></p>" +
                 "<p>%s</p>" +
                 "<p><strong>Key:</strong></p>" +
+                "<p>%s</p>"
+    const val CREATE_ROLE_TEXT =
+        "A LabPipe role has been created by you.\n\n" +
+                "Identifier: %s\n" +
+                "Name: %s"
+    const val CREATE_ROLE_HTML =
+        "<p>A LabPipe role has been created by you.<p>" +
+                "<br>" +
+                "<p><strong>Identifier:</strong></p>" +
+                "<p>%s</p>" +
+                "<p><strong>Name:</strong></p>" +
+                "<p>%s</p>"
+    const val CREATE_EMAILGROUP_TEXT =
+        "A LabPipe email group has been created by you.\n\n" +
+                "Identifier: %s\n" +
+                "Name: %s\n" +
+                "Form: %s"
+    const val CREATE_EMAILGROUP_HTML =
+        "<p>A LabPipe role has been created by you.<p>" +
+                "<br>" +
+                "<p><strong>Identifier:</strong></p>" +
+                "<p>%s</p>" +
+                "<p><strong>Name:</strong></p>" +
+                "<p>%s</p>" +
+                "<p><strong>Form:</strong></p>" +
+                "<p>%s</p>"
+    const val CREATE_INSTRUMENT_TEXT =
+        "A LabPipe instrument has been created by you.\n\n" +
+                "Identifier: %s\n" +
+                "Name: %s"
+    const val CREATE_INSTRUMENT_HTML =
+        "<p>A LabPipe instrument has been created by you.<p>" +
+                "<br>" +
+                "<p><strong>Identifier:</strong></p>" +
+                "<p>%s</p>" +
+                "<p><strong>Name:</strong></p>" +
+                "<p>%s</p>"
+    const val CREATE_LOCATION_TEXT =
+        "A LabPipe location has been added by you.\n\n" +
+                "Identifier: %s\n" +
+                "Name: %s"
+    const val CREATE_LOCATION_HTML =
+        "<p>A LabPipe location has been added by you.<p>" +
+                "<br>" +
+                "<p><strong>Identifier:</strong></p>" +
+                "<p>%s</p>" +
+                "<p><strong>Name:</strong></p>" +
+                "<p>%s</p>"
+    const val CREATE_STUDY_TEXT =
+        "A LabPipe study has been added by you.\n\n" +
+                "Identifier: %s\n" +
+                "Name: %s"
+    const val CREATE_STUDY_HTML =
+        "<p>A LabPipe study has been added by you.<p>" +
+                "<br>" +
+                "<p><strong>Identifier:</strong></p>" +
+                "<p>%s</p>" +
+                "<p><strong>Name:</strong></p>" +
                 "<p>%s</p>"
 }

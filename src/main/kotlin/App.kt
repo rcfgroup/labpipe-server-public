@@ -10,6 +10,15 @@ fun main(args: Array<String>) {
     LPServerCmdLine().subcommands(
         Config().subcommands(Server(), Database(), Email()),
         Check(), Run(), Init(),
-        Create().subcommands(CreateOperator(), CreateAccessToken())
+        Add().subcommands(
+            AddOperator(),
+            AddAccessToken(),
+            AddRole(),
+            AddEmailGroup(),
+            AddInstrument(),
+            AddLocation(),
+            AddStudy()
+        ),
+        ImportCmd()
     ).main(argArray)
 }

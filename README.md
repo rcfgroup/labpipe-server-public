@@ -18,7 +18,7 @@ The documentation is available [here](http://docs.labpipe.org).
 * JRE 8 or above
 * MongoDB 4.0.3 or above
 
-Download latest stable release [here](../../releases). Once you have downloaded the jar file, you can run it with:
+Download latest release [here](../../releases). Once you have downloaded the jar file, you can run it with:
 
 ```
 java -jar labpipe-server-all.jar --help

@@ -12,8 +12,14 @@ jobs:
       with:
         java-version: 1.8
     - name: Build
+      if: github.event_name == 'push'
       run: ./gradlew build
-    - name: Create GitHub Release
+    - name: Build for release [tag only]
+      if: github.event_name == 'create' && github.event.ref_type == 'tag'
+      run: sed "s/0.0.0/$TAG/g" build.gradle.kts > _build.gradle.kts && mv _build.gradle.kts build.gradle.kts &&./gradlew build -x jar
+      env:
+        TAG: ${{github.event.ref}}
+    - name: Create GitHub release [tag only]
       env:
         GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
       if: github.event_name == 'create' && github.event.ref_type == 'tag'
@@ -23,3 +29,25 @@ jobs:
         echo "Release id: $RELEASE_ID"
         sleep 10
         for filename in build/libs/*; do curl --data-binary "@$filename" -H "Content-Type: application/java-archive" "https://uploads.github.com/repos/$GITHUB_REPOSITORY/releases/$RELEASE_ID/assets?name=$(basename $filename)&access_token=$GITHUB_TOKEN" ; done
+    - name: Upload to test server [tag only]
+      if: github.event_name == 'create' && github.event.ref_type == 'tag'
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{secrets.LABPIPE_TEST_HOST}}
+        username: ${{secrets.LABPIPE_TEST_SERVER_USER}}
+        password: ${{secrets.LABPIPE_TEST_SERVER_CREDENTIAL}}
+        source: "build/libs/labpipe-server-${{github.event.ref}}.jar"
+        target: "/local/apps/labpipe"
+        strip_components: 2
+    - name: Deploy to test server [tag only]
+      if: github.event_name == 'create' && github.event.ref_type == 'tag'
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{secrets.LABPIPE_TEST_HOST}}
+        username: ${{secrets.LABPIPE_TEST_SERVER_USER}}
+        password: ${{secrets.LABPIPE_TEST_SERVER_CREDENTIAL}}
+        script: |
+          cd /local/apps/labpipe
+          screen -S labpipe -X quit
+          screen -S labpipe -d -m java -jar labpipe-server-${{github.event.ref}}.jar run
+          

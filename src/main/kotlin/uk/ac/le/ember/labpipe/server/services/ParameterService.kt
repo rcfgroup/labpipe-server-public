@@ -8,19 +8,15 @@ import uk.ac.le.ember.labpipe.server.AuthManager
 import uk.ac.le.ember.labpipe.server.Constants
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 
-object ParameterService {
+private fun getParameter(paramName: String): List<Any> {
+    val col = Runtime.mongoDatabase.getCollection(paramName)
+    return col.aggregate<Any>(project(excludeId())).toMutableList()
+}
 
-    private fun getWithParameterName(paramName: String): List<Any> {
-        println("Getting parameter [$paramName]")
-        val col = Runtime.mongoDatabase.getCollection(paramName)
-        return col.aggregate<Any>(project(excludeId())).toMutableList()
-    }
-
-    fun routes() {
-        println("Add parameter service routes.")
-        Runtime.server.get(
-            Constants.API.PARAMETER.FROM_NAME, { ctx -> ctx.json(getWithParameterName(ctx.pathParam("paramName"))) },
-            roles(AuthManager.ApiRole.AUTHORISED, AuthManager.ApiRole.TOKEN_AUTHORISED)
-        )
-    }
+fun parameterRoutes() {
+    println("Add parameter service routes.")
+    Runtime.server.get(
+        Constants.API.PARAMETER.FROM_NAME, { ctx -> ctx.json(getParameter(ctx.pathParam("identifier"))) },
+        roles(AuthManager.ApiRole.AUTHORISED, AuthManager.ApiRole.TOKEN_AUTHORISED)
+    )
 }
