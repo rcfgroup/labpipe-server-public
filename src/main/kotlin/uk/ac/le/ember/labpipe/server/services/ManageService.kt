@@ -189,6 +189,38 @@ fun addRole(identifier: String, name: String, operator: Operator? = null, notify
     return ResultMessage(200, Message(Constants.MESSAGES.ROLE_ADDED))
 }
 
+fun addRole(role: OperatorRole, operator: Operator? = null, notify: Boolean = true): ResultMessage {
+    val col = Runtime.mongoDatabase.getCollection<OperatorRole>(Constants.MONGO.REQUIRED_COLLECTIONS.ROLES)
+    val current = col.findOne(OperatorRole::identifier eq role.identifier)
+    current?.run {
+        return ResultMessage(400, Message("""Role with identifier [$identifier] already exists."""))
+    }
+    col.insertOne(role)
+    operator?.run {
+        if (notify) {
+            EmailUtil.sendEmail(
+                from = Recipient(
+                    Runtime.config.notificationEmailName,
+                    Runtime.config.notificationEmailAddress,
+                    null
+                ),
+                to = listOf(
+                    Recipient(
+                        operator.name,
+                        operator.email,
+                        null
+                    )
+                ),
+                subject = "LabPipe Role Created",
+                text = String.format(EmailTemplates.CREATE_ROLE_TEXT, role.identifier, name),
+                html = String.format(EmailTemplates.CREATE_ROLE_HTML, role.identifier, name),
+                async = true
+            )
+        }
+    }
+    return ResultMessage(200, Message(Constants.MESSAGES.ROLE_ADDED))
+}
+
 private fun addRole(ctx: Context): Context {
     val identifier = ctx.queryParam("identifier")
     val name = ctx.queryParam("name")
@@ -202,13 +234,7 @@ private fun addRole(ctx: Context): Context {
     return ctx.status(400).json(Message("Please make sure you have provided name and email."))
 }
 
-fun addEmailGroup(
-    identifier: String,
-    name: String,
-    formIdentifier: String,
-    operator: Operator? = null,
-    notify: Boolean = true
-): ResultMessage {
+fun addEmailGroup(identifier: String, name: String, formIdentifier: String, operator: Operator? = null, notify: Boolean = true): ResultMessage {
     val col = Runtime.mongoDatabase.getCollection<EmailGroup>(Constants.MONGO.REQUIRED_COLLECTIONS.EMAIL_GROUPS)
     val current = col.findOne(EmailGroup::identifier eq identifier)
     current?.run {
@@ -236,6 +262,38 @@ fun addEmailGroup(
                 subject = "LabPipe Role Created",
                 text = String.format(EmailTemplates.CREATE_EMAILGROUP_TEXT, identifier, name, formIdentifier),
                 html = String.format(EmailTemplates.CREATE_EMAILGROUP_HTML, identifier, name, formIdentifier),
+                async = true
+            )
+        }
+    }
+    return ResultMessage(200, Message(Constants.MESSAGES.EMAIL_GROUP_ADDED))
+}
+
+fun addEmailGroup(emailGroup: EmailGroup, operator: Operator? = null, notify: Boolean = true): ResultMessage {
+    val col = Runtime.mongoDatabase.getCollection<EmailGroup>(Constants.MONGO.REQUIRED_COLLECTIONS.EMAIL_GROUPS)
+    val current = col.findOne(EmailGroup::identifier eq emailGroup.identifier)
+    current?.run {
+        return ResultMessage(400, Message("""Email group with identifier [$identifier] already exists."""))
+    }
+    col.insertOne(emailGroup)
+    operator?.run {
+        if (notify) {
+            EmailUtil.sendEmail(
+                from = Recipient(
+                    Runtime.config.notificationEmailName,
+                    Runtime.config.notificationEmailAddress,
+                    null
+                ),
+                to = listOf(
+                    Recipient(
+                        operator.name,
+                        operator.email,
+                        null
+                    )
+                ),
+                subject = "LabPipe Role Created",
+                text = String.format(EmailTemplates.CREATE_EMAILGROUP_TEXT, emailGroup.identifier, emailGroup.name, emailGroup.formIdentifier),
+                html = String.format(EmailTemplates.CREATE_EMAILGROUP_HTML, emailGroup.identifier, emailGroup.name, emailGroup.formIdentifier),
                 async = true
             )
         }

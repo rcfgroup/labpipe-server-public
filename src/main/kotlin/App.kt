@@ -18,6 +18,7 @@ fun main(args: Array<String>) {
             AddInstrument(),
             AddLocation(),
             AddStudy()
-        )
+        ),
+        ImportCmd()
     ).main(argArray)
 }

@@ -270,17 +270,6 @@ class Run : CliktCommand(name = "run", help = "Run server") {
     }
 }
 
-
-
-class Import : CliktCommand(name = "import", help = "Import record") {
-    private val study by option("--study").file(exists = true, fileOkay = true, folderOkay = true, readable = true)
-
-
-    override fun run() {
-        echo("Import record")
-    }
-}
-
 class Init : CliktCommand(name = "init", help = "Init server") {
 
     override fun run() {
