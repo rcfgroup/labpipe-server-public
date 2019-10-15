@@ -16,6 +16,7 @@ object Constants {
 
         object FORM {
             private const val FT_ROOT = "$ROOT/form/template"
+            const val ALL = "$FT_ROOT/all"
             const val FROM_IDENTIFIER = "$FT_ROOT/identifier/:identifier"
             const val FROM_STUDY_INSTRUMENT = "$FT_ROOT/study/:studyIdentifier/instrument/:instrumentIdentifier"
         }

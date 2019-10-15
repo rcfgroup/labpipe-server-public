@@ -30,7 +30,7 @@ data class ClientSettings(var identifier: String, var name: String) {
 
 data class Operator(var email: String) {
     var name: String = ""
-    var username: String = ""
+    var username: String = email
     var passwordHash: String = ""
     var active: Boolean = false
 
