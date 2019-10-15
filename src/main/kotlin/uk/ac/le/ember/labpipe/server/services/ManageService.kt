@@ -4,7 +4,9 @@ import com.github.ajalt.clikt.output.TermUi.echo
 import io.javalin.core.security.SecurityUtil.roles
 import io.javalin.http.Context
 import org.apache.commons.lang3.RandomStringUtils
-import org.litote.kmongo.*
+import org.litote.kmongo.eq
+import org.litote.kmongo.findOne
+import org.litote.kmongo.getCollection
 import org.mindrot.jbcrypt.BCrypt
 import org.simplejavamail.email.Recipient
 import uk.ac.le.ember.labpipe.server.AuthManager
@@ -222,19 +224,19 @@ fun addRole(role: OperatorRole, operator: Operator? = null, notify: Boolean = tr
 }
 
 private fun addRole(ctx: Context): Context {
-    val identifier = ctx.queryParam("identifier")
-    val name = ctx.queryParam("name")
-    identifier?.run {
-        name?.run {
-            val operator = AuthManager.getUser(ctx)
-            val result = addRole(identifier = identifier, name = name, operator = operator, notify = true)
-            return ctx.status(result.status).json(result.message)
-        }
-    }
-    return ctx.status(400).json(Message("Please make sure you have provided name and email."))
+    val role = ctx.body<OperatorRole>()
+    val operator = AuthManager.getUser(ctx)
+    val result = addRole(role = role, operator = operator, notify = true)
+    return ctx.status(result.status).json(result.message)
 }
 
-fun addEmailGroup(identifier: String, name: String, formIdentifier: String, operator: Operator? = null, notify: Boolean = true): ResultMessage {
+fun addEmailGroup(
+    identifier: String,
+    name: String,
+    formIdentifier: String,
+    operator: Operator? = null,
+    notify: Boolean = true
+): ResultMessage {
     val col = Runtime.mongoDatabase.getCollection<EmailGroup>(Constants.MONGO.REQUIRED_COLLECTIONS.EMAIL_GROUPS)
     val current = col.findOne(EmailGroup::identifier eq identifier)
     current?.run {
@@ -292,8 +294,18 @@ fun addEmailGroup(emailGroup: EmailGroup, operator: Operator? = null, notify: Bo
                     )
                 ),
                 subject = "LabPipe Role Created",
-                text = String.format(EmailTemplates.CREATE_EMAILGROUP_TEXT, emailGroup.identifier, emailGroup.name, emailGroup.formIdentifier),
-                html = String.format(EmailTemplates.CREATE_EMAILGROUP_HTML, emailGroup.identifier, emailGroup.name, emailGroup.formIdentifier),
+                text = String.format(
+                    EmailTemplates.CREATE_EMAILGROUP_TEXT,
+                    emailGroup.identifier,
+                    emailGroup.name,
+                    emailGroup.formIdentifier
+                ),
+                html = String.format(
+                    EmailTemplates.CREATE_EMAILGROUP_HTML,
+                    emailGroup.identifier,
+                    emailGroup.name,
+                    emailGroup.formIdentifier
+                ),
                 async = true
             )
         }
@@ -302,22 +314,20 @@ fun addEmailGroup(emailGroup: EmailGroup, operator: Operator? = null, notify: Bo
 }
 
 private fun addEmailGroup(ctx: Context): Context {
-    val identifier = ctx.queryParam("identifier")
-    val name = ctx.queryParam("name")
-    val formIdentifier = ctx.queryParam("formIdentifier")
-    identifier?.run {
-        name?.run {
-            formIdentifier?.run {
-                val operator = AuthManager.getUser(ctx)
-                val result = addEmailGroup(identifier = identifier, name = name, formIdentifier = formIdentifier, operator = operator, notify = true)
-                return ctx.status(result.status).json(result.message)
-            }
-        }
-    }
-    return ctx.status(400).json(Message("Missing required parameter."))
+    val emailGroup = ctx.body<EmailGroup>()
+    val operator = AuthManager.getUser(ctx)
+    val result = addEmailGroup(emailGroup = emailGroup, operator = operator, notify = true)
+    return ctx.status(result.status).json(result.message)
 }
 
-fun addInstrument(identifier: String, name: String, realtime: Boolean = false, fileType: MutableList<String> = mutableListOf(), operator: Operator? = null, notify: Boolean = true): ResultMessage {
+fun addInstrument(
+    identifier: String,
+    name: String,
+    realtime: Boolean = false,
+    fileType: MutableList<String> = mutableListOf(),
+    operator: Operator? = null,
+    notify: Boolean = true
+): ResultMessage {
     val col = Runtime.mongoDatabase.getCollection<Instrument>(Constants.MONGO.REQUIRED_COLLECTIONS.INSTRUMENTS)
     val current = col.findOne(Instrument::identifier eq identifier)
     current?.run {
@@ -352,7 +362,8 @@ fun addInstrument(identifier: String, name: String, realtime: Boolean = false, f
     return ResultMessage(200, Message(Constants.MESSAGES.INSTRUMENT_ADDED))
 }
 
-fun addInstrument(instrument: Instrument, operator: Operator? = null, notify: Boolean = true): ResultMessage {val col = Runtime.mongoDatabase.getCollection<Instrument>(Constants.MONGO.REQUIRED_COLLECTIONS.INSTRUMENTS)
+fun addInstrument(instrument: Instrument, operator: Operator? = null, notify: Boolean = true): ResultMessage {
+    val col = Runtime.mongoDatabase.getCollection<Instrument>(Constants.MONGO.REQUIRED_COLLECTIONS.INSTRUMENTS)
     val current = col.findOne(Instrument::identifier eq instrument.identifier)
     current?.run {
         return ResultMessage(400, Message("""Instrument with identifier [${instrument.identifier}] already exists."""))
