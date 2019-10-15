@@ -54,7 +54,7 @@ object Constants {
                 const val OPERATOR = "$CR_ROOT/operator"
                 const val TOKEN = "$CR_ROOT/token"
                 const val ROLE = "$CR_ROOT/role"
-                const val EMAIL_GROUP = "$CR_ROOT/emailgroup"
+                const val EMAIL_GROUP = "$CR_ROOT/email-group"
                 const val INSTRUMENT = "$CR_ROOT/instrument"
                 const val LOCATION = "$CR_ROOT/location"
                 const val STUDY = "$CR_ROOT/study"
