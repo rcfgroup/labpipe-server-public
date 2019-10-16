@@ -8,6 +8,7 @@ import org.litote.kmongo.getCollection
 import org.mindrot.jbcrypt.BCrypt
 import uk.ac.le.ember.labpipe.server.data.AccessToken
 import uk.ac.le.ember.labpipe.server.data.ApiRoleAssign
+import uk.ac.le.ember.labpipe.server.data.Message
 import uk.ac.le.ember.labpipe.server.data.Operator
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 
@@ -20,7 +21,7 @@ object AuthManager {
                 handler.handle(ctx)
             } else {
                 ctx.status(401)
-                    .result(Constants.MESSAGES.UNAUTHORIZED)
+                    .json(Message(Constants.MESSAGES.UNAUTHORIZED))
             }
         }
     }

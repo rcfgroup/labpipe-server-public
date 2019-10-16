@@ -70,6 +70,18 @@ dependencies {
 
     // https://mvnrepository.com/artifact/commons-io/commons-io
     compile("commons-io", "commons-io", "2.6")
+
+    // https://mvnrepository.com/artifact/io.swagger.core.v3/swagger-core
+    compile("io.swagger.core.v3", "swagger-core", "2.0.10")
+
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.module/jackson-module-kotlin
+    compile("com.fasterxml.jackson.module", "jackson-module-kotlin", "2.10.0")
+
+    // https://mvnrepository.com/artifact/cc.vileda/kotlin-openapi3-dsl
+    compile("cc.vileda", "kotlin-openapi3-dsl", "0.20.2")
+
+
+
 }
 
 configure<JavaPluginConvention> {
