@@ -16,6 +16,7 @@ object Constants {
 
         object FORM {
             private const val FT_ROOT = "$ROOT/form/template"
+            const val ALL = "$FT_ROOT/all"
             const val FROM_IDENTIFIER = "$FT_ROOT/identifier/:identifier"
             const val FROM_STUDY_INSTRUMENT = "$FT_ROOT/study/:studyIdentifier/instrument/:instrumentIdentifier"
         }
@@ -53,7 +54,7 @@ object Constants {
                 const val OPERATOR = "$CR_ROOT/operator"
                 const val TOKEN = "$CR_ROOT/token"
                 const val ROLE = "$CR_ROOT/role"
-                const val EMAIL_GROUP = "$CR_ROOT/emailgroup"
+                const val EMAIL_GROUP = "$CR_ROOT/email-group"
                 const val INSTRUMENT = "$CR_ROOT/instrument"
                 const val LOCATION = "$CR_ROOT/location"
                 const val STUDY = "$CR_ROOT/study"
