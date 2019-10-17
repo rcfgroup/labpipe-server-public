@@ -30,7 +30,7 @@ fun addOperator(email: String, name: String, notify: Boolean = true): ResultMess
     val tempPassword = RandomStringUtils.randomAlphanumeric(8)
     operator.passwordHash = BCrypt.hashpw(tempPassword, BCrypt.gensalt())
     operator.active = true
-    operator.roles.add(Constants.DEFAULT_OPERATOR_ROLE)
+    operator.roles.add(Constants.DEFAULT_OPERATOR_ROLE.identifier)
     col.insertOne(operator)
     if (notify) {
         EmailUtil.sendEmail(
@@ -80,7 +80,7 @@ fun addOperator(operator: Operator, notify: Boolean = true): ResultMessage {
     val tempPassword = RandomStringUtils.randomAlphanumeric(8)
     operator.passwordHash = BCrypt.hashpw(tempPassword, BCrypt.gensalt())
     operator.active = true
-    operator.roles.add(Constants.DEFAULT_OPERATOR_ROLE)
+    operator.roles.add(Constants.DEFAULT_OPERATOR_ROLE.identifier)
     col.insertOne(operator)
     if (notify) {
         EmailUtil.sendEmail(
@@ -134,7 +134,7 @@ fun addToken(operator: Operator? = null, notify: Boolean = true): ResultMessage 
     val key = RandomStringUtils.randomAlphanumeric(16)
     val accessToken =
         AccessToken(token = token, keyHash = BCrypt.hashpw(key, BCrypt.gensalt()))
-    accessToken.roles.add(Constants.DEFAULT_TOKEN_ROLE)
+    accessToken.roles.add(Constants.DEFAULT_TOKEN_ROLE.identifier)
     col.insertOne(accessToken)
     echo("""[Token] $token""")
     echo("""[Key] $key""")
