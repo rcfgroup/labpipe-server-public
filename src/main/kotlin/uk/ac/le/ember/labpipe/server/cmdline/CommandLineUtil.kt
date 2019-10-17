@@ -5,7 +5,6 @@ import com.github.ajalt.clikt.output.TermUi.echo
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
-import com.github.ajalt.clikt.parameters.types.file
 import com.github.ajalt.clikt.parameters.types.int
 import io.javalin.Javalin
 import org.apache.commons.configuration2.PropertiesConfiguration
@@ -13,7 +12,7 @@ import org.apache.commons.configuration2.builder.fluent.Configurations
 import org.apache.commons.configuration2.ex.ConfigurationException
 import uk.ac.le.ember.labpipe.server.AuthManager
 import uk.ac.le.ember.labpipe.server.Constants
-import uk.ac.le.ember.labpipe.server.data.LPConfig
+import uk.ac.le.ember.labpipe.server.LPConfig
 import uk.ac.le.ember.labpipe.server.db.DatabaseUtil
 import uk.ac.le.ember.labpipe.server.notification.EmailUtil
 import uk.ac.le.ember.labpipe.server.services.*
