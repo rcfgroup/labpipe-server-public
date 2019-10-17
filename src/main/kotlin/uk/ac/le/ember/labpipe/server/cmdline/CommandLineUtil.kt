@@ -17,6 +17,7 @@ import uk.ac.le.ember.labpipe.server.db.DatabaseUtil
 import uk.ac.le.ember.labpipe.server.notification.EmailUtil
 import uk.ac.le.ember.labpipe.server.services.*
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
+import uk.ac.le.ember.labpipe.server.sessions.Runtime.Companion.config
 import java.io.File
 import java.nio.file.Paths
 
