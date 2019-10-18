@@ -9,7 +9,7 @@ import com.github.ajalt.clikt.parameters.types.choice
 import com.github.ajalt.clikt.parameters.types.file
 import com.google.gson.Gson
 import com.google.gson.JsonParser
-import uk.ac.le.ember.labpipe.server.data.*
+import uk.ac.le.ember.labpipe.server.*
 import uk.ac.le.ember.labpipe.server.db.DatabaseUtil
 import uk.ac.le.ember.labpipe.server.notification.EmailUtil
 import uk.ac.le.ember.labpipe.server.services.*
@@ -115,7 +115,7 @@ class AddLocation : CliktCommand(name = "location", help = "Add new location") {
         DatabaseUtil.connect()
         EmailUtil.connect()
         val location = Location(identifier = identifier, name = name)
-        location.type = type!!.toMutableList()
+        location.type = type!!.toMutableSet()
         addLocation(location = location)
     }
 }

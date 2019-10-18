@@ -3,6 +3,8 @@ package uk.ac.le.ember.labpipe.server
 object Constants {
     const val DEFAULT_CONFIG_FILE_NAME = "config.ini"
     const val DB_COL_FORM_DATA_PREFIX = "FORM_DATA_"
+    val DEFAULT_TOKEN_ROLE = OperatorRole(identifier = "token", name = "Token")
+    val DEFAULT_OPERATOR_ROLE = OperatorRole(identifier = "operator", name = "Operator")
 
     object API {
         const val ROOT: String = "/api"

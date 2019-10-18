@@ -1,6 +1,5 @@
 package uk.ac.le.ember.labpipe.server.notification
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
@@ -11,8 +10,8 @@ import org.litote.kmongo.eq
 import org.litote.kmongo.findOne
 import org.litote.kmongo.getCollection
 import uk.ac.le.ember.labpipe.server.Constants
-import uk.ac.le.ember.labpipe.server.data.FormTemplate
-import uk.ac.le.ember.labpipe.server.data.Operator
+import uk.ac.le.ember.labpipe.server.FormTemplate
+import uk.ac.le.ember.labpipe.server.Operator
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 
 data class ReportTemplate(var identifier: String) {

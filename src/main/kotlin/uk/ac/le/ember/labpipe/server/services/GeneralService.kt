@@ -3,7 +3,7 @@ package uk.ac.le.ember.labpipe.server.services
 import io.javalin.core.security.SecurityUtil.roles
 import uk.ac.le.ember.labpipe.server.AuthManager
 import uk.ac.le.ember.labpipe.server.Constants
-import uk.ac.le.ember.labpipe.server.data.Message
+import uk.ac.le.ember.labpipe.server.Message
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 
 fun generalRoutes() {

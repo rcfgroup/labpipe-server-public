@@ -6,9 +6,9 @@ import kotlinx.coroutines.launch
 import org.litote.kmongo.*
 import org.simplejavamail.email.Recipient
 import uk.ac.le.ember.labpipe.server.Constants
-import uk.ac.le.ember.labpipe.server.data.EmailGroup
-import uk.ac.le.ember.labpipe.server.data.FormTemplate
-import uk.ac.le.ember.labpipe.server.data.Operator
+import uk.ac.le.ember.labpipe.server.EmailGroup
+import uk.ac.le.ember.labpipe.server.FormTemplate
+import uk.ac.le.ember.labpipe.server.Operator
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 
 object NotificationUtil {

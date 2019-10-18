@@ -4,7 +4,7 @@ import io.javalin.core.security.SecurityUtil
 import org.litote.kmongo.*
 import uk.ac.le.ember.labpipe.server.AuthManager
 import uk.ac.le.ember.labpipe.server.Constants
-import uk.ac.le.ember.labpipe.server.data.FormTemplate
+import uk.ac.le.ember.labpipe.server.FormTemplate
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 
 

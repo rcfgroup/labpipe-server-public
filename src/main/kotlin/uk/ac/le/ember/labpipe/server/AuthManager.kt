@@ -6,10 +6,6 @@ import io.javalin.http.Context
 import org.litote.kmongo.findOne
 import org.litote.kmongo.getCollection
 import org.mindrot.jbcrypt.BCrypt
-import uk.ac.le.ember.labpipe.server.data.AccessToken
-import uk.ac.le.ember.labpipe.server.data.ApiRoleAssign
-import uk.ac.le.ember.labpipe.server.data.Message
-import uk.ac.le.ember.labpipe.server.data.Operator
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 
 object AuthManager {
@@ -21,7 +17,7 @@ object AuthManager {
                 handler.handle(ctx)
             } else {
                 ctx.status(401)
-                    .json(Message(Constants.MESSAGES.UNAUTHORIZED))
+                    .result(Constants.MESSAGES.UNAUTHORIZED)
             }
         }
     }
@@ -91,10 +87,10 @@ object AuthManager {
         UNAUTHORISED,
     }
 
-    fun getApiRoles(url: String): List<String> {
+    fun getApiRoles(url: String): Set<String> {
         val apiRole: ApiRoleAssign? =
             Runtime.mongoDatabase.getCollection<ApiRoleAssign>(Constants.MONGO.REQUIRED_COLLECTIONS.API_ACCESS_ROLES)
                 .findOne(eq("url", url))
-        return apiRole?.roles ?: listOf()
+        return apiRole?.roles ?: setOf()
     }
 }

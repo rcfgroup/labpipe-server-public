@@ -10,14 +10,12 @@ import io.javalin.Javalin
 import org.apache.commons.configuration2.PropertiesConfiguration
 import org.apache.commons.configuration2.builder.fluent.Configurations
 import org.apache.commons.configuration2.ex.ConfigurationException
-import uk.ac.le.ember.labpipe.server.AuthManager
-import uk.ac.le.ember.labpipe.server.Constants
-import uk.ac.le.ember.labpipe.server.data.LPConfig
+import org.litote.kmongo.*
+import uk.ac.le.ember.labpipe.server.*
 import uk.ac.le.ember.labpipe.server.db.DatabaseUtil
 import uk.ac.le.ember.labpipe.server.notification.EmailUtil
 import uk.ac.le.ember.labpipe.server.services.*
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
-import uk.ac.le.ember.labpipe.server.sessions.Runtime.Companion.config
 import java.io.File
 import java.nio.file.Paths
 
@@ -273,6 +271,14 @@ class Run : CliktCommand(name = "run", help = "Run server") {
 class Init : CliktCommand(name = "init", help = "Init server") {
 
     override fun run() {
-        echo("The init function will be available in next release.")
+        val col = Runtime.mongoDatabase.getCollection<OperatorRole>(Constants.MONGO.REQUIRED_COLLECTIONS.ROLES)
+        val tokenRole = col.findOne(OperatorRole::identifier eq Constants.DEFAULT_OPERATOR_ROLE.identifier)
+        if (tokenRole == null) {
+            col.insertOne(Constants.DEFAULT_TOKEN_ROLE)
+        }
+        val operatorRole = col.findOne(OperatorRole::identifier eq Constants.DEFAULT_OPERATOR_ROLE.identifier)
+        if (operatorRole == null) {
+            col.insertOne(Constants.DEFAULT_OPERATOR_ROLE)
+        }
     }
 }

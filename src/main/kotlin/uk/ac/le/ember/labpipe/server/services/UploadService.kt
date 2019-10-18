@@ -6,8 +6,8 @@ import io.javalin.http.Context
 import org.litote.kmongo.getCollection
 import uk.ac.le.ember.labpipe.server.AuthManager
 import uk.ac.le.ember.labpipe.server.Constants
-import uk.ac.le.ember.labpipe.server.data.FormFileUpload
-import uk.ac.le.ember.labpipe.server.data.Message
+import uk.ac.le.ember.labpipe.server.FormFileUpload
+import uk.ac.le.ember.labpipe.server.Message
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 import java.nio.file.Paths
 
