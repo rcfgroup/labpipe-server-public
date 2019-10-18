@@ -25,11 +25,12 @@ class Add : CliktCommand(name = "add", help = "Add new record") {
 class AddOperator : CliktCommand(name = "operator", help = "Add new operator") {
     private val name by option("--name", help = "operator name").prompt(text = "Please enter operator name")
     private val email by option("--email", help = "operator email").prompt(text = "Please enter operator email")
+    private val show by option("--show", help = "show operator username and password once created").flag()
     override fun run() {
         importConfig()
         DatabaseUtil.connect()
         EmailUtil.connect()
-        val result = addOperator(email = email, name = name, notify = true)
+        val result = addOperator(email = email, name = name, notify = true, show = show)
         echo(result.message.message)
 
     }

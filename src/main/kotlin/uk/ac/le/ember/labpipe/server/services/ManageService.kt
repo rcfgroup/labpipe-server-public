@@ -18,7 +18,7 @@ import uk.ac.le.ember.labpipe.server.sessions.Runtime
 import java.util.*
 
 
-fun addOperator(email: String, name: String, notify: Boolean = true): ResultMessage {
+fun addOperator(email: String, name: String, notify: Boolean = true, show: Boolean = false): ResultMessage {
     val col = Runtime.mongoDatabase.getCollection<Operator>(Constants.MONGO.REQUIRED_COLLECTIONS.OPERATORS)
     val current = col.findOne(Operator::email eq email)
     current?.run {
@@ -31,6 +31,10 @@ fun addOperator(email: String, name: String, notify: Boolean = true): ResultMess
     operator.passwordHash = BCrypt.hashpw(tempPassword, BCrypt.gensalt())
     operator.active = true
     col.insertOne(operator)
+    if (show) {
+        echo("[Username] ${operator.username}")
+        echo("[Password] $tempPassword")
+    }
     if (notify) {
         EmailUtil.sendEmail(
             from = Recipient(
@@ -64,7 +68,7 @@ fun addOperator(email: String, name: String, notify: Boolean = true): ResultMess
     return ResultMessage(200, Message(Constants.MESSAGES.OPERATOR_ADDED))
 }
 
-fun addOperator(operator: Operator, notify: Boolean = true): ResultMessage {
+fun addOperator(operator: Operator, notify: Boolean = true, show: Boolean = false): ResultMessage {
     val col = Runtime.mongoDatabase.getCollection<Operator>(Constants.MONGO.REQUIRED_COLLECTIONS.OPERATORS)
     val current = col.findOne(Operator::email eq operator.email)
     current?.run {
@@ -74,6 +78,10 @@ fun addOperator(operator: Operator, notify: Boolean = true): ResultMessage {
     operator.passwordHash = BCrypt.hashpw(tempPassword, BCrypt.gensalt())
     operator.active = true
     col.insertOne(operator)
+    if (show) {
+        echo("[Username] ${operator.username}")
+        echo("[Password] $tempPassword")
+    }
     if (notify) {
         EmailUtil.sendEmail(
             from = Recipient(
