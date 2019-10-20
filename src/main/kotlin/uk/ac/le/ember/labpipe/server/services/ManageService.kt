@@ -7,6 +7,7 @@ import org.apache.commons.lang3.RandomStringUtils
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOne
 import org.litote.kmongo.getCollection
+import org.litote.kmongo.updateOne
 import org.mindrot.jbcrypt.BCrypt
 import org.simplejavamail.email.Recipient
 import uk.ac.le.ember.labpipe.server.*
@@ -16,8 +17,7 @@ import java.util.*
 
 
 fun addOperator(email: String, name: String, notify: Boolean = true, show: Boolean = false): ResultMessage {
-    val col = Runtime.mongoDatabase.getCollection<Operator>(Constants.MONGO.REQUIRED_COLLECTIONS.OPERATORS)
-    val current = col.findOne(Operator::email eq email)
+    val current = MONGO.COLLECTIONS.OPERATORS.findOne(Operator::email eq email)
     current?.run {
         return ResultMessage(
             400,
@@ -31,7 +31,7 @@ fun addOperator(email: String, name: String, notify: Boolean = true, show: Boole
     operator.passwordHash = BCrypt.hashpw(tempPassword, BCrypt.gensalt())
     operator.active = true
     operator.roles.add(Constants.DEFAULT_OPERATOR_ROLE.identifier)
-    col.insertOne(operator)
+    MONGO.COLLECTIONS.OPERATORS.insertOne(operator)
     if (show) {
         echo("[Username] ${operator.username}")
         echo("[Password] $tempPassword")
@@ -73,7 +73,7 @@ fun addOperator(email: String, name: String, notify: Boolean = true, show: Boole
 }
 
 fun addOperator(operator: Operator, notify: Boolean = true, show: Boolean = false): ResultMessage {
-    val col = Runtime.mongoDatabase.getCollection<Operator>(Constants.MONGO.REQUIRED_COLLECTIONS.OPERATORS)
+    val col = Runtime.mongoDatabase.getCollection<Operator>(MONGO.COL_NAMES.OPERATORS)
     val current = col.findOne(Operator::email eq operator.email)
     current?.run {
         return ResultMessage(
@@ -132,8 +132,27 @@ private fun addOperator(ctx: Context): Context {
     return ctx.status(result.status).json(result.message)
 }
 
+fun changePassword(operator: Operator, newPassHash: String): ResultMessage {
+    val decoder = Base64.getDecoder()
+    val decoded = decoder.decode(newPassHash)
+    val newPassword = String(decoded, Charsets.UTF_8)
+    operator.passwordHash = BCrypt.hashpw(newPassword, BCrypt.gensalt())
+    MONGO.COLLECTIONS.OPERATORS.updateOne(Operator::username eq operator.username, operator)
+    return ResultMessage(200, Message("Password updated."))
+}
+
+private fun changePassword(ctx: Context): Context {
+    val operator = AuthManager.getUser(ctx)
+    val newPassHash = ctx.body()
+    operator?.run {
+        val result = changePassword(operator, newPassHash)
+        return ctx.status(200).json(result.message)
+    }
+    return ctx.status(400).json(Message(Constants.MESSAGES.UNAUTHORIZED))
+}
+
 fun addToken(operator: Operator? = null, notify: Boolean = true): ResultMessage {
-    val col = Runtime.mongoDatabase.getCollection<AccessToken>(Constants.MONGO.REQUIRED_COLLECTIONS.ACCESS_TOKENS)
+    val col = Runtime.mongoDatabase.getCollection<AccessToken>(MONGO.COL_NAMES.ACCESS_TOKENS)
     var token = UUID.randomUUID().toString()
     while (col.findOne(AccessToken::token eq token) != null
     ) {
@@ -182,7 +201,7 @@ private fun addToken(ctx: Context): Context {
 
 fun addRole(identifier: String, name: String, operator: Operator? = null, notify: Boolean = true): ResultMessage {
     val current =
-        Runtime.mongoDatabase.getCollection<OperatorRole>(Constants.MONGO.REQUIRED_COLLECTIONS.ROLES)
+        Runtime.mongoDatabase.getCollection<OperatorRole>(MONGO.COL_NAMES.ROLES)
             .findOne(OperatorRole::identifier eq identifier)
     current?.run {
         return ResultMessage(
@@ -191,7 +210,7 @@ fun addRole(identifier: String, name: String, operator: Operator? = null, notify
         )
     }
     val role = OperatorRole(identifier = identifier, name = name)
-    Runtime.mongoDatabase.getCollection<OperatorRole>(Constants.MONGO.REQUIRED_COLLECTIONS.ROLES)
+    Runtime.mongoDatabase.getCollection<OperatorRole>(MONGO.COL_NAMES.ROLES)
         .insertOne(role)
     operator?.run {
         if (notify) {
@@ -222,7 +241,7 @@ fun addRole(identifier: String, name: String, operator: Operator? = null, notify
 }
 
 fun addRole(role: OperatorRole, operator: Operator? = null, notify: Boolean = true): ResultMessage {
-    val col = Runtime.mongoDatabase.getCollection<OperatorRole>(Constants.MONGO.REQUIRED_COLLECTIONS.ROLES)
+    val col = Runtime.mongoDatabase.getCollection<OperatorRole>(MONGO.COL_NAMES.ROLES)
     val current = col.findOne(OperatorRole::identifier eq role.identifier)
     current?.run {
         return ResultMessage(
@@ -273,7 +292,7 @@ fun addEmailGroup(
     operator: Operator? = null,
     notify: Boolean = true
 ): ResultMessage {
-    val col = Runtime.mongoDatabase.getCollection<EmailGroup>(Constants.MONGO.REQUIRED_COLLECTIONS.EMAIL_GROUPS)
+    val col = Runtime.mongoDatabase.getCollection<EmailGroup>(MONGO.COL_NAMES.EMAIL_GROUPS)
     val current = col.findOne(EmailGroup::identifier eq identifier)
     current?.run {
         return ResultMessage(
@@ -314,7 +333,7 @@ fun addEmailGroup(
 }
 
 fun addEmailGroup(emailGroup: EmailGroup, operator: Operator? = null, notify: Boolean = true): ResultMessage {
-    val col = Runtime.mongoDatabase.getCollection<EmailGroup>(Constants.MONGO.REQUIRED_COLLECTIONS.EMAIL_GROUPS)
+    val col = Runtime.mongoDatabase.getCollection<EmailGroup>(MONGO.COL_NAMES.EMAIL_GROUPS)
     val current = col.findOne(EmailGroup::identifier eq emailGroup.identifier)
     current?.run {
         return ResultMessage(
@@ -376,7 +395,7 @@ fun addInstrument(
     operator: Operator? = null,
     notify: Boolean = true
 ): ResultMessage {
-    val col = Runtime.mongoDatabase.getCollection<Instrument>(Constants.MONGO.REQUIRED_COLLECTIONS.INSTRUMENTS)
+    val col = Runtime.mongoDatabase.getCollection<Instrument>(MONGO.COL_NAMES.INSTRUMENTS)
     val current = col.findOne(Instrument::identifier eq identifier)
     current?.run {
         return ResultMessage(
@@ -417,7 +436,7 @@ fun addInstrument(
 }
 
 fun addInstrument(instrument: Instrument, operator: Operator? = null, notify: Boolean = true): ResultMessage {
-    val col = Runtime.mongoDatabase.getCollection<Instrument>(Constants.MONGO.REQUIRED_COLLECTIONS.INSTRUMENTS)
+    val col = Runtime.mongoDatabase.getCollection<Instrument>(MONGO.COL_NAMES.INSTRUMENTS)
     val current = col.findOne(Instrument::identifier eq instrument.identifier)
     current?.run {
         return ResultMessage(
@@ -462,7 +481,7 @@ private fun addInstrument(ctx: Context): Context {
 }
 
 fun addLocation(location: Location, operator: Operator? = null, notify: Boolean = true): ResultMessage {
-    val col = Runtime.mongoDatabase.getCollection<Location>(Constants.MONGO.REQUIRED_COLLECTIONS.LOCATIONS)
+    val col = Runtime.mongoDatabase.getCollection<Location>(MONGO.COL_NAMES.LOCATIONS)
     val current = col.findOne(Location::identifier eq location.identifier)
     current?.run {
         return ResultMessage(
@@ -507,7 +526,7 @@ private fun addLocation(ctx: Context): Context {
 }
 
 fun addStudy(study: Study, operator: Operator? = null, notify: Boolean = true): ResultMessage {
-    val col = Runtime.mongoDatabase.getCollection<Study>(Constants.MONGO.REQUIRED_COLLECTIONS.STUDIES)
+    val col = Runtime.mongoDatabase.getCollection<Study>(MONGO.COL_NAMES.STUDIES)
     val current = col.findOne(Study::identifier eq study.identifier)
     current?.run {
         return ResultMessage(
@@ -555,6 +574,10 @@ fun manageRoutes() {
     println("Add manage service routes.")
     Runtime.server.post(
         Constants.API.MANAGE.CREATE.OPERATOR, { ctx -> addOperator(ctx) },
+        roles(AuthManager.ApiRole.AUTHORISED)
+    )
+    Runtime.server.put(
+        Constants.API.MANAGE.UPDATE.PASSWORD, { ctx -> changePassword(ctx) },
         roles(AuthManager.ApiRole.AUTHORISED)
     )
     Runtime.server.post(
