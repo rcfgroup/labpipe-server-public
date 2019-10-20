@@ -7,10 +7,12 @@ import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.types.int
 import io.javalin.Javalin
+import kotlinx.coroutines.runBlocking
 import org.apache.commons.configuration2.PropertiesConfiguration
 import org.apache.commons.configuration2.builder.fluent.Configurations
 import org.apache.commons.configuration2.ex.ConfigurationException
-import org.litote.kmongo.*
+import org.litote.kmongo.eq
+import org.litote.kmongo.findOne
 import uk.ac.le.ember.labpipe.server.*
 import uk.ac.le.ember.labpipe.server.db.DatabaseUtil
 import uk.ac.le.ember.labpipe.server.notification.EmailUtil
@@ -271,14 +273,155 @@ class Run : CliktCommand(name = "run", help = "Run server") {
 class Init : CliktCommand(name = "init", help = "Init server") {
 
     override fun run() {
-        val col = Runtime.mongoDatabase.getCollection<OperatorRole>(Constants.MONGO.REQUIRED_COLLECTIONS.ROLES)
-        val tokenRole = col.findOne(OperatorRole::identifier eq Constants.DEFAULT_OPERATOR_ROLE.identifier)
-        if (tokenRole == null) {
-            col.insertOne(Constants.DEFAULT_TOKEN_ROLE)
+        importConfig()
+        DatabaseUtil.connect()
+        DatabaseUtil.testConnection()
+        runBlocking {
+            if (MONGO.COLLECTIONS.ROLES.findOne(OperatorRole::identifier eq Constants.DEFAULT_TOKEN_ROLE.identifier) == null) {
+                MONGO.COLLECTIONS.ROLES.insertOne(Constants.DEFAULT_TOKEN_ROLE)
+            }
         }
-        val operatorRole = col.findOne(OperatorRole::identifier eq Constants.DEFAULT_OPERATOR_ROLE.identifier)
-        if (operatorRole == null) {
-            col.insertOne(Constants.DEFAULT_OPERATOR_ROLE)
+        runBlocking {
+            if (MONGO.COLLECTIONS.ROLES.findOne(OperatorRole::identifier eq Constants.DEFAULT_OPERATOR_ROLE.identifier) == null) {
+                MONGO.COLLECTIONS.ROLES.insertOne(Constants.DEFAULT_OPERATOR_ROLE)
+            }
+        }
+        runBlocking {
+            if (MONGO.COLLECTIONS.ROLES.findOne(OperatorRole::identifier eq Constants.DEFAULT_ADMIN_ROLE.identifier) == null) {
+                MONGO.COLLECTIONS.ROLES.insertOne(Constants.DEFAULT_ADMIN_ROLE)
+            }
+        }
+        runBlocking {
+            val record = ApiAccessRole(url = Constants.API.GENERAL.CONN_AUTH, roles = mutableSetOf(Constants.DEFAULT_OPERATOR_ROLE.identifier))
+            if (MONGO.COLLECTIONS.API_ACCESS_ROLES.findOne(ApiAccessRole::url eq record.url) == null) {
+                MONGO.COLLECTIONS.API_ACCESS_ROLES.insertOne(record)
+            }
+        }
+        runBlocking {
+            val record = ApiAccessRole(url = Constants.API.GENERAL.CONN_TOKEN, roles = mutableSetOf(Constants.DEFAULT_TOKEN_ROLE.identifier))
+            if (MONGO.COLLECTIONS.API_ACCESS_ROLES.findOne(ApiAccessRole::url eq record.url) == null) {
+                MONGO.COLLECTIONS.API_ACCESS_ROLES.insertOne(record)
+            }
+        }
+        runBlocking {
+            val record = ApiAccessRole(url = Constants.API.PARAMETER.FROM_NAME, roles = mutableSetOf(Constants.DEFAULT_TOKEN_ROLE.identifier, Constants.DEFAULT_OPERATOR_ROLE.identifier, Constants.DEFAULT_ADMIN_ROLE.identifier))
+            if (MONGO.COLLECTIONS.API_ACCESS_ROLES.findOne(ApiAccessRole::url eq record.url) == null) {
+                MONGO.COLLECTIONS.API_ACCESS_ROLES.insertOne(record)
+            }
+        }
+        runBlocking {
+            val record = ApiAccessRole(url = Constants.API.FORM.ALL, roles = mutableSetOf(Constants.DEFAULT_TOKEN_ROLE.identifier, Constants.DEFAULT_OPERATOR_ROLE.identifier, Constants.DEFAULT_ADMIN_ROLE.identifier))
+            if (MONGO.COLLECTIONS.API_ACCESS_ROLES.findOne(ApiAccessRole::url eq record.url) == null) {
+                MONGO.COLLECTIONS.API_ACCESS_ROLES.insertOne(record)
+            }
+        }
+        runBlocking {
+            val record = ApiAccessRole(url = Constants.API.FORM.FROM_IDENTIFIER, roles = mutableSetOf(Constants.DEFAULT_TOKEN_ROLE.identifier, Constants.DEFAULT_OPERATOR_ROLE.identifier, Constants.DEFAULT_ADMIN_ROLE.identifier))
+            if (MONGO.COLLECTIONS.API_ACCESS_ROLES.findOne(ApiAccessRole::url eq record.url) == null) {
+                MONGO.COLLECTIONS.API_ACCESS_ROLES.insertOne(record)
+            }
+        }
+        runBlocking {
+            val record = ApiAccessRole(url = Constants.API.FORM.FROM_STUDY_INSTRUMENT, roles = mutableSetOf(Constants.DEFAULT_TOKEN_ROLE.identifier, Constants.DEFAULT_OPERATOR_ROLE.identifier, Constants.DEFAULT_ADMIN_ROLE.identifier))
+            if (MONGO.COLLECTIONS.API_ACCESS_ROLES.findOne(ApiAccessRole::url eq record.url) == null) {
+                MONGO.COLLECTIONS.API_ACCESS_ROLES.insertOne(record)
+            }
+        }
+        runBlocking {
+            val record = ApiAccessRole(url = Constants.API.MANAGE.CREATE.EMAIL_GROUP, roles = mutableSetOf(Constants.DEFAULT_ADMIN_ROLE.identifier))
+            if (MONGO.COLLECTIONS.API_ACCESS_ROLES.findOne(ApiAccessRole::url eq record.url) == null) {
+                MONGO.COLLECTIONS.API_ACCESS_ROLES.insertOne(record)
+            }
+        }
+        runBlocking {
+            val record = ApiAccessRole(url = Constants.API.MANAGE.CREATE.INSTRUMENT, roles = mutableSetOf(Constants.DEFAULT_ADMIN_ROLE.identifier))
+            if (MONGO.COLLECTIONS.API_ACCESS_ROLES.findOne(ApiAccessRole::url eq record.url) == null) {
+                MONGO.COLLECTIONS.API_ACCESS_ROLES.insertOne(record)
+            }
+        }
+        runBlocking {
+            val record = ApiAccessRole(url = Constants.API.MANAGE.CREATE.LOCATION, roles = mutableSetOf(Constants.DEFAULT_ADMIN_ROLE.identifier))
+            if (MONGO.COLLECTIONS.API_ACCESS_ROLES.findOne(ApiAccessRole::url eq record.url) == null) {
+                MONGO.COLLECTIONS.API_ACCESS_ROLES.insertOne(record)
+            }
+        }
+        runBlocking {
+            val record = ApiAccessRole(url = Constants.API.MANAGE.CREATE.OPERATOR, roles = mutableSetOf(Constants.DEFAULT_ADMIN_ROLE.identifier))
+            if (MONGO.COLLECTIONS.API_ACCESS_ROLES.findOne(ApiAccessRole::url eq record.url) == null) {
+                MONGO.COLLECTIONS.API_ACCESS_ROLES.insertOne(record)
+            }
+        }
+        runBlocking {
+            val record = ApiAccessRole(url = Constants.API.MANAGE.UPDATE.PASSWORD, roles = mutableSetOf(Constants.DEFAULT_ADMIN_ROLE.identifier, Constants.DEFAULT_OPERATOR_ROLE.identifier))
+            if (MONGO.COLLECTIONS.API_ACCESS_ROLES.findOne(ApiAccessRole::url eq record.url) == null) {
+                MONGO.COLLECTIONS.API_ACCESS_ROLES.insertOne(record)
+            }
+        }
+        runBlocking {
+            val record = ApiAccessRole(url = Constants.API.MANAGE.CREATE.ROLE, roles = mutableSetOf(Constants.DEFAULT_ADMIN_ROLE.identifier))
+            if (MONGO.COLLECTIONS.API_ACCESS_ROLES.findOne(ApiAccessRole::url eq record.url) == null) {
+                MONGO.COLLECTIONS.API_ACCESS_ROLES.insertOne(record)
+            }
+        }
+        runBlocking {
+            val record = ApiAccessRole(url = Constants.API.MANAGE.CREATE.STUDY, roles = mutableSetOf(Constants.DEFAULT_ADMIN_ROLE.identifier))
+            if (MONGO.COLLECTIONS.API_ACCESS_ROLES.findOne(ApiAccessRole::url eq record.url) == null) {
+                MONGO.COLLECTIONS.API_ACCESS_ROLES.insertOne(record)
+            }
+        }
+        runBlocking {
+            val record = ApiAccessRole(url = Constants.API.MANAGE.CREATE.TOKEN, roles = mutableSetOf(Constants.DEFAULT_ADMIN_ROLE.identifier))
+            if (MONGO.COLLECTIONS.API_ACCESS_ROLES.findOne(ApiAccessRole::url eq record.url) == null) {
+                MONGO.COLLECTIONS.API_ACCESS_ROLES.insertOne(record)
+            }
+        }
+        runBlocking {
+            val record = ApiAccessRole(url = Constants.API.QUERY.INSTRUMENT, roles = mutableSetOf(Constants.DEFAULT_TOKEN_ROLE.identifier, Constants.DEFAULT_OPERATOR_ROLE.identifier, Constants.DEFAULT_ADMIN_ROLE.identifier))
+            if (MONGO.COLLECTIONS.API_ACCESS_ROLES.findOne(ApiAccessRole::url eq record.url) == null) {
+                MONGO.COLLECTIONS.API_ACCESS_ROLES.insertOne(record)
+            }
+        }
+        runBlocking {
+            val record = ApiAccessRole(url = Constants.API.QUERY.INSTRUMENTS, roles = mutableSetOf(Constants.DEFAULT_TOKEN_ROLE.identifier, Constants.DEFAULT_OPERATOR_ROLE.identifier, Constants.DEFAULT_ADMIN_ROLE.identifier))
+            if (MONGO.COLLECTIONS.API_ACCESS_ROLES.findOne(ApiAccessRole::url eq record.url) == null) {
+                MONGO.COLLECTIONS.API_ACCESS_ROLES.insertOne(record)
+            }
+        }
+        runBlocking {
+            val record = ApiAccessRole(url = Constants.API.QUERY.RECORDS, roles = mutableSetOf(Constants.DEFAULT_TOKEN_ROLE.identifier, Constants.DEFAULT_OPERATOR_ROLE.identifier, Constants.DEFAULT_ADMIN_ROLE.identifier))
+            if (MONGO.COLLECTIONS.API_ACCESS_ROLES.findOne(ApiAccessRole::url eq record.url) == null) {
+                MONGO.COLLECTIONS.API_ACCESS_ROLES.insertOne(record)
+            }
+        }
+        runBlocking {
+            val record = ApiAccessRole(url = Constants.API.QUERY.STUDY_RECORDS, roles = mutableSetOf(Constants.DEFAULT_TOKEN_ROLE.identifier, Constants.DEFAULT_OPERATOR_ROLE.identifier, Constants.DEFAULT_ADMIN_ROLE.identifier))
+            if (MONGO.COLLECTIONS.API_ACCESS_ROLES.findOne(ApiAccessRole::url eq record.url) == null) {
+                MONGO.COLLECTIONS.API_ACCESS_ROLES.insertOne(record)
+            }
+        }
+        runBlocking {
+            val record = ApiAccessRole(url = Constants.API.QUERY.STUDY, roles = mutableSetOf(Constants.DEFAULT_TOKEN_ROLE.identifier, Constants.DEFAULT_OPERATOR_ROLE.identifier, Constants.DEFAULT_ADMIN_ROLE.identifier))
+            if (MONGO.COLLECTIONS.API_ACCESS_ROLES.findOne(ApiAccessRole::url eq record.url) == null) {
+                MONGO.COLLECTIONS.API_ACCESS_ROLES.insertOne(record)
+            }
+        }
+        runBlocking {
+            val record = ApiAccessRole(url = Constants.API.QUERY.STUDIES, roles = mutableSetOf(Constants.DEFAULT_TOKEN_ROLE.identifier, Constants.DEFAULT_OPERATOR_ROLE.identifier, Constants.DEFAULT_ADMIN_ROLE.identifier))
+            if (MONGO.COLLECTIONS.API_ACCESS_ROLES.findOne(ApiAccessRole::url eq record.url) == null) {
+                MONGO.COLLECTIONS.API_ACCESS_ROLES.insertOne(record)
+            }
+        }
+        runBlocking {
+            val record = ApiAccessRole(url = Constants.API.RECORD.ADD, roles = mutableSetOf(Constants.DEFAULT_TOKEN_ROLE.identifier, Constants.DEFAULT_OPERATOR_ROLE.identifier, Constants.DEFAULT_ADMIN_ROLE.identifier))
+            if (MONGO.COLLECTIONS.API_ACCESS_ROLES.findOne(ApiAccessRole::url eq record.url) == null) {
+                MONGO.COLLECTIONS.API_ACCESS_ROLES.insertOne(record)
+            }
+        }
+        runBlocking {
+            val record = ApiAccessRole(url = Constants.API.UPLOAD.FORM_FILE, roles = mutableSetOf(Constants.DEFAULT_TOKEN_ROLE.identifier, Constants.DEFAULT_OPERATOR_ROLE.identifier, Constants.DEFAULT_ADMIN_ROLE.identifier))
+            if (MONGO.COLLECTIONS.API_ACCESS_ROLES.findOne(ApiAccessRole::url eq record.url) == null) {
+                MONGO.COLLECTIONS.API_ACCESS_ROLES.insertOne(record)
+            }
         }
     }
 }
