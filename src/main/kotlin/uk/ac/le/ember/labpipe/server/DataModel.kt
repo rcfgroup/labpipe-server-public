@@ -1,7 +1,6 @@
 package uk.ac.le.ember.labpipe.server
 
 import java.nio.file.Paths
-import java.util.*
 
 data class LPConfig(var serverPort: Int = 4567) {
     var cachePath: String = Paths.get(System.getProperty("user.home"), "labpipe").toString()
