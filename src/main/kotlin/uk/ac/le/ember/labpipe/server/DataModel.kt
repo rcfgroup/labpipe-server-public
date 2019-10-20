@@ -1,6 +1,7 @@
 package uk.ac.le.ember.labpipe.server
 
 import java.nio.file.Paths
+import java.util.*
 
 data class LPConfig(var serverPort: Int = 4567) {
     var cachePath: String = Paths.get(System.getProperty("user.home"), "labpipe").toString()
@@ -53,7 +54,7 @@ data class Location(var identifier: String, var name: String) {
 
 data class OperatorRole(val identifier: String, val name: String)
 
-data class ApiRoleAssign(var url: String, var roles: MutableSet<String>)
+data class ApiAccessRole(var url: String, var roles: MutableSet<String>)
 
 data class FormTemplate(var identifier: String, var name: String) {
     var studyIdentifier: String = ""
@@ -140,7 +141,21 @@ data class Instrument(var identifier: String, var name: String) {
     var fileType: MutableSet<String> = mutableSetOf()
 }
 
+data class Collector(var identifier: String, var name: String)
+
+data class SampleType(var identifier: String, var name: String)
+
 data class Study(var identifier: String) {
     var name: String = ""
     var config: Any? = null
+}
+
+data class Record(var actionIdentifier: String) {
+    var formIdentifier: String = ""
+    var studyIdentifier: String = ""
+    var instrumentIdentifier: String = ""
+    var savedBy: String? = null
+    var uploadedBy: String? = null
+    var created: String? = null
+    var record: Any? = null
 }
