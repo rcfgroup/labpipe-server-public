@@ -1,8 +1,13 @@
 package uk.ac.le.ember.labpipe.server
 
+import org.litote.kmongo.getCollection
+import uk.ac.le.ember.labpipe.server.notification.ReportTemplate
+import uk.ac.le.ember.labpipe.server.sessions.Runtime
+
 object Constants {
     const val DEFAULT_CONFIG_FILE_NAME = "config.ini"
     const val DB_COL_FORM_DATA_PREFIX = "FORM_DATA_"
+    val DEFAULT_ADMIN_ROLE = OperatorRole(identifier = "admin", name = "Admin")
     val DEFAULT_TOKEN_ROLE = OperatorRole(identifier = "token", name = "Token")
     val DEFAULT_OPERATOR_ROLE = OperatorRole(identifier = "operator", name = "Operator")
 
@@ -61,6 +66,11 @@ object Constants {
                 const val LOCATION = "$CR_ROOT/location"
                 const val STUDY = "$CR_ROOT/study"
             }
+
+            object UPDATE {
+                private const val UD_ROOT = "$MG_ROOT/update"
+                const val PASSWORD = "${UD_ROOT}/password"
+            }
         }
     }
 
@@ -99,24 +109,7 @@ object Constants {
         const val PATH_UPLOADED = "path.uploaded"
     }
 
-    object MONGO {
-        object REQUIRED_COLLECTIONS {
-            const val ACCESS_TOKENS = "ACCESS_TOKENS"
-            const val ROLES = "ROLES"
-            const val CLIENT_SETTINGS = "CLIENT_SETTINGS"
-            const val API_ACCESS_ROLES = "API_ACCESS_ROLES"
-            const val OPERATORS = "OPERATORS"
-            const val STUDIES = "STUDIES"
-            const val FORMS = "FORMS"
-            const val REPORT_TEMPLATES = "REPORT_TEMPLATES"
-            const val INSTRUMENTS = "INSTRUMENTS"
-            const val COLLECTORS = "COLLECTORS"
-            const val SAMPLE_TYPES = "SAMPLE_TYPES"
-            const val LOCATIONS = "LOCATIONS"
-            const val EMAIL_GROUPS = "EMAIL_GROUPS"
-            const val UPLOADED = "UPLOADED"
-        }
-    }
+
 
     object NOTIFICATION {
         object STYLE {
@@ -217,4 +210,42 @@ object EmailTemplates {
                 "<p>%s</p>" +
                 "<p><strong>Name:</strong></p>" +
                 "<p>%s</p>"
+}
+
+object MONGO {
+    object COL_NAMES {
+        const val ACCESS_TOKENS = "ACCESS_TOKENS"
+        const val ROLES = "ROLES"
+        const val CLIENT_SETTINGS = "CLIENT_SETTINGS"
+        const val API_ACCESS_ROLES = "API_ACCESS_ROLES"
+        const val OPERATORS = "OPERATORS"
+        const val STUDIES = "STUDIES"
+        const val FORMS = "FORMS"
+        const val REPORT_TEMPLATES = "REPORT_TEMPLATES"
+        const val INSTRUMENTS = "INSTRUMENTS"
+        const val COLLECTORS = "COLLECTORS"
+        const val SAMPLE_TYPES = "SAMPLE_TYPES"
+        const val LOCATIONS = "LOCATIONS"
+        const val EMAIL_GROUPS = "EMAIL_GROUPS"
+        const val UPLOADED = "UPLOADED"
+    }
+
+    object COLLECTIONS {
+        val ACCESS_TOKENS = Runtime.mongoDatabase.getCollection<AccessToken>(COL_NAMES.ACCESS_TOKENS)
+        val ROLES = Runtime.mongoDatabase.getCollection<OperatorRole>(COL_NAMES.ROLES)
+        val CLIENT_SETTINGS = Runtime.mongoDatabase.getCollection<ClientSettings>(COL_NAMES.CLIENT_SETTINGS)
+        val API_ACCESS_ROLES = Runtime.mongoDatabase.getCollection<ApiAccessRole>(COL_NAMES.API_ACCESS_ROLES)
+        val OPERATORS = Runtime.mongoDatabase.getCollection<Operator>(COL_NAMES.OPERATORS)
+        val STUDIES = Runtime.mongoDatabase.getCollection<Study>(COL_NAMES.STUDIES)
+        val FORMS = Runtime.mongoDatabase.getCollection<FormTemplate>(COL_NAMES.FORMS)
+        val REPORT_TEMPLATES = Runtime.mongoDatabase.getCollection<ReportTemplate>(COL_NAMES.REPORT_TEMPLATES)
+        val INSTRUMENTS = Runtime.mongoDatabase.getCollection<Instrument>(COL_NAMES.INSTRUMENTS)
+        val COLLECTORS = Runtime.mongoDatabase.getCollection<Collector>(COL_NAMES.COLLECTORS)
+        val SAMPLE_TYPES = Runtime.mongoDatabase.getCollection<SampleType>(COL_NAMES.SAMPLE_TYPES)
+        val LOCATIONS = Runtime.mongoDatabase.getCollection<Location>(COL_NAMES.LOCATIONS)
+        val EMAIL_GROUPS = Runtime.mongoDatabase.getCollection<EmailGroup>(COL_NAMES.EMAIL_GROUPS)
+        val UPLOADED = Runtime.mongoDatabase.getCollection<FormFileUpload>(COL_NAMES.UPLOADED)
+    }
+
+
 }
