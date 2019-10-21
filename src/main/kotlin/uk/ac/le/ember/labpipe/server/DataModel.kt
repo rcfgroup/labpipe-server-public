@@ -24,9 +24,7 @@ data class Parameter(var identifier: String) {
     var value: MutableList<Any> = mutableListOf()
 }
 
-data class ClientSettings(var identifier: String, var name: String) {
-    var value: MutableList<String> = mutableListOf()
-}
+data class ClientSettings(var identifier: String, var name: String, var value: MutableSet<String>? = mutableSetOf())
 
 data class Operator(var email: String) {
     var name: String = ""

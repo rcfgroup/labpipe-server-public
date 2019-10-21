@@ -292,6 +292,11 @@ class Init : CliktCommand(name = "init", help = "Init server") {
             }
         }
         runBlocking {
+            if (MONGO.COLLECTIONS.CLIENT_SETTINGS.findOne(ClientSettings::identifier eq Constants.DEFAULT_CLIENT_SETTING.identifier) == null) {
+                MONGO.COLLECTIONS.CLIENT_SETTINGS.insertOne(Constants.DEFAULT_CLIENT_SETTING)
+            }
+        }
+        runBlocking {
             val record = ApiAccessRole(url = Constants.API.GENERAL.CONN_AUTH, roles = mutableSetOf(Constants.DEFAULT_OPERATOR_ROLE.identifier))
             if (MONGO.COLLECTIONS.API_ACCESS_ROLES.findOne(ApiAccessRole::url eq record.url) == null) {
                 MONGO.COLLECTIONS.API_ACCESS_ROLES.insertOne(record)

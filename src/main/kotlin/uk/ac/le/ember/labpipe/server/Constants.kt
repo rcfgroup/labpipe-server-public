@@ -10,6 +10,7 @@ object Constants {
     val DEFAULT_ADMIN_ROLE = OperatorRole(identifier = "admin", name = "Admin")
     val DEFAULT_TOKEN_ROLE = OperatorRole(identifier = "token", name = "Token")
     val DEFAULT_OPERATOR_ROLE = OperatorRole(identifier = "operator", name = "Operator")
+    val DEFAULT_CLIENT_SETTING = ClientSettings(identifier = "client_init", name = "Parameter list for client init", value = mutableSetOf("LOCATIONS","OPERATORS","STUDIES","INSTRUMENTS","COLLECTORS"))
 
     object API {
         const val ROOT: String = "/api"
