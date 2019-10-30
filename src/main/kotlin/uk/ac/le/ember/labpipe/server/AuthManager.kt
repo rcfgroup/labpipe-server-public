@@ -6,9 +6,6 @@ import io.javalin.http.Context
 import org.litote.kmongo.findOne
 import org.litote.kmongo.getCollection
 import org.mindrot.jbcrypt.BCrypt
-import uk.ac.le.ember.labpipe.server.data.AccessToken
-import uk.ac.le.ember.labpipe.server.data.ApiRoleAssign
-import uk.ac.le.ember.labpipe.server.data.Operator
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 
 object AuthManager {
@@ -20,7 +17,7 @@ object AuthManager {
                 handler.handle(ctx)
             } else {
                 ctx.status(401)
-                    .result(Constants.MESSAGES.UNAUTHORIZED)
+                    .json(Message(MESSAGES.UNAUTHORIZED))
             }
         }
     }
@@ -32,7 +29,7 @@ object AuthManager {
             return null
         }
         val basicAuthCredentials = ctx.basicAuthCredentials()
-        val col = Runtime.mongoDatabase.getCollection<Operator>(Constants.MONGO.REQUIRED_COLLECTIONS.OPERATORS)
+        val col = Runtime.mongoDatabase.getCollection<Operator>(MONGO.COL_NAMES.OPERATORS)
         return col.findOne(eq("username", basicAuthCredentials.username))
     }
 
@@ -44,12 +41,12 @@ object AuthManager {
             return ApiRole.PUBLIC
         }
         val basicAuthCredentials = ctx.basicAuthCredentials()
-        val colOperator = Runtime.mongoDatabase.getCollection<Operator>(Constants.MONGO.REQUIRED_COLLECTIONS.OPERATORS)
+        val colOperator = Runtime.mongoDatabase.getCollection<Operator>(MONGO.COL_NAMES.OPERATORS)
         val operator: Operator? = colOperator.findOne(eq("username", basicAuthCredentials.username))
         if (operator == null) {
             print("No operator auth")
             val colToken =
-                Runtime.mongoDatabase.getCollection<AccessToken>(Constants.MONGO.REQUIRED_COLLECTIONS.ACCESS_TOKENS)
+                Runtime.mongoDatabase.getCollection<AccessToken>(MONGO.COL_NAMES.ACCESS_TOKENS)
             val accessToken: AccessToken? = colToken.findOne(eq("token", basicAuthCredentials.username))
             return if (accessToken == null) {
                 ApiRole.PUBLIC
@@ -90,10 +87,10 @@ object AuthManager {
         UNAUTHORISED,
     }
 
-    fun getApiRoles(url: String): List<String> {
-        val apiRole: ApiRoleAssign? =
-            Runtime.mongoDatabase.getCollection<ApiRoleAssign>(Constants.MONGO.REQUIRED_COLLECTIONS.API_ACCESS_ROLES)
+    fun getApiRoles(url: String): Set<String> {
+        val apiAccessRole: uk.ac.le.ember.labpipe.server.ApiAccessRole? =
+            Runtime.mongoDatabase.getCollection<uk.ac.le.ember.labpipe.server.ApiAccessRole>(MONGO.COL_NAMES.API_ACCESS_ROLES)
                 .findOne(eq("url", url))
-        return apiRole?.roles ?: listOf()
+        return apiAccessRole?.roles ?: setOf()
     }
 }

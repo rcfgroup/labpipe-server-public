@@ -1,6 +1,5 @@
 package uk.ac.le.ember.labpipe.server.notification
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
@@ -9,10 +8,9 @@ import j2html.TagCreator
 import j2html.TagCreator.*
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOne
-import org.litote.kmongo.getCollection
-import uk.ac.le.ember.labpipe.server.Constants
-import uk.ac.le.ember.labpipe.server.data.FormTemplate
-import uk.ac.le.ember.labpipe.server.data.Operator
+import uk.ac.le.ember.labpipe.server.FormTemplate
+import uk.ac.le.ember.labpipe.server.MONGO
+import uk.ac.le.ember.labpipe.server.Operator
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 
 data class ReportTemplate(var identifier: String) {
@@ -56,15 +54,20 @@ enum class ElementSource(val value: String) {
 
 object ReportUtil {
     fun generateHtml(operator: Operator, form: FormTemplate, formData: JsonObject): String? {
-        val reportTemplate =
-            Runtime.mongoDatabase.getCollection<ReportTemplate>(Constants.MONGO.REQUIRED_COLLECTIONS.REPORT_TEMPLATES)
-                .findOne(ReportTemplate::formIdentifier eq form.identifier, ReportTemplate::active eq true)
+        val reportTemplate = MONGO.COLLECTIONS.REPORT_TEMPLATES.findOne(ReportTemplate::formIdentifier eq form.identifier, ReportTemplate::active eq true)
         reportTemplate?.run {
             Runtime.logger.info { "Report template found." }
             Runtime.logger.info { reportTemplate.html.size }
             val elements = reportTemplate.html
             elements.sortedWith(compareBy { it.order })
             var reportBody = body()
+            reportBody.with(
+                header().withClasses("header", "header-5").with(
+                    div().withClasses("branding").with(
+                        span("LabPipe Notification").withClasses("title")
+                    )
+                )
+            )
             elements.forEach { element ->
                 run {
                     Runtime.logger.info { "Processing report element: $element" }
@@ -637,7 +640,7 @@ object ReportUtil {
             }
             val report = html(
                 head(
-                    TagCreator.link().withRel("stylesheet").withHref("https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css")
+                    TagCreator.link().withRel("stylesheet").withHref("https://unpkg.com/@clr/ui/clr-ui.min.css")
                 ),
                 reportBody
             )
@@ -666,18 +669,18 @@ object ReportUtil {
         }
     }
 
-    fun getNestedFormData(formData: JsonObject, keyString: String): JsonElement? {
-        return if (keyString.contains('.')) {
-            val keyArray = keyString.split(".")
-            var result: JsonElement? = null
+    fun getNestedFormData(formData: JsonObject, keyString: String, inRecord: Boolean = true): JsonElement? {
+        var key = if (inRecord) "record.$keyString" else keyString
+        println(key)
+        return if (key.contains('.')) {
+            val keyArray = key.split(".")
+            var result: JsonElement? = formData
             keyArray.forEach {
-                run {
-                    result = formData.get(it)
-                }
+                    result = result?.asJsonObject?.get(it)
             }
             result
         } else {
-            formData.get(keyString)
+            formData.get(key)
         }
     }
 }

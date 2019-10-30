@@ -1,6 +1,5 @@
 package uk.ac.le.ember.labpipe.server.db
 
-import com.mongodb.MongoClientOptions
 import com.mongodb.MongoClientURI
 import org.litote.kmongo.KMongo
 import uk.ac.le.ember.labpipe.server.sessions.Runtime

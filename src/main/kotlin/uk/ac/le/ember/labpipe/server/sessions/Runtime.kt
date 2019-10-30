@@ -5,7 +5,7 @@ import com.mongodb.client.MongoDatabase
 import io.javalin.Javalin
 import mu.KotlinLogging
 import org.simplejavamail.mailer.Mailer
-import uk.ac.le.ember.labpipe.server.data.LPConfig
+import uk.ac.le.ember.labpipe.server.LPConfig
 
 class Runtime {
     companion object {

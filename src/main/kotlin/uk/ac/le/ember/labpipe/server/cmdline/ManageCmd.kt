@@ -9,7 +9,7 @@ import com.github.ajalt.clikt.parameters.types.choice
 import com.github.ajalt.clikt.parameters.types.file
 import com.google.gson.Gson
 import com.google.gson.JsonParser
-import uk.ac.le.ember.labpipe.server.data.*
+import uk.ac.le.ember.labpipe.server.*
 import uk.ac.le.ember.labpipe.server.db.DatabaseUtil
 import uk.ac.le.ember.labpipe.server.notification.EmailUtil
 import uk.ac.le.ember.labpipe.server.services.*
@@ -25,11 +25,12 @@ class Add : CliktCommand(name = "add", help = "Add new record") {
 class AddOperator : CliktCommand(name = "operator", help = "Add new operator") {
     private val name by option("--name", help = "operator name").prompt(text = "Please enter operator name")
     private val email by option("--email", help = "operator email").prompt(text = "Please enter operator email")
+    private val show by option("--show", help = "show operator username and password once created").flag()
     override fun run() {
         importConfig()
         DatabaseUtil.connect()
         EmailUtil.connect()
-        val result = addOperator(email = email, name = name, notify = true)
+        val result = addOperator(email = email, name = name, notify = true, show = show)
         echo(result.message.message)
 
     }
@@ -114,7 +115,7 @@ class AddLocation : CliktCommand(name = "location", help = "Add new location") {
         DatabaseUtil.connect()
         EmailUtil.connect()
         val location = Location(identifier = identifier, name = name)
-        location.type = type!!.toMutableList()
+        location.type = type!!.toMutableSet()
         addLocation(location = location)
     }
 }

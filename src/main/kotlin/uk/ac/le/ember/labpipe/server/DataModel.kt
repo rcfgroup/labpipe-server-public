@@ -1,4 +1,4 @@
-package uk.ac.le.ember.labpipe.server.data
+package uk.ac.le.ember.labpipe.server
 
 import java.nio.file.Paths
 
@@ -24,9 +24,7 @@ data class Parameter(var identifier: String) {
     var value: MutableList<Any> = mutableListOf()
 }
 
-data class ClientSettings(var identifier: String, var name: String) {
-    var value: MutableList<String> = mutableListOf()
-}
+data class ClientSettings(var identifier: String, var name: String, var value: MutableSet<String>? = mutableSetOf())
 
 data class Operator(var email: String) {
     var name: String = ""
@@ -34,33 +32,34 @@ data class Operator(var email: String) {
     var passwordHash: String = ""
     var active: Boolean = false
 
-    var projects: MutableList<String> = mutableListOf()
-    var notificationGroup: MutableList<String> = mutableListOf()
+    var projects: MutableSet<String> = mutableSetOf()
+    var notificationGroup: MutableSet<String> = mutableSetOf()
 
-    var roles: MutableList<String> = mutableListOf()
+    var roles: MutableSet<String> = mutableSetOf()
 }
 
 data class AccessToken(
     var token: String,
     var keyHash: String
 ) {
-    var roles: MutableList<String> = mutableListOf()
+    var roles: MutableSet<String> = mutableSetOf()
 }
 
 data class Location(var identifier: String, var name: String) {
-    var type: MutableList<String> = mutableListOf()
+    var type: MutableSet<String> = mutableSetOf()
 }
 
 data class OperatorRole(val identifier: String, val name: String)
 
-data class ApiRoleAssign(var url: String, var roles: MutableList<String>)
+data class ApiAccessRole(var url: String, var roles: MutableSet<String>)
 
 data class FormTemplate(var identifier: String, var name: String) {
     var studyIdentifier: String = ""
 
     var instrumentIdentifier: String = ""
 
-    var template: WizardTemplate = WizardTemplate("Default Wizard Template")
+    var template: WizardTemplate =
+        WizardTemplate("Default Wizard Template")
     var url: String? = null
 
     var notificationStyle: String = "all"
@@ -81,7 +80,7 @@ data class FormTemplate(var identifier: String, var name: String) {
 }
 
 data class ElectronFileFilter(var name: String) {
-    var extensions: MutableList<String> = mutableListOf()
+    var extensions: MutableSet<String> = mutableSetOf()
 }
 
 data class QuestionTemplate(var key: String, var label: String, var controlType: String) {
@@ -93,7 +92,7 @@ data class QuestionTemplate(var key: String, var label: String, var controlType:
     var helperText: String = ""
     var target: String? = null
     var multiple: Boolean = false
-    var filter: MutableList<ElectronFileFilter> = mutableListOf()
+    var filter: MutableSet<ElectronFileFilter> = mutableSetOf()
 }
 
 data class WizardPageFormValidProcess(var order: Int, var processType: String, var parameters: MutableList<String>) {
@@ -122,12 +121,12 @@ data class EmailGroup(var identifier: String) {
 
     var formIdentifier: String = ""
 
-    var admin: MutableList<String> = mutableListOf()
-    var member: MutableList<String> = mutableListOf()
+    var admin: MutableSet<String> = mutableSetOf()
+    var member: MutableSet<String> = mutableSetOf()
 }
 
 data class FormFileUpload(var identifier: String) {
-    var files: MutableList<String> = mutableListOf()
+    var files: MutableSet<String> = mutableSetOf()
 }
 
 data class Message(var message: String)
@@ -136,10 +135,24 @@ data class ResultMessage(var status: Int, var message: Message)
 
 data class Instrument(var identifier: String, var name: String) {
     var realtime: Boolean = false
-    var fileType: MutableList<String> = mutableListOf()
+    var fileType: MutableSet<String> = mutableSetOf()
 }
+
+data class Collector(var identifier: String, var name: String)
+
+data class SampleType(var identifier: String, var name: String)
 
 data class Study(var identifier: String) {
     var name: String = ""
     var config: Any? = null
+}
+
+data class Record(var actionIdentifier: String) {
+    var formIdentifier: String = ""
+    var studyIdentifier: String = ""
+    var instrumentIdentifier: String = ""
+    var savedBy: String? = null
+    var uploadedBy: String? = null
+    var created: String? = null
+    var record: Any? = null
 }
