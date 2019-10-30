@@ -2,8 +2,8 @@ package uk.ac.le.ember.labpipe.server.services
 
 import io.javalin.core.security.SecurityUtil
 import org.litote.kmongo.*
+import uk.ac.le.ember.labpipe.server.API
 import uk.ac.le.ember.labpipe.server.AuthManager
-import uk.ac.le.ember.labpipe.server.Constants
 import uk.ac.le.ember.labpipe.server.FormTemplate
 import uk.ac.le.ember.labpipe.server.MONGO
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
@@ -12,17 +12,17 @@ import uk.ac.le.ember.labpipe.server.sessions.Runtime
 fun formRoutes() {
     println("Add form service routes")
     Runtime.server.get(
-        Constants.API.FORM.ALL,
+        API.FORM.ALL,
         { ctx -> ctx.json(listForms()) },
         SecurityUtil.roles(AuthManager.ApiRole.AUTHORISED, AuthManager.ApiRole.TOKEN_AUTHORISED)
     )
     Runtime.server.get(
-        Constants.API.FORM.FROM_IDENTIFIER,
+        API.FORM.FROM_IDENTIFIER,
         { ctx -> getForm(ctx.pathParam("identifier"))?.let { ctx.json(it) } },
         SecurityUtil.roles(AuthManager.ApiRole.AUTHORISED, AuthManager.ApiRole.TOKEN_AUTHORISED)
     )
     Runtime.server.get(
-        Constants.API.FORM.FROM_STUDY_INSTRUMENT,
+        API.FORM.FROM_STUDY_INSTRUMENT,
         { ctx -> ctx.json(getForm(ctx.pathParam("studyIdentifier"), ctx.pathParam("instrumentIdentifier"))) },
         SecurityUtil.roles(AuthManager.ApiRole.AUTHORISED, AuthManager.ApiRole.TOKEN_AUTHORISED)
     )

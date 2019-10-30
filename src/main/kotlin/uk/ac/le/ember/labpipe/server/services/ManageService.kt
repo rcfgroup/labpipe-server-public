@@ -30,7 +30,7 @@ fun addOperator(email: String, name: String, notify: Boolean = true, show: Boole
     val tempPassword = RandomStringUtils.randomAlphanumeric(8)
     operator.passwordHash = BCrypt.hashpw(tempPassword, BCrypt.gensalt())
     operator.active = true
-    operator.roles.add(Constants.DEFAULT_OPERATOR_ROLE.identifier)
+    operator.roles.add(DEFAULT_OPERATOR_ROLE.identifier)
     MONGO.COLLECTIONS.OPERATORS.insertOne(operator)
     if (show) {
         echo("[Username] ${operator.username}")
@@ -68,7 +68,7 @@ fun addOperator(email: String, name: String, notify: Boolean = true, show: Boole
     }
     return ResultMessage(
         200,
-        Message(Constants.MESSAGES.OPERATOR_ADDED)
+        Message(MESSAGES.OPERATOR_ADDED)
     )
 }
 
@@ -84,7 +84,7 @@ fun addOperator(operator: Operator, notify: Boolean = true, show: Boolean = fals
     val tempPassword = RandomStringUtils.randomAlphanumeric(8)
     operator.passwordHash = BCrypt.hashpw(tempPassword, BCrypt.gensalt())
     operator.active = true
-    operator.roles.add(Constants.DEFAULT_OPERATOR_ROLE.identifier)
+    operator.roles.add(DEFAULT_OPERATOR_ROLE.identifier)
     col.insertOne(operator)
     if (show) {
         echo("[Username] ${operator.username}")
@@ -122,7 +122,7 @@ fun addOperator(operator: Operator, notify: Boolean = true, show: Boolean = fals
     }
     return ResultMessage(
         200,
-        Message(Constants.MESSAGES.OPERATOR_ADDED)
+        Message(MESSAGES.OPERATOR_ADDED)
     )
 }
 
@@ -148,7 +148,7 @@ private fun changePassword(ctx: Context): Context {
         val result = changePassword(operator, newPassHash)
         return ctx.status(200).json(result.message)
     }
-    return ctx.status(400).json(Message(Constants.MESSAGES.UNAUTHORIZED))
+    return ctx.status(400).json(Message(MESSAGES.UNAUTHORIZED))
 }
 
 fun addToken(operator: Operator? = null, notify: Boolean = true): ResultMessage {
@@ -161,7 +161,7 @@ fun addToken(operator: Operator? = null, notify: Boolean = true): ResultMessage 
     val key = RandomStringUtils.randomAlphanumeric(16)
     val accessToken =
         AccessToken(token = token, keyHash = BCrypt.hashpw(key, BCrypt.gensalt()))
-    accessToken.roles.add(Constants.DEFAULT_TOKEN_ROLE.identifier)
+    accessToken.roles.add(DEFAULT_TOKEN_ROLE.identifier)
     col.insertOne(accessToken)
     echo("""[Token] $token""")
     echo("""[Key] $key""")
@@ -189,7 +189,7 @@ fun addToken(operator: Operator? = null, notify: Boolean = true): ResultMessage 
     }
     return ResultMessage(
         200,
-        Message(Constants.MESSAGES.TOKEN_ADDED)
+        Message(MESSAGES.TOKEN_ADDED)
     )
 }
 
@@ -236,7 +236,7 @@ fun addRole(identifier: String, name: String, operator: Operator? = null, notify
     }
     return ResultMessage(
         200,
-        Message(Constants.MESSAGES.ROLE_ADDED)
+        Message(MESSAGES.ROLE_ADDED)
     )
 }
 
@@ -274,7 +274,7 @@ fun addRole(role: OperatorRole, operator: Operator? = null, notify: Boolean = tr
     }
     return ResultMessage(
         200,
-        Message(Constants.MESSAGES.ROLE_ADDED)
+        Message(MESSAGES.ROLE_ADDED)
     )
 }
 
@@ -328,7 +328,7 @@ fun addEmailGroup(
     }
     return ResultMessage(
         200,
-        Message(Constants.MESSAGES.EMAIL_GROUP_ADDED)
+        Message(MESSAGES.EMAIL_GROUP_ADDED)
     )
 }
 
@@ -376,7 +376,7 @@ fun addEmailGroup(emailGroup: EmailGroup, operator: Operator? = null, notify: Bo
     }
     return ResultMessage(
         200,
-        Message(Constants.MESSAGES.EMAIL_GROUP_ADDED)
+        Message(MESSAGES.EMAIL_GROUP_ADDED)
     )
 }
 
@@ -431,7 +431,7 @@ fun addInstrument(
     }
     return ResultMessage(
         200,
-        Message(Constants.MESSAGES.INSTRUMENT_ADDED)
+        Message(MESSAGES.INSTRUMENT_ADDED)
     )
 }
 
@@ -469,7 +469,7 @@ fun addInstrument(instrument: Instrument, operator: Operator? = null, notify: Bo
     }
     return ResultMessage(
         200,
-        Message(Constants.MESSAGES.INSTRUMENT_ADDED)
+        Message(MESSAGES.INSTRUMENT_ADDED)
     )
 }
 
@@ -514,7 +514,7 @@ fun addLocation(location: Location, operator: Operator? = null, notify: Boolean 
     }
     return ResultMessage(
         200,
-        Message(Constants.MESSAGES.LOCATION_ADDED)
+        Message(MESSAGES.LOCATION_ADDED)
     )
 }
 
@@ -559,7 +559,7 @@ fun addStudy(study: Study, operator: Operator? = null, notify: Boolean = true): 
     }
     return ResultMessage(
         200,
-        Message(Constants.MESSAGES.STUDY_ADDED)
+        Message(MESSAGES.STUDY_ADDED)
     )
 }
 
@@ -573,35 +573,35 @@ private fun addStudy(ctx: Context): Context {
 fun manageRoutes() {
     println("Add manage service routes.")
     Runtime.server.post(
-        Constants.API.MANAGE.CREATE.OPERATOR, { ctx -> addOperator(ctx) },
+        API.MANAGE.CREATE.OPERATOR, { ctx -> addOperator(ctx) },
         roles(AuthManager.ApiRole.AUTHORISED)
     )
     Runtime.server.put(
-        Constants.API.MANAGE.UPDATE.PASSWORD, { ctx -> changePassword(ctx) },
+        API.MANAGE.UPDATE.PASSWORD, { ctx -> changePassword(ctx) },
         roles(AuthManager.ApiRole.AUTHORISED)
     )
     Runtime.server.post(
-        Constants.API.MANAGE.CREATE.TOKEN, { ctx -> addToken(ctx) },
+        API.MANAGE.CREATE.TOKEN, { ctx -> addToken(ctx) },
         roles(AuthManager.ApiRole.AUTHORISED)
     )
     Runtime.server.post(
-        Constants.API.MANAGE.CREATE.ROLE, { ctx -> addRole(ctx) },
+        API.MANAGE.CREATE.ROLE, { ctx -> addRole(ctx) },
         roles(AuthManager.ApiRole.AUTHORISED)
     )
     Runtime.server.post(
-        Constants.API.MANAGE.CREATE.EMAIL_GROUP, { ctx -> addEmailGroup(ctx) },
+        API.MANAGE.CREATE.EMAIL_GROUP, { ctx -> addEmailGroup(ctx) },
         roles(AuthManager.ApiRole.AUTHORISED)
     )
     Runtime.server.post(
-        Constants.API.MANAGE.CREATE.INSTRUMENT, { ctx -> addInstrument(ctx) },
+        API.MANAGE.CREATE.INSTRUMENT, { ctx -> addInstrument(ctx) },
         roles(AuthManager.ApiRole.AUTHORISED)
     )
     Runtime.server.post(
-        Constants.API.MANAGE.CREATE.LOCATION, { ctx -> addLocation(ctx) },
+        API.MANAGE.CREATE.LOCATION, { ctx -> addLocation(ctx) },
         roles(AuthManager.ApiRole.AUTHORISED)
     )
     Runtime.server.post(
-        Constants.API.MANAGE.CREATE.STUDY, { ctx -> addStudy(ctx) },
+        API.MANAGE.CREATE.STUDY, { ctx -> addStudy(ctx) },
         roles(AuthManager.ApiRole.AUTHORISED)
     )
 }

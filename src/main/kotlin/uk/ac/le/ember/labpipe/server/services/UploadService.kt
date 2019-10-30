@@ -29,6 +29,6 @@ private fun uploadFile(ctx: Context): Context {
 
 fun uploadRoutes() {
     println("Add upload service routes.")
-    Runtime.server.post(Constants.API.UPLOAD.FORM_FILE, { ctx -> uploadFile(ctx) },
+    Runtime.server.post(API.UPLOAD.FORM_FILE, { ctx -> uploadFile(ctx) },
         SecurityUtil.roles(AuthManager.ApiRole.AUTHORISED, AuthManager.ApiRole.TOKEN_AUTHORISED))
 }

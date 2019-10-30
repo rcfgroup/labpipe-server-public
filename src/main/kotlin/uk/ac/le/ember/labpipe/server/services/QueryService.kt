@@ -13,7 +13,7 @@ import uk.ac.le.ember.labpipe.server.sessions.Runtime
 
 private fun listRecords(): List<Any> {
     val colNames = Runtime.mongoDatabase.listCollectionNames()
-    val colNameList = colNames.toMutableList().filter { it.startsWith(Constants.DB_COL_FORM_DATA_PREFIX) }
+    val colNameList = colNames.toMutableList().filter { it.startsWith(DB_COL_FORM_DATA_PREFIX) }
     val records = colNameList.map {
         Runtime.mongoDatabase.getCollection(it).aggregate<Any>(project(excludeId())).toMutableList()
     }.flatten()
@@ -25,7 +25,7 @@ private fun listRecords(study: String?): List<Any> {
     return when (study) {
         null -> {
             val colNames = Runtime.mongoDatabase.listCollectionNames()
-            val colNameList = colNames.toMutableList().filter { it.startsWith(Constants.DB_COL_FORM_DATA_PREFIX) }
+            val colNameList = colNames.toMutableList().filter { it.startsWith(DB_COL_FORM_DATA_PREFIX) }
             colNameList.map {
                 Runtime.mongoDatabase.getCollection(it).aggregate<Any>(project(excludeId())).toMutableList()
             }.flatten()
@@ -33,7 +33,7 @@ private fun listRecords(study: String?): List<Any> {
         else -> {
             val colNames = Runtime.mongoDatabase.getCollection(MONGO.COL_NAMES.FORMS)
                 .aggregate<FormTemplate>(project(excludeId())).toMutableList()
-                .filter { it.studyIdentifier.equals(study, true) }.map { "${Constants.DB_COL_FORM_DATA_PREFIX}${it.identifier}" }
+                .filter { it.studyIdentifier.equals(study, true) }.map { "${DB_COL_FORM_DATA_PREFIX}${it.identifier}" }
             colNames.map {
                 Runtime.mongoDatabase.getCollection(it).aggregate<Any>(project(excludeId())).toMutableList()
             }.flatten()
@@ -70,42 +70,42 @@ private fun findOneInstrument(ctx: Context): Context {
 fun queryRoutes() {
     println("Add query service routes.")
     Runtime.server.get(
-        Constants.API.QUERY.RECORDS, { ctx -> ctx.json(listRecords()) },
+        API.QUERY.RECORDS, { ctx -> ctx.json(listRecords()) },
         SecurityUtil.roles(
             AuthManager.ApiRole.AUTHORISED,
             AuthManager.ApiRole.TOKEN_AUTHORISED
         )
     )
     Runtime.server.get(
-        Constants.API.QUERY.STUDY_RECORDS, { ctx -> ctx.json(listRecords(ctx.pathParam("studyIdentifier"))) },
+        API.QUERY.STUDY_RECORDS, { ctx -> ctx.json(listRecords(ctx.pathParam("studyIdentifier"))) },
         SecurityUtil.roles(
             AuthManager.ApiRole.AUTHORISED,
             AuthManager.ApiRole.TOKEN_AUTHORISED
         )
     )
     Runtime.server.get(
-        Constants.API.QUERY.STUDIES, { ctx -> ctx.json(listStudies()) },
+        API.QUERY.STUDIES, { ctx -> ctx.json(listStudies()) },
         SecurityUtil.roles(
             AuthManager.ApiRole.AUTHORISED,
             AuthManager.ApiRole.TOKEN_AUTHORISED
         )
     )
     Runtime.server.get(
-        Constants.API.QUERY.STUDY, { ctx -> findOneStudy(ctx) },
+        API.QUERY.STUDY, { ctx -> findOneStudy(ctx) },
         SecurityUtil.roles(
             AuthManager.ApiRole.AUTHORISED,
             AuthManager.ApiRole.TOKEN_AUTHORISED
         )
     )
     Runtime.server.get(
-        Constants.API.QUERY.INSTRUMENTS, { ctx -> ctx.json(listInstruments()) },
+        API.QUERY.INSTRUMENTS, { ctx -> ctx.json(listInstruments()) },
         SecurityUtil.roles(
             AuthManager.ApiRole.AUTHORISED,
             AuthManager.ApiRole.TOKEN_AUTHORISED
         )
     )
     Runtime.server.get(
-        Constants.API.QUERY.INSTRUMENT, { ctx -> findOneInstrument(ctx) },
+        API.QUERY.INSTRUMENT, { ctx -> findOneInstrument(ctx) },
         SecurityUtil.roles(
             AuthManager.ApiRole.AUTHORISED,
             AuthManager.ApiRole.TOKEN_AUTHORISED

@@ -72,8 +72,8 @@ object NotificationUtil {
         Runtime.logger.info { "Form [${form?.identifier}] requests notification style: ${form?.notificationStyle}" }
         when (form?.notificationStyle) {
             null -> return null
-            Constants.NOTIFICATION.STYLE.DO_NOT_NOTIFY -> return null
-            Constants.NOTIFICATION.STYLE.OPERATOR_ONLY -> return mutableListOf(
+            NOTIFICATION.STYLE.DO_NOT_NOTIFY -> return null
+            NOTIFICATION.STYLE.OPERATOR_ONLY -> return mutableListOf(
                 Recipient(
                     operator.name,
                     operator.email,
@@ -98,9 +98,9 @@ object NotificationUtil {
                         .find(Operator::username `in` memberUsernames).toMutableList()
                         .map { o -> Recipient(o.name, o.email, null) }
                 return when (form.notificationStyle) {
-                    Constants.NOTIFICATION.STYLE.ADMIN_ONLY -> adminList
-                    Constants.NOTIFICATION.STYLE.MEMBER_ONLY -> memberList
-                    Constants.NOTIFICATION.STYLE.NOTIFY_ALL -> {
+                    NOTIFICATION.STYLE.ADMIN_ONLY -> adminList
+                    NOTIFICATION.STYLE.MEMBER_ONLY -> memberList
+                    NOTIFICATION.STYLE.NOTIFY_ALL -> {
                         (adminList + memberList).distinctBy { it.address }
                     }
                     else -> {

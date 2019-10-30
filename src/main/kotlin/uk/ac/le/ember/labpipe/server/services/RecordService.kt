@@ -9,10 +9,7 @@ import org.bson.types.ObjectId
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOne
 import org.litote.kmongo.getCollection
-import uk.ac.le.ember.labpipe.server.AuthManager
-import uk.ac.le.ember.labpipe.server.Constants
-import uk.ac.le.ember.labpipe.server.Message
-import uk.ac.le.ember.labpipe.server.Record
+import uk.ac.le.ember.labpipe.server.*
 import uk.ac.le.ember.labpipe.server.notification.NotificationUtil
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 import java.time.LocalDateTime
@@ -24,7 +21,7 @@ private fun saveRecord(jsonObject: JsonObject): String? {
     val record = Document.parse(Gson().toJson(jsonObject))
     try {
         val col = Runtime.mongoDatabase
-            .getCollection("${Constants.DB_COL_FORM_DATA_PREFIX}$formIdentifier")
+            .getCollection("${DB_COL_FORM_DATA_PREFIX}$formIdentifier")
         col.insertOne(record)
     } catch (e: Exception) {
         Runtime.logger.error(e) { "[Form: $formIdentifier] data cannot be saved." }
@@ -38,7 +35,7 @@ private fun saveRecord(jsonObject: JsonObject): String? {
 
 // TODO
 // fun addRecord(record: Record, operator: Operator? = null): Context {
-//    val col = Runtime.mongoDatabase.getCollection<Record>("${Constants.DB_COL_FORM_DATA_PREFIX}${record.formIdentifier}")
+//    val col = Runtime.mongoDatabase.getCollection<Record>("${DB_COL_FORM_DATA_PREFIX}${record.formIdentifier}")
 //    record.created = LocalDateTime.now().toString()
 //    record.uploadedBy = operator?.username
 //    val current = col.findOne(Record::actionIdentifier eq record.actionIdentifier)
@@ -52,7 +49,7 @@ private fun saveRecord(jsonObject: JsonObject): String? {
 
 fun recordRoutes() {
     println("Add record service routes.")
-    Runtime.server.post(Constants.API.RECORD.ADD, { ctx ->
+    Runtime.server.post(API.RECORD.ADD, { ctx ->
         val operator = AuthManager.getUser(ctx)
         operator?.run {
             val jsonParser = JsonParser()
@@ -60,7 +57,7 @@ fun recordRoutes() {
             val formIdentifier = record.get("formIdentifier").asString
             record.addProperty("uploaded_by", operator.username)
             record.addProperty("created", LocalDateTime.now().toString())
-            val colRecord = Runtime.mongoDatabase.getCollection<Record>("${Constants.DB_COL_FORM_DATA_PREFIX}${formIdentifier}")
+            val colRecord = Runtime.mongoDatabase.getCollection<Record>("${DB_COL_FORM_DATA_PREFIX}${formIdentifier}")
             val current = colRecord.findOne(Record::actionIdentifier eq record.get("actionIdentifier").asString)
             if (current != null) {
                 Runtime.logger.info { "Record exists [${current.actionIdentifier}]" }
