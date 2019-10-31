@@ -24,8 +24,8 @@ object NotificationUtil {
                     var htmlReport = ReportUtil.generateHtml(operator, recordForm, record)
                     EmailUtil.sendEmail(
                         from = Recipient(
-                            Runtime.config.notificationEmailName,
-                            Runtime.config.notificationEmailAddress,
+                            Runtime.lpConfig.notificationEmailName,
+                            Runtime.lpConfig.notificationEmailAddress,
                             null
                         ),
                         to = recipients,
@@ -53,8 +53,8 @@ object NotificationUtil {
                     var htmlReport = ReportUtil.generateHtml(operator, recordForm, recordObject)
                     EmailUtil.sendEmail(
                         from = Recipient(
-                            Runtime.config.notificationEmailName,
-                            Runtime.config.notificationEmailAddress,
+                            Runtime.lpConfig.notificationEmailName,
+                            Runtime.lpConfig.notificationEmailAddress,
                             null
                         ),
                         to = recipients,
