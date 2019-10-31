@@ -13,7 +13,7 @@ private fun uploadFile(ctx: Context): Context {
         var f = FormFileUpload(identifier = identifier)
         ctx.uploadedFiles("files").forEachIndexed { index, uploadedFile ->
             val newPath = Paths.get(
-                Runtime.config.uploadedPath,
+                Runtime.lpConfig.uploadedPath,
                 "${identifier}@${index}${uploadedFile.extension}"
             )
             FileUtil.streamToFile(

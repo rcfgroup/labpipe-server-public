@@ -12,10 +12,10 @@ data class EmailAttachment(var name: String, var file: FileDataSource)
 
 object EmailUtil {
     fun connect(): Mailer {
-        Runtime.mailer = MailerBuilder.withSMTPServerHost(Runtime.config.emailHost)
-            .withSMTPServerPort(Runtime.config.emailPort)
-            .withSMTPServerUsername(Runtime.config.emailUser)
-            .withSMTPServerPassword(Runtime.config.emailPass).buildMailer()
+        Runtime.mailer = MailerBuilder.withSMTPServerHost(Runtime.lpConfig.emailHost)
+            .withSMTPServerPort(Runtime.lpConfig.emailPort)
+            .withSMTPServerUsername(Runtime.lpConfig.emailUser)
+            .withSMTPServerPassword(Runtime.lpConfig.emailPass).buildMailer()
         return Runtime.mailer
     }
 

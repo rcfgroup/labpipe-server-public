@@ -115,54 +115,54 @@ fun readConfig(): PropertiesConfiguration? {
 fun importConfig() {
     val properties = readConfig()
     properties?.run {
-        Runtime.config = LPConfig(
+        Runtime.lpConfig = LPConfig(
             serverPort = if (properties.containsKey(CONFIGS.SERVER_PORT)) properties.getInt(CONFIGS.SERVER_PORT)
             else 4567
         )
-        Runtime.config.cachePath =
+        Runtime.lpConfig.cachePath =
             if (properties.containsKey(CONFIGS.PATH_CACHE)) properties.getString(CONFIGS.PATH_CACHE)
             else Paths.get(System.getProperty("user.home"), "labpipe").toString()
-        Runtime.config.uploadedPath =
+        Runtime.lpConfig.uploadedPath =
             if (properties.containsKey(CONFIGS.PATH_UPLOADED)) properties.getString(CONFIGS.PATH_UPLOADED)
             else Paths.get(System.getProperty("user.home"), "labpipe", "uploaded").toString()
-        Runtime.config.dbHost =
+        Runtime.lpConfig.dbHost =
             if (properties.containsKey(CONFIGS.DB_HOST)) properties.getString(CONFIGS.DB_HOST)
             else "localhost"
-        Runtime.config.dbPort =
+        Runtime.lpConfig.dbPort =
             if (properties.containsKey(CONFIGS.DB_PORT)) properties.getInt(CONFIGS.DB_PORT)
             else 27017
-        Runtime.config.dbName =
+        Runtime.lpConfig.dbName =
             if (properties.containsKey(CONFIGS.DB_NAME)) properties.getString(CONFIGS.DB_NAME)
             else "labpipe"
-        Runtime.config.dbUser =
+        Runtime.lpConfig.dbUser =
             if (properties.containsKey(CONFIGS.DB_USER)) properties.getString(CONFIGS.DB_USER)
             else null
-        Runtime.config.dbPass =
+        Runtime.lpConfig.dbPass =
             if (properties.containsKey(CONFIGS.DB_PASS)) properties.getString(CONFIGS.DB_PASS)
             else null
-        Runtime.config.emailHost =
+        Runtime.lpConfig.emailHost =
             if (properties.containsKey(CONFIGS.MAIL_HOST)) properties.getString(CONFIGS.MAIL_HOST)
             else "localhost"
-        Runtime.config.emailPort =
+        Runtime.lpConfig.emailPort =
             if (properties.containsKey(CONFIGS.MAIL_PORT)) properties.getInt(CONFIGS.MAIL_PORT)
             else 25
-        Runtime.config.emailUser =
+        Runtime.lpConfig.emailUser =
             if (properties.containsKey(CONFIGS.MAIL_USER)) properties.getString(CONFIGS.MAIL_USER)
             else null
-        Runtime.config.emailPass =
+        Runtime.lpConfig.emailPass =
             if (properties.containsKey(CONFIGS.MAIL_PASS)) properties.getString(CONFIGS.MAIL_PASS)
             else null
-        Runtime.config.notificationEmailName =
+        Runtime.lpConfig.notificationEmailName =
             if (properties.containsKey(CONFIGS.MAIL_NAME)) properties.getString(CONFIGS.MAIL_NAME)
             else "LabPipe Notification"
-        Runtime.config.notificationEmailAddress =
+        Runtime.lpConfig.notificationEmailAddress =
             if (properties.containsKey(CONFIGS.MAIL_ADDR)) properties.getString(CONFIGS.MAIL_ADDR)
             else "no-reply@labpipe.org"
     }
 }
 
 fun startServer() {
-    Runtime.server = Javalin.create()
+    Runtime.server = Javalin.create { config -> config.enableCorsForAllOrigins() }
     AuthManager.setManager()
     generalRoutes()
     parameterRoutes()
@@ -171,8 +171,8 @@ fun startServer() {
     queryRoutes()
     manageRoutes()
     uploadRoutes()
-    Runtime.server.start(Runtime.config.serverPort)
-    echo("Server running at " + Runtime.config.serverPort)
+    Runtime.server.start(Runtime.lpConfig.serverPort)
+    echo("Server running at " + Runtime.lpConfig.serverPort)
 }
 
 class LPServerCmdLine :

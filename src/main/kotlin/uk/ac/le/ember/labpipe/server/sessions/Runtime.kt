@@ -10,7 +10,7 @@ import uk.ac.le.ember.labpipe.server.LPConfig
 class Runtime {
     companion object {
         var logger = KotlinLogging.logger {}
-        var config = LPConfig()
+        var lpConfig = LPConfig()
         var debugMode: Boolean = false
 
         lateinit var mongoClient: MongoClient

@@ -39,8 +39,8 @@ fun addOperator(email: String, name: String, notify: Boolean = true, show: Boole
     if (notify) {
         EmailUtil.sendEmail(
             from = Recipient(
-                Runtime.config.notificationEmailName,
-                Runtime.config.notificationEmailAddress,
+                Runtime.lpConfig.notificationEmailName,
+                Runtime.lpConfig.notificationEmailAddress,
                 null
             ),
             to = listOf(
@@ -93,8 +93,8 @@ fun addOperator(operator: Operator, notify: Boolean = true, show: Boolean = fals
     if (notify) {
         EmailUtil.sendEmail(
             from = Recipient(
-                Runtime.config.notificationEmailName,
-                Runtime.config.notificationEmailAddress,
+                Runtime.lpConfig.notificationEmailName,
+                Runtime.lpConfig.notificationEmailAddress,
                 null
             ),
             to = listOf(
@@ -169,8 +169,8 @@ fun addToken(operator: Operator? = null, notify: Boolean = true): ResultMessage 
         if (notify) {
             EmailUtil.sendEmail(
                 from = Recipient(
-                    Runtime.config.notificationEmailName,
-                    Runtime.config.notificationEmailAddress,
+                    Runtime.lpConfig.notificationEmailName,
+                    Runtime.lpConfig.notificationEmailAddress,
                     null
                 ),
                 to = listOf(
@@ -216,8 +216,8 @@ fun addRole(identifier: String, name: String, operator: Operator? = null, notify
         if (notify) {
             EmailUtil.sendEmail(
                 from = Recipient(
-                    Runtime.config.notificationEmailName,
-                    Runtime.config.notificationEmailAddress,
+                    Runtime.lpConfig.notificationEmailName,
+                    Runtime.lpConfig.notificationEmailAddress,
                     null
                 ),
                 to = listOf(
@@ -254,8 +254,8 @@ fun addRole(role: OperatorRole, operator: Operator? = null, notify: Boolean = tr
         if (notify) {
             EmailUtil.sendEmail(
                 from = Recipient(
-                    Runtime.config.notificationEmailName,
-                    Runtime.config.notificationEmailAddress,
+                    Runtime.lpConfig.notificationEmailName,
+                    Runtime.lpConfig.notificationEmailAddress,
                     null
                 ),
                 to = listOf(
@@ -308,8 +308,8 @@ fun addEmailGroup(
         if (notify) {
             EmailUtil.sendEmail(
                 from = Recipient(
-                    Runtime.config.notificationEmailName,
-                    Runtime.config.notificationEmailAddress,
+                    Runtime.lpConfig.notificationEmailName,
+                    Runtime.lpConfig.notificationEmailAddress,
                     null
                 ),
                 to = listOf(
@@ -346,8 +346,8 @@ fun addEmailGroup(emailGroup: EmailGroup, operator: Operator? = null, notify: Bo
         if (notify) {
             EmailUtil.sendEmail(
                 from = Recipient(
-                    Runtime.config.notificationEmailName,
-                    Runtime.config.notificationEmailAddress,
+                    Runtime.lpConfig.notificationEmailName,
+                    Runtime.lpConfig.notificationEmailAddress,
                     null
                 ),
                 to = listOf(
@@ -411,8 +411,8 @@ fun addInstrument(
         if (notify) {
             EmailUtil.sendEmail(
                 from = Recipient(
-                    Runtime.config.notificationEmailName,
-                    Runtime.config.notificationEmailAddress,
+                    Runtime.lpConfig.notificationEmailName,
+                    Runtime.lpConfig.notificationEmailAddress,
                     null
                 ),
                 to = listOf(
@@ -449,8 +449,8 @@ fun addInstrument(instrument: Instrument, operator: Operator? = null, notify: Bo
         if (notify) {
             EmailUtil.sendEmail(
                 from = Recipient(
-                    Runtime.config.notificationEmailName,
-                    Runtime.config.notificationEmailAddress,
+                    Runtime.lpConfig.notificationEmailName,
+                    Runtime.lpConfig.notificationEmailAddress,
                     null
                 ),
                 to = listOf(
@@ -494,8 +494,8 @@ fun addLocation(location: Location, operator: Operator? = null, notify: Boolean 
         if (notify) {
             EmailUtil.sendEmail(
                 from = Recipient(
-                    Runtime.config.notificationEmailName,
-                    Runtime.config.notificationEmailAddress,
+                    Runtime.lpConfig.notificationEmailName,
+                    Runtime.lpConfig.notificationEmailAddress,
                     null
                 ),
                 to = listOf(
@@ -539,8 +539,8 @@ fun addStudy(study: Study, operator: Operator? = null, notify: Boolean = true): 
         if (notify) {
             EmailUtil.sendEmail(
                 from = Recipient(
-                    Runtime.config.notificationEmailName,
-                    Runtime.config.notificationEmailAddress,
+                    Runtime.lpConfig.notificationEmailName,
+                    Runtime.lpConfig.notificationEmailAddress,
                     null
                 ),
                 to = listOf(
