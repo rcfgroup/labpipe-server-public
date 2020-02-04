@@ -52,8 +52,7 @@ fun recordRoutes() {
     Runtime.server.post(API.RECORD.ADD, { ctx ->
         val operator = AuthManager.getUser(ctx)
         operator?.run {
-            val jsonParser = JsonParser()
-            val record = jsonParser.parse(ctx.body()).asJsonObject
+            val record = JsonParser.parseString(ctx.body()).asJsonObject
             val formIdentifier = record.get("formIdentifier").asString
             record.addProperty("uploaded_by", operator.username)
             record.addProperty("created", LocalDateTime.now().toString())

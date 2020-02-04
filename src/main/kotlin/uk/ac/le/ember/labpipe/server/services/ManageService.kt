@@ -9,7 +9,7 @@ import org.litote.kmongo.findOne
 import org.litote.kmongo.getCollection
 import org.litote.kmongo.updateOne
 import org.mindrot.jbcrypt.BCrypt
-import org.simplejavamail.email.Recipient
+import org.simplejavamail.api.email.Recipient
 import uk.ac.le.ember.labpipe.server.*
 import uk.ac.le.ember.labpipe.server.notification.EmailUtil
 import uk.ac.le.ember.labpipe.server.sessions.Runtime

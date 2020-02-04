@@ -132,8 +132,7 @@ class AddStudy : CliktCommand(name = "study", help = "Add new study") {
         importConfig()
         DatabaseUtil.connect()
         EmailUtil.connect()
-        val jsonParser = JsonParser()
-        val config = jsonParser.parse(config).asJsonObject
+        val config = JsonParser.parseString(config).asJsonObject
         val study = Study(identifier = identifier)
         study.name = name
         study.config = config
