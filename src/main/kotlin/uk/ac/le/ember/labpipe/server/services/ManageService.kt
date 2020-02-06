@@ -3,15 +3,16 @@ package uk.ac.le.ember.labpipe.server.services
 import com.github.ajalt.clikt.output.TermUi.echo
 import io.javalin.core.security.SecurityUtil.roles
 import io.javalin.http.Context
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import org.apache.commons.lang3.RandomStringUtils
-import org.litote.kmongo.eq
-import org.litote.kmongo.findOne
-import org.litote.kmongo.getCollection
-import org.litote.kmongo.updateOne
+import org.litote.kmongo.*
 import org.mindrot.jbcrypt.BCrypt
 import org.simplejavamail.api.email.Recipient
 import uk.ac.le.ember.labpipe.server.*
 import uk.ac.le.ember.labpipe.server.notification.EmailUtil
+import uk.ac.le.ember.labpipe.server.notification.NotificationUtil
+import uk.ac.le.ember.labpipe.server.notification.ReportUtil
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 import java.util.*
 
@@ -35,6 +36,12 @@ fun addOperator(email: String, name: String, notify: Boolean = true, show: Boole
     if (show) {
         echo("[Username] ${operator.username}")
         echo("[Password] $tempPassword")
+    }
+    operator.notificationGroup.forEach {
+        MONGO.COLLECTIONS.EMAIL_GROUPS.updateOne(
+            EmailGroup::identifier eq it,
+            EmailGroup::member addToSet operator.username
+        )
     }
     if (notify) {
         EmailUtil.sendEmail(
@@ -89,6 +96,12 @@ fun addOperator(operator: Operator, notify: Boolean = true, show: Boolean = fals
     if (show) {
         echo("[Username] ${operator.username}")
         echo("[Password] $tempPassword")
+    }
+    operator.notificationGroup.forEach {
+        MONGO.COLLECTIONS.EMAIL_GROUPS.updateOne(
+            EmailGroup::identifier eq it,
+            EmailGroup::member addToSet operator.username
+        )
     }
     if (notify) {
         EmailUtil.sendEmail(
