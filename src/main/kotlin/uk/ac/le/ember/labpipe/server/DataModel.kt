@@ -10,6 +10,7 @@ data class LPConfig(var serverPort: Int = 4567) {
     var dbName: String = "labpipe-dev"
     var dbUser: String? = null
     var dbPass: String? = null
+    var dbSrv: Boolean = false
 
     var emailHost: String = "localhost"
     var emailPort: Int = 25

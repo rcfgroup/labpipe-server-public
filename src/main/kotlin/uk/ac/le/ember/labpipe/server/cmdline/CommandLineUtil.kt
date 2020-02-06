@@ -76,6 +76,7 @@ fun readConfig(): PropertiesConfiguration? {
         updateConfig(key = CONFIGS.DB_HOST, value = "localhost")
         updateConfig(key = CONFIGS.DB_PORT, value = 27017)
         updateConfig(key = CONFIGS.DB_NAME, value = "labpipe-dev")
+        updateConfig(key = CONFIGS.DB_SRV, value = false)
 
         updateConfig(key = CONFIGS.MAIL_HOST, value = "localhost")
         updateConfig(key = CONFIGS.MAIL_PORT, value = 25)
@@ -96,6 +97,7 @@ fun readConfig(): PropertiesConfiguration? {
         echo("[HOST]: localhost")
         echo("[PORT]: 27017")
         echo("[NAME]: labpipe-dev")
+        echo("[SRV]: No")
         echo("------ Email Server ------")
         echo("[HOST]: localhost")
         echo("[PORT]: 25")
@@ -140,6 +142,9 @@ fun importConfig() {
         Runtime.lpConfig.dbPass =
             if (properties.containsKey(CONFIGS.DB_PASS)) properties.getString(CONFIGS.DB_PASS)
             else null
+        Runtime.lpConfig.dbSrv =
+            if (properties.containsKey(CONFIGS.DB_SRV)) properties.getBoolean(CONFIGS.DB_SRV)
+            else false
         Runtime.lpConfig.emailHost =
             if (properties.containsKey(CONFIGS.MAIL_HOST)) properties.getString(CONFIGS.MAIL_HOST)
             else "localhost"
@@ -208,6 +213,7 @@ class Database : CliktCommand(name = "db", help = "Configure database server") {
     private val name by option("--name", help = "database name")
     private val user by option("--user", help = "database user")
     private val pswd by option("--pass", help = "database password")
+    private val srv by option("--srv-on", help = "use srv").flag("--srv-off", default = false)
 
     override fun run() {
         updateConfig(key = CONFIGS.DB_HOST, value = host)
@@ -215,6 +221,7 @@ class Database : CliktCommand(name = "db", help = "Configure database server") {
         updateConfig(key = CONFIGS.DB_NAME, value = name)
         updateConfig(key = CONFIGS.DB_USER, value = user)
         updateConfig(key = CONFIGS.DB_PASS, value = pswd)
+        updateConfig(key = CONFIGS.DB_SRV, value = srv)
     }
 }
 
