@@ -9,10 +9,13 @@ class DatabaseUtil {
     companion object {
 
         fun connect() {
+            val mongoProtocol = if (Runtime.lpConfig.dbSrv) "mongodb+srv://" else "mongodb://"
+            val mongoPort = if (Runtime.lpConfig.dbSrv) "" else ":${Runtime.lpConfig.dbPort}"
             val mongoConnectionString = if (Runtime.lpConfig.dbUser != null && Runtime.lpConfig.dbPass != null)
-                "mongodb://${Runtime.lpConfig.dbUser}:${Runtime.lpConfig.dbPass}@${Runtime.lpConfig.dbHost}:${Runtime.lpConfig.dbPort}/${Runtime.lpConfig.dbName}?retryWrites=false"
+                "${mongoProtocol}${Runtime.lpConfig.dbUser}:${Runtime.lpConfig.dbPass}@${Runtime.lpConfig.dbHost}${mongoPort}/${Runtime.lpConfig.dbName}?retryWrites=true&w=majority"
             else
-                "mongodb://${Runtime.lpConfig.dbHost}:${Runtime.lpConfig.dbPort}/${Runtime.lpConfig.dbName}?retryWrites=false"
+                "${mongoProtocol}${Runtime.lpConfig.dbHost}${mongoPort}/${Runtime.lpConfig.dbName}?retryWrites=true&w=majority"
+            println(mongoConnectionString)
             val mongoUri = MongoClientURI(mongoConnectionString)
             Runtime.mongoClient = KMongo.createClient(mongoUri)
             Runtime.mongoDatabase = Runtime.mongoClient.getDatabase(Runtime.lpConfig.dbName)

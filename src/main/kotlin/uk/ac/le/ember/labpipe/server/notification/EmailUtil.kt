@@ -1,9 +1,9 @@
 package uk.ac.le.ember.labpipe.server.notification
 
-import org.simplejavamail.email.AttachmentResource
+import org.simplejavamail.api.email.AttachmentResource
+import org.simplejavamail.api.email.Recipient
+import org.simplejavamail.api.mailer.Mailer
 import org.simplejavamail.email.EmailBuilder
-import org.simplejavamail.email.Recipient
-import org.simplejavamail.mailer.Mailer
 import org.simplejavamail.mailer.MailerBuilder
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 import javax.activation.FileDataSource

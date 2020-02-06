@@ -97,6 +97,7 @@ object CONFIGS {
     const val DB_NAME = "database.name"
     const val DB_USER = "database.user"
     const val DB_PASS = "database.pass"
+    const val DB_SRV = "database.srv"
 
     const val MAIL_HOST = "mail.host"
     const val MAIL_PORT = "mail.port"

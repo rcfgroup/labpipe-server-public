@@ -233,8 +233,7 @@ object ReportUtil {
                                     when (ElementMethod.values().find { it.value.equals(element.method, true) }) {
                                         ElementMethod.VALUE -> reportBody.with(table(tr(td(element.value[0]))))
                                         ElementMethod.JSON -> {
-                                            val jsonParser = JsonParser()
-                                            val value = jsonParser.parse(element.value[0]).asJsonObject
+                                            val value = JsonParser.parseString(element.value[0]).asJsonObject
                                             var table = table().withClasses("table", "table-responsive")
                                             value?.run {
                                                 val entries = value.entrySet()
@@ -357,8 +356,7 @@ object ReportUtil {
                                     when (ElementMethod.values().find { it.value.equals(element.method, true) }) {
                                         ElementMethod.VALUE -> reportBody.with(table(tr(td(element.value[0]))))
                                         ElementMethod.JSON -> {
-                                            val jsonParser = JsonParser()
-                                            val value = jsonParser.parse(element.value[0]).asJsonObject
+                                            val value = JsonParser.parseString(element.value[0]).asJsonObject
                                             var table = table().withClasses("table", "table-responsive")
                                             value?.run {
                                                 val entries = value.entrySet()

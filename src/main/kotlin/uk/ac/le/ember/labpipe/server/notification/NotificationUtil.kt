@@ -6,7 +6,7 @@ import com.google.gson.JsonParser
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.litote.kmongo.*
-import org.simplejavamail.email.Recipient
+import org.simplejavamail.api.email.Recipient
 import uk.ac.le.ember.labpipe.server.*
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 
@@ -48,8 +48,7 @@ object NotificationUtil {
                     for (r in recipients) {
                         println("Recipient: ${r.name} <${r.address}>")
                     }
-                    val jsonParser = JsonParser()
-                    val recordObject = jsonParser.parse(Gson().toJson(record)).asJsonObject
+                    val recordObject = JsonParser.parseString(Gson().toJson(record)).asJsonObject
                     var htmlReport = ReportUtil.generateHtml(operator, recordForm, recordObject)
                     EmailUtil.sendEmail(
                         from = Recipient(
