@@ -1,6 +1,7 @@
 package uk.ac.le.ember.labpipe.server.notification
 
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import kotlinx.coroutines.GlobalScope
@@ -22,6 +23,8 @@ object NotificationUtil {
                         println("Recipient: ${r.name} <${r.address}>")
                     }
                     var htmlReport = ReportUtil.generateHtml(operator, recordForm, record)
+                    val gson = GsonBuilder().setPrettyPrinting().create()
+                    var textReport = gson.toJson(record)
                     EmailUtil.sendEmail(
                         from = Recipient(
                             Runtime.lpConfig.notificationEmailName,
@@ -30,8 +33,8 @@ object NotificationUtil {
                         ),
                         to = recipients,
                         subject = recordForm.notificationSubject,
-                        text = "TEXT TEMPLATE",
-                        html = htmlReport ?: "Unable to generate html",
+                        text = textReport,
+                        html = htmlReport ?: textReport,
                         async = true
                     )
                 }

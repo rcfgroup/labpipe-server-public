@@ -78,8 +78,9 @@ dependencies {
 configure<JavaPluginConvention> {
     sourceCompatibility = JavaVersion.VERSION_11
 }
-tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
+
+tasks.withType<Test> {
+    useJUnitPlatform()
 }
 
 application {
