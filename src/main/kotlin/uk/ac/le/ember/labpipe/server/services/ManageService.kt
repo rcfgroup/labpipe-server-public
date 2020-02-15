@@ -538,7 +538,7 @@ private fun addLocation(ctx: Context): Context {
     return ctx.status(result.status).json(result.message)
 }
 
-fun addStudy(study: Study, operator: Operator? = null, notify: Boolean = true): ResultMessage {
+fun addStudy(study: Study, config: String? = null, operator: Operator? = null, notify: Boolean = true): ResultMessage {
     val col = Runtime.mongoDatabase.getCollection<Study>(MONGO.COL_NAMES.STUDIES)
     val current = col.findOne(Study::identifier eq study.identifier)
     current?.run {
@@ -548,6 +548,10 @@ fun addStudy(study: Study, operator: Operator? = null, notify: Boolean = true): 
         )
     }
     col.insertOne(study)
+    config?.run {
+        val dollarSign = "$"
+        col.updateOne("""{identifier: '${study.identifier}'}""", """{${dollarSign}set:{config:${config}}}""")
+    }
     operator?.run {
         if (notify) {
             EmailUtil.sendEmail(
@@ -579,7 +583,7 @@ fun addStudy(study: Study, operator: Operator? = null, notify: Boolean = true): 
 private fun addStudy(ctx: Context): Context {
     val study = ctx.body<Study>()
     val operator = AuthManager.getUser(ctx)
-    val result = addStudy(study, operator, true)
+    val result = addStudy(study, operator = operator, notify = true)
     return ctx.status(result.status).json(result.message)
 }
 
