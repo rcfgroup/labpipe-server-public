@@ -57,7 +57,10 @@ dependencies {
     compile("io.javalin", "javalin", "3.7.0")
 
     // https://mvnrepository.com/artifact/org.simplejavamail/simple-java-mail
-    compile("org.simplejavamail", "simple-java-mail", "6.0.2")
+    compile("org.simplejavamail", "simple-java-mail", "6.0.3")
+
+    // https://mvnrepository.com/artifact/org.simplejavamail/batch-module
+    compile("org.simplejavamail", "batch-module", "6.0.3")
 
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     compile("com.google.code.gson", "gson", "2.8.6")
