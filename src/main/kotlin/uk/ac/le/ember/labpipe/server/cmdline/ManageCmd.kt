@@ -1,14 +1,10 @@
 package uk.ac.le.ember.labpipe.server.cmdline
 
 import com.github.ajalt.clikt.core.CliktCommand
-import com.github.ajalt.clikt.parameters.options.flag
-import com.github.ajalt.clikt.parameters.options.option
-import com.github.ajalt.clikt.parameters.options.prompt
-import com.github.ajalt.clikt.parameters.options.split
+import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.choice
 import com.github.ajalt.clikt.parameters.types.file
 import com.google.gson.Gson
-import com.google.gson.JsonParser
 import uk.ac.le.ember.labpipe.server.*
 import uk.ac.le.ember.labpipe.server.db.DatabaseUtil
 import uk.ac.le.ember.labpipe.server.notification.EmailUtil
@@ -108,14 +104,14 @@ class AddLocation : CliktCommand(name = "location", help = "Add new location") {
         help = "location identifier"
     ).prompt(text = "Please enter location identifier")
     private val name by option("--name", help = "location name").prompt(text = "Please enter location name")
-    private val type by option("--type", help = "location types").split(",")
+    private val type by option("--type", help = "location types").split(",").default(mutableListOf())
 
     override fun run() {
         importConfig()
         DatabaseUtil.connect()
         EmailUtil.connect()
         val location = Location(identifier = identifier, name = name)
-        location.type = type!!.toMutableSet()
+        location.type = type.toMutableSet()
         addLocation(location = location)
     }
 }
@@ -132,11 +128,9 @@ class AddStudy : CliktCommand(name = "study", help = "Add new study") {
         importConfig()
         DatabaseUtil.connect()
         EmailUtil.connect()
-        val config = JsonParser.parseString(config).asJsonObject
         val study = Study(identifier = identifier)
         study.name = name
-        study.config = config
-        addStudy(study)
+        addStudy(study, config = config)
     }
 }
 
@@ -148,53 +142,49 @@ class ImportCmd : CliktCommand(name = "import", help = "Import record(s) from fi
         "instrument",
         "location",
         "study"
-    )
+    ).prompt(text = "Please enter import target from available choices")
     private val source by option("--source", help = "file of operator(s)").file(
         exists = true,
         fileOkay = true,
         folderOkay = false,
         readable = true
-    )
+    ).prompt(text = "Please enter source file path")
 
     override fun run() {
         importConfig()
         DatabaseUtil.connect()
         EmailUtil.connect()
         val gson = Gson()
-        target?.run {
-            source?.run {
-                when (target) {
-                    "operator" -> {
-                        val reader = FileReader(source)
-                        val data = gson.fromJson(reader, Array<Operator>::class.java)
-                        data.forEach { addOperator(operator = it, notify = true) }
-                    }
-                    "role" -> {
-                        val reader = FileReader(source)
-                        val data = gson.fromJson(reader, Array<OperatorRole>::class.java)
-                        data.forEach { addRole(role = it, notify = true) }
-                    }
-                    "email-group" -> {
-                        val reader = FileReader(source)
-                        val data = gson.fromJson(reader, Array<EmailGroup>::class.java)
-                        data.forEach { addEmailGroup(emailGroup = it, notify = true) }
-                    }
-                    "instrument" -> {
-                        val reader = FileReader(source)
-                        val data = gson.fromJson(reader, Array<Instrument>::class.java)
-                        data.forEach { addInstrument(instrument = it, notify = true) }
-                    }
-                    "location" -> {
-                        val reader = FileReader(source)
-                        val data = gson.fromJson(reader, Array<Location>::class.java)
-                        data.forEach { addLocation(location = it, notify = true) }
-                    }
-                    "study" -> {
-                        val reader = FileReader(source)
-                        val data = gson.fromJson(reader, Array<Study>::class.java)
-                        data.forEach { addStudy(study = it, notify = true) }
-                    }
-                }
+        when (target) {
+            "operator" -> {
+                val reader = FileReader(source)
+                val data = gson.fromJson(reader, Array<Operator>::class.java)
+                data.forEach { addOperator(operator = it, notify = true) }
+            }
+            "role" -> {
+                val reader = FileReader(source)
+                val data = gson.fromJson(reader, Array<OperatorRole>::class.java)
+                data.forEach { addRole(role = it, notify = true) }
+            }
+            "email-group" -> {
+                val reader = FileReader(source)
+                val data = gson.fromJson(reader, Array<EmailGroup>::class.java)
+                data.forEach { addEmailGroup(emailGroup = it, notify = true) }
+            }
+            "instrument" -> {
+                val reader = FileReader(source)
+                val data = gson.fromJson(reader, Array<Instrument>::class.java)
+                data.forEach { addInstrument(instrument = it, notify = true) }
+            }
+            "location" -> {
+                val reader = FileReader(source)
+                val data = gson.fromJson(reader, Array<Location>::class.java)
+                data.forEach { addLocation(location = it, notify = true) }
+            }
+            "study" -> {
+                val reader = FileReader(source)
+                val data = gson.fromJson(reader, Array<Study>::class.java)
+                data.forEach { addStudy(study = it, notify = true) }
             }
         }
     }

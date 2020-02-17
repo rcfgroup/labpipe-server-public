@@ -54,7 +54,10 @@ enum class ElementSource(val value: String) {
 
 object ReportUtil {
     fun generateHtml(operator: Operator, form: FormTemplate, formData: JsonObject): String? {
-        val reportTemplate = MONGO.COLLECTIONS.REPORT_TEMPLATES.findOne(ReportTemplate::formIdentifier eq form.identifier, ReportTemplate::active eq true)
+        val reportTemplate = MONGO.COLLECTIONS.REPORT_TEMPLATES.findOne(
+            ReportTemplate::formIdentifier eq form.identifier,
+            ReportTemplate::active eq true
+        )
         reportTemplate?.run {
             Runtime.logger.info { "Report template found." }
             Runtime.logger.info { reportTemplate.html.size }
@@ -674,7 +677,7 @@ object ReportUtil {
             val keyArray = key.split(".")
             var result: JsonElement? = formData
             keyArray.forEach {
-                    result = result?.asJsonObject?.get(it)
+                result = result?.asJsonObject?.get(it)
             }
             result
         } else {
