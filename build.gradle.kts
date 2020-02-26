@@ -6,6 +6,7 @@ plugins {
     application
     kotlin("jvm") version "1.3.61"
     id("com.github.johnrengelman.shadow") version "5.2.0"
+    kotlin("kapt") version "1.3.61"
 }
 
 group = "uk.ac.le.ember"
@@ -20,6 +21,9 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3")
     testImplementation("io.kotlintest", "kotlintest-runner-junit5", "3.4.2")
+
+
+    kapt("org.litote.kmongo:kmongo-annotation-processor:3.12.0")
 
 
     // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
