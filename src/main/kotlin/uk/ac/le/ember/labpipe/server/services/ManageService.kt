@@ -40,7 +40,7 @@ fun addOperator(email: String, name: String, notify: Boolean = true, show: Boole
     operator.notificationGroup.forEach {
         MONGO.COLLECTIONS.EMAIL_GROUPS.updateOne(
             EmailGroup::identifier eq it,
-            EmailGroup::member addToSet operator.username
+            addToSet(EmailGroup::member, operator.username)
         )
     }
     if (notify) {
@@ -100,7 +100,7 @@ fun addOperator(operator: Operator, notify: Boolean = true, show: Boolean = fals
     operator.notificationGroup.forEach {
         MONGO.COLLECTIONS.EMAIL_GROUPS.updateOne(
             EmailGroup::identifier eq it,
-            EmailGroup::member addToSet operator.username
+            addToSet(EmailGroup::member, operator.username)
         )
     }
     if (notify) {

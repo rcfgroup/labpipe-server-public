@@ -1,7 +1,9 @@
 package uk.ac.le.ember.labpipe.server
 
+import org.litote.kmongo.Data
 import java.nio.file.Paths
 
+@Data
 data class LPConfig(var serverPort: Int = 4567) {
     var cachePath: String = Paths.get(System.getProperty("user.home"), "labpipe").toString()
     var uploadedPath: String = Paths.get(System.getProperty("user.home"), "labpipe", "uploaded").toString()
@@ -21,12 +23,15 @@ data class LPConfig(var serverPort: Int = 4567) {
     var notificationEmailAddress: String = "no-reply@labpipe.org"
 }
 
+@Data
 data class Parameter(var identifier: String) {
     var value: MutableList<Any> = mutableListOf()
 }
 
+@Data
 data class ClientSettings(var identifier: String, var name: String, var value: MutableSet<String>? = mutableSetOf())
 
+@Data
 data class Operator(var email: String) {
     var name: String = ""
     var username: String = email
@@ -39,6 +44,7 @@ data class Operator(var email: String) {
     var roles: MutableSet<String> = mutableSetOf()
 }
 
+@Data
 data class AccessToken(
     var token: String,
     var keyHash: String
@@ -46,14 +52,18 @@ data class AccessToken(
     var roles: MutableSet<String> = mutableSetOf()
 }
 
+@Data
 data class Location(var identifier: String, var name: String) {
     var type: MutableSet<String> = mutableSetOf()
 }
 
+@Data
 data class OperatorRole(val identifier: String, val name: String)
 
+@Data
 data class ApiAccessRole(var url: String, var roles: MutableSet<String>)
 
+@Data
 data class FormTemplate(var identifier: String, var name: String) {
     var studyIdentifier: String = ""
 
@@ -80,10 +90,12 @@ data class FormTemplate(var identifier: String, var name: String) {
     }
 }
 
+@Data
 data class ElectronFileFilter(var name: String) {
     var extensions: MutableSet<String> = mutableSetOf()
 }
 
+@Data
 data class QuestionTemplate(var key: String, var label: String, var controlType: String) {
     var required: Boolean = true
     var order: Int = 1
@@ -96,6 +108,7 @@ data class QuestionTemplate(var key: String, var label: String, var controlType:
     var filter: MutableSet<ElectronFileFilter> = mutableSetOf()
 }
 
+@Data
 data class WizardPageFormValidProcess(var order: Int, var processType: String, var parameters: MutableList<String>) {
     var newField: String? = null
     var auto: Boolean = false
@@ -103,6 +116,7 @@ data class WizardPageFormValidProcess(var order: Int, var processType: String, v
     var allowCopy: Boolean = false
 }
 
+@Data
 data class WizardPageTemplate(var key: String, var title: String) {
     var navTitle: String? = ""
     var requireValidForm: Boolean = true
@@ -111,10 +125,12 @@ data class WizardPageTemplate(var key: String, var title: String) {
     var formValidProcess: MutableList<WizardPageFormValidProcess> = mutableListOf()
 }
 
+@Data
 data class WizardTemplate(var title: String) {
     var pages: MutableList<WizardPageTemplate> = mutableListOf()
 }
 
+@Data
 data class EmailGroup(var identifier: String) {
     var name: String = ""
 
@@ -126,28 +142,36 @@ data class EmailGroup(var identifier: String) {
     var member: MutableSet<String> = mutableSetOf()
 }
 
+@Data
 data class FormFileUpload(var identifier: String) {
     var files: MutableSet<String> = mutableSetOf()
 }
 
+@Data
 data class Message(var message: String)
 
+@Data
 data class ResultMessage(var status: Int, var message: Message)
 
+@Data
 data class Instrument(var identifier: String, var name: String) {
     var realtime: Boolean = false
     var fileType: MutableSet<String> = mutableSetOf()
 }
 
+@Data
 data class Collector(var identifier: String, var name: String)
 
+@Data
 data class SampleType(var identifier: String, var name: String)
 
+@Data
 data class Study(var identifier: String) {
     var name: String = ""
     var config: Any? = null
 }
 
+@Data
 data class Record(var actionIdentifier: String) {
     var formIdentifier: String = ""
     var studyIdentifier: String = ""
