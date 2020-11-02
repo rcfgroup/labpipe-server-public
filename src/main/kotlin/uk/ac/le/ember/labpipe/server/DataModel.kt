@@ -3,25 +3,6 @@ package uk.ac.le.ember.labpipe.server
 import org.litote.kmongo.Data
 import java.nio.file.Paths
 
-@Data
-data class LPConfig(var serverPort: Int = 4567) {
-    var cachePath: String = Paths.get(System.getProperty("user.home"), "labpipe").toString()
-    var uploadedPath: String = Paths.get(System.getProperty("user.home"), "labpipe", "uploaded").toString()
-    var dbHost: String = "localhost"
-    var dbPort: Int = 27017
-    var dbName: String = "labpipe-dev"
-    var dbUser: String? = null
-    var dbPass: String? = null
-    var dbSrv: Boolean = false
-
-    var emailHost: String = "localhost"
-    var emailPort: Int = 25
-    var emailUser: String? = null
-    var emailPass: String? = null
-
-    var notificationEmailName: String = "LabPipe Notification"
-    var notificationEmailAddress: String = "no-reply@labpipe.org"
-}
 
 @Data
 data class Parameter(var identifier: String) {
