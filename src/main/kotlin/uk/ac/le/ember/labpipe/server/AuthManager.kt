@@ -83,8 +83,8 @@ object AuthManager {
     }
 
     fun getApiRoles(url: String): Set<String> {
-        val apiAccessRole: uk.ac.le.ember.labpipe.server.ApiAccessRole? =
-            Runtime.mongoDatabase.getCollection<uk.ac.le.ember.labpipe.server.ApiAccessRole>(MONGO.COL_NAMES.API_ACCESS_ROLES)
+        val apiAccessRole: ApiAccessRole? =
+            Runtime.mongoDatabase.getCollection<ApiAccessRole>(MONGO.COL_NAMES.API_ACCESS_ROLES)
                 .findOne(eq("url", url))
         return apiAccessRole?.roles ?: setOf()
     }
