@@ -3,10 +3,13 @@ package uk.ac.le.ember.labpipe.server
 import com.mongodb.client.model.Filters.eq
 import io.javalin.core.security.Role
 import io.javalin.http.Context
+import mu.KotlinLogging
 import org.litote.kmongo.findOne
 import org.litote.kmongo.getCollection
 import org.mindrot.jbcrypt.BCrypt
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
+
+private val logger = KotlinLogging.logger {}
 
 object AuthManager {
     fun setManager() {

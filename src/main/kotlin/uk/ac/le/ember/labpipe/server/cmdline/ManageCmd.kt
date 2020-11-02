@@ -9,7 +9,9 @@ import com.github.ajalt.clikt.parameters.options.split
 import com.github.ajalt.clikt.parameters.types.choice
 import com.github.ajalt.clikt.parameters.types.file
 import com.google.gson.Gson
+import mu.KotlinLogging
 import uk.ac.le.ember.labpipe.server.EmailGroup
+import uk.ac.le.ember.labpipe.server.FormTemplate
 import uk.ac.le.ember.labpipe.server.Instrument
 import uk.ac.le.ember.labpipe.server.Location
 import uk.ac.le.ember.labpipe.server.Operator
@@ -19,13 +21,18 @@ import uk.ac.le.ember.labpipe.server.controllers.ConfigController
 import uk.ac.le.ember.labpipe.server.controllers.DatabaseController
 import uk.ac.le.ember.labpipe.server.controllers.EmailController
 import uk.ac.le.ember.labpipe.server.services.addEmailGroup
+import uk.ac.le.ember.labpipe.server.services.addForm
 import uk.ac.le.ember.labpipe.server.services.addInstrument
 import uk.ac.le.ember.labpipe.server.services.addLocation
 import uk.ac.le.ember.labpipe.server.services.addOperator
 import uk.ac.le.ember.labpipe.server.services.addRole
 import uk.ac.le.ember.labpipe.server.services.addStudy
 import uk.ac.le.ember.labpipe.server.services.addToken
+import uk.ac.le.ember.labpipe.server.services.assignUserRole
+import uk.ac.le.ember.labpipe.server.sessions.Runtime
 import java.io.FileReader
+
+private val logger = KotlinLogging.logger {}
 
 class Add : CliktCommand(name = "add", help = "Add new record") {
 
@@ -39,7 +46,7 @@ class AddOperator : CliktCommand(name = "operator", help = "Add new operator") {
     private val email by option("--email", help = "operator email").prompt(text = "Please enter operator email")
     private val show by option("--show", help = "show operator username and password once created").flag()
     override fun run() {
-        ConfigController.load()
+        Runtime.config = ConfigController.load()
         DatabaseController.connect()
         EmailController.connect()
         val result = addOperator(email = email, name = name, notify = true, show = show)
@@ -50,7 +57,7 @@ class AddOperator : CliktCommand(name = "operator", help = "Add new operator") {
 
 class AddAccessToken : CliktCommand(name = "token", help = "Add new access token") {
     override fun run() {
-        ConfigController.load()
+        Runtime.config = ConfigController.load()
         DatabaseController.connect()
         EmailController.connect()
         addToken()
@@ -66,11 +73,10 @@ class AddRole : CliktCommand(name = "role", help = "Add new role") {
     private val name by option("--name", help = "role name").prompt(text = "Please enter role name")
 
     override fun run() {
-        ConfigController.load()
+        Runtime.config = ConfigController.load()
         DatabaseController.connect()
         EmailController.connect()
         addRole(identifier = identifier, name = name)
-
     }
 }
 
@@ -86,7 +92,7 @@ class AddEmailGroup : CliktCommand(name = "email-group", help = "Add new email g
     ).prompt(text = "Please enter email group form identifier")
 
     override fun run() {
-        ConfigController.load()
+        Runtime.config = ConfigController.load()
         DatabaseController.connect()
         EmailController.connect()
         addEmailGroup(identifier = identifier, name = name, formIdentifier = formIdentifier)
@@ -107,7 +113,7 @@ class AddInstrument : CliktCommand(name = "instrument", help = "Add new instrume
     private val fileType by option("--file-type", help = "instrument generated file types").split(",")
 
     override fun run() {
-        ConfigController.load()
+        Runtime.config = ConfigController.load()
         DatabaseController.connect()
         EmailController.connect()
         addInstrument(identifier = identifier, name = name, realtime = realtime, fileType = fileType!!.toMutableList())
@@ -123,7 +129,7 @@ class AddLocation : CliktCommand(name = "location", help = "Add new location") {
     private val type by option("--type", help = "location types").split(",").default(mutableListOf())
 
     override fun run() {
-        ConfigController.load()
+        Runtime.config = ConfigController.load()
         DatabaseController.connect()
         EmailController.connect()
         val location = Location(identifier = identifier, name = name)
@@ -141,7 +147,7 @@ class AddStudy : CliktCommand(name = "study", help = "Add new study") {
     private val config by option("--config")
 
     override fun run() {
-        ConfigController.load()
+        Runtime.config = ConfigController.load()
         DatabaseController.connect()
         EmailController.connect()
         val study = Study(identifier = identifier)
@@ -157,7 +163,8 @@ class ImportCmd : CliktCommand(name = "import", help = "Import record(s) from fi
         "email-group",
         "instrument",
         "location",
-        "study"
+        "study",
+        "form"
     ).prompt(text = "Please enter import target from available choices")
     private val source by option("--source", help = "file of operator(s)").file(
         exists = true,
@@ -167,7 +174,7 @@ class ImportCmd : CliktCommand(name = "import", help = "Import record(s) from fi
     ).prompt(text = "Please enter source file path")
 
     override fun run() {
-        ConfigController.load()
+        Runtime.config = ConfigController.load()
         DatabaseController.connect()
         EmailController.connect()
         val gson = Gson()
@@ -202,6 +209,33 @@ class ImportCmd : CliktCommand(name = "import", help = "Import record(s) from fi
                 val data = gson.fromJson(reader, Array<Study>::class.java)
                 data.forEach { addStudy(study = it, notify = true) }
             }
+            "form" -> {
+                val reader = FileReader(source)
+                val data = gson.fromJson(reader, Array<FormTemplate>::class.java)
+                data.forEach { addForm(form = it, notify = true) }
+            }
         }
+    }
+}
+
+class Assign : CliktCommand(name = "assign", help = "Assign user") {
+
+    override fun run() {
+        echo("Add new record")
+    }
+}
+
+class AssignRole: CliktCommand(name = "role", help = "Assign user role") {
+    private val email by option("--email", help = "operator email").prompt(text = "Please enter operator email")
+    private val identifier by option(
+        "--identifier",
+        help = "role identifier"
+    ).prompt(text = "Please enter role identifier")
+
+    override fun run() {
+        Runtime.config = ConfigController.load()
+        DatabaseController.connect()
+        EmailController.connect()
+        assignUserRole(email = email, roleId = identifier)
     }
 }

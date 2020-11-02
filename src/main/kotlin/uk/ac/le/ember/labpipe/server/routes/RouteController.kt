@@ -32,6 +32,7 @@ import uk.ac.le.ember.labpipe.server.services.uploadFileChunk
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
+import kotlin.math.log
 
 private val logger = KotlinLogging.logger {}
 
@@ -278,7 +279,7 @@ class RouteController {
                 getRateLimiter(ctx = ctx, url = API.UPLOAD.FORM_FILE)
                 uploadFile(ctx) },
                 SecurityUtil.roles(AuthManager.ApiRole.AUTHORISED, AuthManager.ApiRole.TOKEN_AUTHORISED))
-            Runtime.server.post(API.UPLOAD.FORM_FILE, { ctx ->
+            Runtime.server.post(API.UPLOAD.FORM_FILE_CHUNK, { ctx ->
                 getRateLimiter(ctx = ctx, url = API.UPLOAD.FORM_FILE_CHUNK)
                 uploadFileChunk(ctx) },
                 SecurityUtil.roles(AuthManager.ApiRole.AUTHORISED, AuthManager.ApiRole.TOKEN_AUTHORISED))

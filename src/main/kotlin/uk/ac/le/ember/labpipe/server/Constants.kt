@@ -88,6 +88,7 @@ object MESSAGES {
     const val INSTRUMENT_ADDED = "Instrument added."
     const val LOCATION_ADDED = "Location added."
     const val STUDY_ADDED = "Study added."
+    const val FORM_ADDED = "Form added."
 }
 
 
@@ -190,6 +191,17 @@ object EmailTemplates {
                 "<p>%s</p>" +
                 "<p><strong>Name:</strong></p>" +
                 "<p>%s</p>"
+    const val CREATE_FORM_TEXT =
+        "A LabPipe form template has been added by you.\n\n" +
+            "Identifier: %s\n" +
+            "Name: %s"
+    const val CREATE_Form_HTML =
+        "<p>A LabPipe form template has been added by you.<p>" +
+            "<br>" +
+            "<p><strong>Identifier:</strong></p>" +
+            "<p>%s</p>" +
+            "<p><strong>Name:</strong></p>" +
+            "<p>%s</p>"
 }
 
 object MONGO {

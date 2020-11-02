@@ -1,6 +1,5 @@
 package uk.ac.le.ember.labpipe.server.services
 
-import com.github.ajalt.clikt.output.TermUi.echo
 import io.javalin.http.Context
 import mu.KotlinLogging
 import org.apache.commons.lang3.RandomStringUtils
@@ -8,6 +7,7 @@ import org.litote.kmongo.addToSet
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOne
 import org.litote.kmongo.getCollection
+import org.litote.kmongo.setTo
 import org.litote.kmongo.updateOne
 import org.mindrot.jbcrypt.BCrypt
 import org.simplejavamail.api.email.Recipient
@@ -17,6 +17,7 @@ import uk.ac.le.ember.labpipe.server.DEFAULT_OPERATOR_ROLE
 import uk.ac.le.ember.labpipe.server.DEFAULT_TOKEN_ROLE
 import uk.ac.le.ember.labpipe.server.EmailGroup
 import uk.ac.le.ember.labpipe.server.EmailTemplates
+import uk.ac.le.ember.labpipe.server.FormTemplate
 import uk.ac.le.ember.labpipe.server.Instrument
 import uk.ac.le.ember.labpipe.server.Location
 import uk.ac.le.ember.labpipe.server.MESSAGES
@@ -81,8 +82,8 @@ fun addOperator(operator: Operator, notify: Boolean = true, show: Boolean = fals
 
 fun postAddOperator(operator: Operator, tempPassword:String,  show: Boolean, notify: Boolean) {
     if (show) {
-        logger.debug{"[Username] ${operator.username}" }
-        logger.debug { "[Password] $tempPassword" }
+        logger.info{"[Username] ${operator.username}" }
+        logger.info { "[Password] $tempPassword" }
     }
     operator.notificationGroup.forEach {
         MONGO.COLLECTIONS.EMAIL_GROUPS.updateOne(
@@ -163,8 +164,8 @@ fun addToken(operator: Operator? = null, notify: Boolean = true): ResultMessage 
         AccessToken(token = token, keyHash = BCrypt.hashpw(key, BCrypt.gensalt()))
     accessToken.roles.add(DEFAULT_TOKEN_ROLE.identifier)
     col.insertOne(accessToken)
-    echo("""[Token] $token""")
-    echo("""[Key] $key""")
+    logger.info("""[Token] $token""")
+    logger.info("""[Key] $key""")
     operator?.run {
         if (notify) {
             EmailController.sendEmail(
@@ -266,8 +267,8 @@ fun addRole(role: OperatorRole, operator: Operator? = null, notify: Boolean = tr
                     )
                 ),
                 subject = "LabPipe Role Created",
-                text = String.format(EmailTemplates.CREATE_ROLE_TEXT, role.identifier, name),
-                html = String.format(EmailTemplates.CREATE_ROLE_HTML, role.identifier, name),
+                text = String.format(EmailTemplates.CREATE_ROLE_TEXT, role.identifier, role.name),
+                html = String.format(EmailTemplates.CREATE_ROLE_HTML, role.identifier, role.name),
                 async = true
             )
         }
@@ -461,8 +462,8 @@ fun addInstrument(instrument: Instrument, operator: Operator? = null, notify: Bo
                     )
                 ),
                 subject = "LabPipe Instrument Added",
-                text = String.format(EmailTemplates.CREATE_INSTRUMENT_TEXT, instrument.identifier, name),
-                html = String.format(EmailTemplates.CREATE_INSTRUMENT_HTML, instrument.identifier, name),
+                text = String.format(EmailTemplates.CREATE_INSTRUMENT_TEXT, instrument.identifier, instrument.name),
+                html = String.format(EmailTemplates.CREATE_INSTRUMENT_HTML, instrument.identifier, instrument.name),
                 async = true
             )
         }
@@ -506,8 +507,8 @@ fun addLocation(location: Location, operator: Operator? = null, notify: Boolean 
                     )
                 ),
                 subject = "LabPipe Location Added",
-                text = String.format(EmailTemplates.CREATE_LOCATION_TEXT, location.identifier, name),
-                html = String.format(EmailTemplates.CREATE_LOCATION_HTML, location.identifier, name),
+                text = String.format(EmailTemplates.CREATE_LOCATION_TEXT, location.identifier, location.name),
+                html = String.format(EmailTemplates.CREATE_LOCATION_HTML, location.identifier, location.name),
                 async = true
             )
         }
@@ -555,8 +556,8 @@ fun addStudy(study: Study, config: String? = null, operator: Operator? = null, n
                     )
                 ),
                 subject = "LabPipe Study Added",
-                text = String.format(EmailTemplates.CREATE_STUDY_TEXT, study.identifier, name),
-                html = String.format(EmailTemplates.CREATE_STUDY_HTML, study.identifier, name),
+                text = String.format(EmailTemplates.CREATE_STUDY_TEXT, study.identifier, study.name),
+                html = String.format(EmailTemplates.CREATE_STUDY_HTML, study.identifier, study.name),
                 async = true
             )
         }
@@ -572,4 +573,52 @@ fun addStudy(ctx: Context): Context {
     val operator = AuthManager.getUser(ctx)
     val result = addStudy(study, operator = operator, notify = true)
     return ctx.status(result.status).json(result.message)
+}
+
+fun assignUserRole(email: String, roleId: String) {
+    val operator = MONGO.COLLECTIONS.OPERATORS.findOne(Operator::email eq email)
+    operator?.run{
+        val role = MONGO.COLLECTIONS.ROLES.findOne(OperatorRole::identifier eq roleId)
+        role?.run {
+            operator.roles.add(roleId)
+            MONGO.COLLECTIONS.OPERATORS.updateOne(Operator::email eq email, Operator::roles setTo operator.roles)
+        }
+    }
+}
+
+fun addForm(form: FormTemplate, operator: Operator? = null, notify: Boolean = true): ResultMessage {
+    val current = MONGO.COLLECTIONS.FORMS.findOne(FormTemplate::identifier eq form.identifier)
+    current?.run {
+        return ResultMessage(
+            400,
+            Message("""Form template with identifier [${form.identifier}] already exists.""")
+        )
+    }
+    MONGO.COLLECTIONS.FORMS.insertOne(form)
+    operator?.run {
+        if (notify) {
+            EmailController.sendEmail(
+                from = Recipient(
+                    Runtime.config[Email.fromName],
+                    Runtime.config[Email.fromAddress],
+                    null
+                ),
+                to = listOf(
+                    Recipient(
+                        operator.name,
+                        operator.email,
+                        null
+                    )
+                ),
+                subject = "LabPipe Form Template Added",
+                text = String.format(EmailTemplates.CREATE_FORM_TEXT, form.identifier, form.name),
+                html = String.format(EmailTemplates.CREATE_Form_HTML, form.identifier, form.name),
+                async = true
+            )
+        }
+    }
+    return ResultMessage(
+        200,
+        Message(MESSAGES.FORM_ADDED)
+    )
 }
