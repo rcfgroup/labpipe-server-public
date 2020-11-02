@@ -67,48 +67,4 @@ private fun findOneInstrument(ctx: Context): Context {
     return ctx.status(500).json(Message("Instrument not exists with given identifier"))
 }
 
-fun queryRoutes() {
-    println("Add query service routes.")
-    Runtime.server.get(
-        API.QUERY.RECORDS, { ctx -> ctx.json(listRecords()) },
-        SecurityUtil.roles(
-            AuthManager.ApiRole.AUTHORISED,
-            AuthManager.ApiRole.TOKEN_AUTHORISED
-        )
-    )
-    Runtime.server.get(
-        API.QUERY.STUDY_RECORDS, { ctx -> ctx.json(listRecords(ctx.pathParam("studyIdentifier"))) },
-        SecurityUtil.roles(
-            AuthManager.ApiRole.AUTHORISED,
-            AuthManager.ApiRole.TOKEN_AUTHORISED
-        )
-    )
-    Runtime.server.get(
-        API.QUERY.STUDIES, { ctx -> ctx.json(listStudies()) },
-        SecurityUtil.roles(
-            AuthManager.ApiRole.AUTHORISED,
-            AuthManager.ApiRole.TOKEN_AUTHORISED
-        )
-    )
-    Runtime.server.get(
-        API.QUERY.STUDY, { ctx -> findOneStudy(ctx) },
-        SecurityUtil.roles(
-            AuthManager.ApiRole.AUTHORISED,
-            AuthManager.ApiRole.TOKEN_AUTHORISED
-        )
-    )
-    Runtime.server.get(
-        API.QUERY.INSTRUMENTS, { ctx -> ctx.json(listInstruments()) },
-        SecurityUtil.roles(
-            AuthManager.ApiRole.AUTHORISED,
-            AuthManager.ApiRole.TOKEN_AUTHORISED
-        )
-    )
-    Runtime.server.get(
-        API.QUERY.INSTRUMENT, { ctx -> findOneInstrument(ctx) },
-        SecurityUtil.roles(
-            AuthManager.ApiRole.AUTHORISED,
-            AuthManager.ApiRole.TOKEN_AUTHORISED
-        )
-    )
 }

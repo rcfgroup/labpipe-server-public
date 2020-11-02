@@ -587,38 +587,4 @@ private fun addStudy(ctx: Context): Context {
     return ctx.status(result.status).json(result.message)
 }
 
-fun manageRoutes() {
-    println("Add manage service routes.")
-    Runtime.server.post(
-        API.MANAGE.CREATE.OPERATOR, { ctx -> addOperator(ctx) },
-        roles(AuthManager.ApiRole.AUTHORISED)
-    )
-    Runtime.server.put(
-        API.MANAGE.UPDATE.PASSWORD, { ctx -> changePassword(ctx) },
-        roles(AuthManager.ApiRole.AUTHORISED)
-    )
-    Runtime.server.post(
-        API.MANAGE.CREATE.TOKEN, { ctx -> addToken(ctx) },
-        roles(AuthManager.ApiRole.AUTHORISED)
-    )
-    Runtime.server.post(
-        API.MANAGE.CREATE.ROLE, { ctx -> addRole(ctx) },
-        roles(AuthManager.ApiRole.AUTHORISED)
-    )
-    Runtime.server.post(
-        API.MANAGE.CREATE.EMAIL_GROUP, { ctx -> addEmailGroup(ctx) },
-        roles(AuthManager.ApiRole.AUTHORISED)
-    )
-    Runtime.server.post(
-        API.MANAGE.CREATE.INSTRUMENT, { ctx -> addInstrument(ctx) },
-        roles(AuthManager.ApiRole.AUTHORISED)
-    )
-    Runtime.server.post(
-        API.MANAGE.CREATE.LOCATION, { ctx -> addLocation(ctx) },
-        roles(AuthManager.ApiRole.AUTHORISED)
-    )
-    Runtime.server.post(
-        API.MANAGE.CREATE.STUDY, { ctx -> addStudy(ctx) },
-        roles(AuthManager.ApiRole.AUTHORISED)
-    )
 }

@@ -13,10 +13,4 @@ private fun getParameter(paramName: String): List<Any> {
     return col.aggregate<Any>(project(excludeId())).toMutableList()
 }
 
-fun parameterRoutes() {
-    println("Add parameter service routes.")
-    Runtime.server.get(
-        API.PARAMETER.FROM_NAME, { ctx -> ctx.json(getParameter(ctx.pathParam("identifier"))) },
-        roles(AuthManager.ApiRole.AUTHORISED, AuthManager.ApiRole.TOKEN_AUTHORISED)
-    )
 }

@@ -27,8 +27,4 @@ private fun uploadFile(ctx: Context): Context {
     return ctx.status(400).json(Message("Form action identifier is required."))
 }
 
-fun uploadRoutes() {
-    println("Add upload service routes.")
-    Runtime.server.post(API.UPLOAD.FORM_FILE, { ctx -> uploadFile(ctx) },
-        SecurityUtil.roles(AuthManager.ApiRole.AUTHORISED, AuthManager.ApiRole.TOKEN_AUTHORISED))
 }
