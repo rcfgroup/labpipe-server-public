@@ -200,6 +200,12 @@ class DatabaseController {
                     MONGO.COLLECTIONS.API_ACCESS_ROLES.insertOne(record)
                 }
             }
+            runBlocking {
+                val record = ApiAccessRole(url = API.UPLOAD.FORM_FILE_CHUNK, roles = mutableSetOf(DEFAULT_TOKEN_ROLE.identifier, DEFAULT_OPERATOR_ROLE.identifier, DEFAULT_ADMIN_ROLE.identifier))
+                if (MONGO.COLLECTIONS.API_ACCESS_ROLES.findOne(ApiAccessRole::url eq record.url) == null) {
+                    MONGO.COLLECTIONS.API_ACCESS_ROLES.insertOne(record)
+                }
+            }
         }
     }
 }

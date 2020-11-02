@@ -28,6 +28,7 @@ import uk.ac.le.ember.labpipe.server.services.listRecords
 import uk.ac.le.ember.labpipe.server.services.listStudies
 import uk.ac.le.ember.labpipe.server.services.saveRecord
 import uk.ac.le.ember.labpipe.server.services.uploadFile
+import uk.ac.le.ember.labpipe.server.services.uploadFileChunk
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
@@ -276,6 +277,10 @@ class RouteController {
             Runtime.server.post(API.UPLOAD.FORM_FILE, { ctx ->
                 getRateLimiter(ctx = ctx, url = API.UPLOAD.FORM_FILE)
                 uploadFile(ctx) },
+                SecurityUtil.roles(AuthManager.ApiRole.AUTHORISED, AuthManager.ApiRole.TOKEN_AUTHORISED))
+            Runtime.server.post(API.UPLOAD.FORM_FILE, { ctx ->
+                getRateLimiter(ctx = ctx, url = API.UPLOAD.FORM_FILE_CHUNK)
+                uploadFileChunk(ctx) },
                 SecurityUtil.roles(AuthManager.ApiRole.AUTHORISED, AuthManager.ApiRole.TOKEN_AUTHORISED))
         }
     }
