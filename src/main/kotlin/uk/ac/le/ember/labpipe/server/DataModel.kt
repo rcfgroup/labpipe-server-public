@@ -1,8 +1,6 @@
 package uk.ac.le.ember.labpipe.server
 
 import org.litote.kmongo.Data
-import java.nio.file.Paths
-
 
 @Data
 data class Parameter(var identifier: String) {
@@ -39,10 +37,10 @@ data class Location(var identifier: String, var name: String) {
 }
 
 @Data
-data class OperatorRole(val identifier: String, val name: String)
+data class OperatorRole(var identifier: String, var name: String)
 
 @Data
-data class ApiAccessRole(var url: String, var roles: MutableSet<String>)
+data class ApiAccessRole(var url: String, var roles: MutableSet<String>, var rate: Int = 0)
 
 @Data
 data class FormTemplate(var identifier: String, var name: String) {
@@ -126,6 +124,12 @@ data class EmailGroup(var identifier: String) {
 @Data
 data class FormFileUpload(var identifier: String) {
     var files: MutableSet<String> = mutableSetOf()
+}
+
+@Data
+data class FormFileChunkUpload(var identifier: String, var chunk: Int, var total: Int, var md5Chunk: String, var md5Total: String, var ext: String) {
+    var file: String = ""
+    var complete: Boolean = false
 }
 
 @Data
