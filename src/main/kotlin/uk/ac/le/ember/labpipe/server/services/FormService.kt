@@ -1,14 +1,13 @@
 package uk.ac.le.ember.labpipe.server.services
 
-import io.javalin.core.security.SecurityUtil
-import org.litote.kmongo.*
-import uk.ac.le.ember.labpipe.server.API
-import uk.ac.le.ember.labpipe.server.AuthManager
+import org.litote.kmongo.aggregate
+import org.litote.kmongo.eq
+import org.litote.kmongo.excludeId
+import org.litote.kmongo.find
+import org.litote.kmongo.findOne
+import org.litote.kmongo.project
 import uk.ac.le.ember.labpipe.server.FormTemplate
 import uk.ac.le.ember.labpipe.server.MONGO
-import uk.ac.le.ember.labpipe.server.sessions.Runtime
-
-
 
 fun listForms(): MutableList<FormTemplate> {
     return MONGO.COLLECTIONS.FORMS.aggregate<FormTemplate>(project(excludeId())).toMutableList()

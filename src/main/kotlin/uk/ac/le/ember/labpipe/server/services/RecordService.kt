@@ -2,21 +2,17 @@ package uk.ac.le.ember.labpipe.server.services
 
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import com.google.gson.JsonParser
-import io.javalin.core.security.SecurityUtil
+import mu.KotlinLogging
 import org.bson.Document
 import org.bson.types.ObjectId
-import org.litote.kmongo.eq
-import org.litote.kmongo.findOne
-import org.litote.kmongo.getCollection
-import uk.ac.le.ember.labpipe.server.*
-import uk.ac.le.ember.labpipe.server.notification.NotificationUtil
+import uk.ac.le.ember.labpipe.server.DB_COL_FORM_DATA_PREFIX
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
-import java.time.LocalDateTime
+
+private val logger = KotlinLogging.logger {}
 
 // TODO Add support for multiple records batch upload
 
-private fun saveRecord(jsonObject: JsonObject): String? {
+fun saveRecord(jsonObject: JsonObject): String? {
     val formIdentifier = jsonObject.get("formIdentifier").asString
     val record = Document.parse(Gson().toJson(jsonObject))
     try {
@@ -24,10 +20,10 @@ private fun saveRecord(jsonObject: JsonObject): String? {
             .getCollection("${DB_COL_FORM_DATA_PREFIX}$formIdentifier")
         col.insertOne(record)
     } catch (e: Exception) {
-        Runtime.logger.error(e) { "[Form: $formIdentifier] data cannot be saved." }
+        logger.error(e) { "[Form: $formIdentifier] data cannot be saved." }
         return null
     }
-    Runtime.logger.info { "[Form: $formIdentifier] data is saved." }
+    logger.info { "[Form: $formIdentifier] data is saved." }
     // TODO post record process plugin here in next release
     val id = record.get("_id") as ObjectId
     return id.toString()
@@ -46,4 +42,3 @@ private fun saveRecord(jsonObject: JsonObject): String? {
 //        }
 //    }
 //}
-

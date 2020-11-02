@@ -1,20 +1,38 @@
 package uk.ac.le.ember.labpipe.server.services
 
 import com.github.ajalt.clikt.output.TermUi.echo
-import io.javalin.core.security.SecurityUtil.roles
 import io.javalin.http.Context
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import mu.KotlinLogging
 import org.apache.commons.lang3.RandomStringUtils
-import org.litote.kmongo.*
+import org.litote.kmongo.addToSet
+import org.litote.kmongo.eq
+import org.litote.kmongo.findOne
+import org.litote.kmongo.getCollection
+import org.litote.kmongo.updateOne
 import org.mindrot.jbcrypt.BCrypt
 import org.simplejavamail.api.email.Recipient
-import uk.ac.le.ember.labpipe.server.*
-import uk.ac.le.ember.labpipe.server.notification.EmailUtil
-import uk.ac.le.ember.labpipe.server.notification.NotificationUtil
-import uk.ac.le.ember.labpipe.server.notification.ReportUtil
+import uk.ac.le.ember.labpipe.server.AccessToken
+import uk.ac.le.ember.labpipe.server.AuthManager
+import uk.ac.le.ember.labpipe.server.DEFAULT_OPERATOR_ROLE
+import uk.ac.le.ember.labpipe.server.DEFAULT_TOKEN_ROLE
+import uk.ac.le.ember.labpipe.server.EmailGroup
+import uk.ac.le.ember.labpipe.server.EmailTemplates
+import uk.ac.le.ember.labpipe.server.Instrument
+import uk.ac.le.ember.labpipe.server.Location
+import uk.ac.le.ember.labpipe.server.MESSAGES
+import uk.ac.le.ember.labpipe.server.MONGO
+import uk.ac.le.ember.labpipe.server.Message
+import uk.ac.le.ember.labpipe.server.Operator
+import uk.ac.le.ember.labpipe.server.OperatorRole
+import uk.ac.le.ember.labpipe.server.ResultMessage
+import uk.ac.le.ember.labpipe.server.Study
+import uk.ac.le.ember.labpipe.server.controllers.ConfigController.Companion.LabPipeConfig.Email
+import uk.ac.le.ember.labpipe.server.controllers.EmailController
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
-import java.util.*
+import java.util.Base64
+import java.util.UUID
+
+private val logger = KotlinLogging.logger {}
 
 
 fun addOperator(email: String, name: String, notify: Boolean = true, show: Boolean = false): ResultMessage {
@@ -33,46 +51,7 @@ fun addOperator(email: String, name: String, notify: Boolean = true, show: Boole
     operator.active = true
     operator.roles.add(DEFAULT_OPERATOR_ROLE.identifier)
     MONGO.COLLECTIONS.OPERATORS.insertOne(operator)
-    if (show) {
-        echo("[Username] ${operator.username}")
-        echo("[Password] $tempPassword")
-    }
-    operator.notificationGroup.forEach {
-        MONGO.COLLECTIONS.EMAIL_GROUPS.updateOne(
-            EmailGroup::identifier eq it,
-            addToSet(EmailGroup::member, operator.username)
-        )
-    }
-    if (notify) {
-        EmailUtil.sendEmail(
-            from = Recipient(
-                Runtime.lpConfig.notificationEmailName,
-                Runtime.lpConfig.notificationEmailAddress,
-                null
-            ),
-            to = listOf(
-                Recipient(
-                    operator.name,
-                    operator.email,
-                    null
-                )
-            ),
-            subject = "Your LabPipe Operator Account",
-            text = String.format(
-                EmailTemplates.CREATE_OPERATOR_TEXT,
-                operator.name,
-                operator.email,
-                tempPassword
-            ),
-            html = String.format(
-                EmailTemplates.CREATE_OPERATOR_HTML,
-                operator.name,
-                operator.email,
-                tempPassword
-            ),
-            async = true
-        )
-    }
+    postAddOperator(operator, tempPassword, show, notify)
     return ResultMessage(
         200,
         Message(MESSAGES.OPERATOR_ADDED)
@@ -93,9 +72,17 @@ fun addOperator(operator: Operator, notify: Boolean = true, show: Boolean = fals
     operator.active = true
     operator.roles.add(DEFAULT_OPERATOR_ROLE.identifier)
     col.insertOne(operator)
+    postAddOperator(operator, tempPassword, show, notify)
+    return ResultMessage(
+        200,
+        Message(MESSAGES.OPERATOR_ADDED)
+    )
+}
+
+fun postAddOperator(operator: Operator, tempPassword:String,  show: Boolean, notify: Boolean) {
     if (show) {
-        echo("[Username] ${operator.username}")
-        echo("[Password] $tempPassword")
+        logger.debug{"[Username] ${operator.username}" }
+        logger.debug { "[Password] $tempPassword" }
     }
     operator.notificationGroup.forEach {
         MONGO.COLLECTIONS.EMAIL_GROUPS.updateOne(
@@ -103,11 +90,11 @@ fun addOperator(operator: Operator, notify: Boolean = true, show: Boolean = fals
             addToSet(EmailGroup::member, operator.username)
         )
     }
-    if (notify) {
-        EmailUtil.sendEmail(
+    if (notify && Runtime.emailAvailable) {
+        EmailController.sendEmail(
             from = Recipient(
-                Runtime.lpConfig.notificationEmailName,
-                Runtime.lpConfig.notificationEmailAddress,
+                Runtime.config[Email.fromName],
+                Runtime.config[Email.fromAddress],
                 null
             ),
             to = listOf(
@@ -133,13 +120,9 @@ fun addOperator(operator: Operator, notify: Boolean = true, show: Boolean = fals
             async = true
         )
     }
-    return ResultMessage(
-        200,
-        Message(MESSAGES.OPERATOR_ADDED)
-    )
 }
 
-private fun addOperator(ctx: Context): Context {
+fun addOperator(ctx: Context): Context {
     val operator = ctx.body<Operator>()
     val result = addOperator(operator, true)
     return ctx.status(result.status).json(result.message)
@@ -154,7 +137,7 @@ fun changePassword(operator: Operator, newPassHash: String): ResultMessage {
     return ResultMessage(200, Message("Password updated."))
 }
 
-private fun changePassword(ctx: Context): Context {
+fun changePassword(ctx: Context): Context {
     val operator = AuthManager.getUser(ctx)
     val newPassHash = ctx.body()
     operator?.run {
@@ -164,14 +147,18 @@ private fun changePassword(ctx: Context): Context {
     return ctx.status(400).json(Message(MESSAGES.UNAUTHORIZED))
 }
 
+fun generateTokenAndKey(): Pair<String, String> {
+    return Pair(UUID.randomUUID().toString(), RandomStringUtils.randomAlphanumeric(16))
+}
+
 fun addToken(operator: Operator? = null, notify: Boolean = true): ResultMessage {
     val col = Runtime.mongoDatabase.getCollection<AccessToken>(MONGO.COL_NAMES.ACCESS_TOKENS)
-    var token = UUID.randomUUID().toString()
-    while (col.findOne(AccessToken::token eq token) != null
-    ) {
-        token = UUID.randomUUID().toString()
+    var (token, key) = generateTokenAndKey()
+    while (col.findOne(AccessToken::token eq token) != null) {
+        val (newToken, newKey) = generateTokenAndKey()
+        token = newToken
+        key = newKey
     }
-    val key = RandomStringUtils.randomAlphanumeric(16)
     val accessToken =
         AccessToken(token = token, keyHash = BCrypt.hashpw(key, BCrypt.gensalt()))
     accessToken.roles.add(DEFAULT_TOKEN_ROLE.identifier)
@@ -180,10 +167,10 @@ fun addToken(operator: Operator? = null, notify: Boolean = true): ResultMessage 
     echo("""[Key] $key""")
     operator?.run {
         if (notify) {
-            EmailUtil.sendEmail(
+            EmailController.sendEmail(
                 from = Recipient(
-                    Runtime.lpConfig.notificationEmailName,
-                    Runtime.lpConfig.notificationEmailAddress,
+                    Runtime.config[Email.fromName],
+                    Runtime.config[Email.fromAddress],
                     null
                 ),
                 to = listOf(
@@ -206,7 +193,7 @@ fun addToken(operator: Operator? = null, notify: Boolean = true): ResultMessage 
     )
 }
 
-private fun addToken(ctx: Context): Context {
+fun addToken(ctx: Context): Context {
     val operator = AuthManager.getUser(ctx)
     val result = addToken(operator = operator, notify = true)
     return ctx.status(result.status).json(result.message)
@@ -227,10 +214,10 @@ fun addRole(identifier: String, name: String, operator: Operator? = null, notify
         .insertOne(role)
     operator?.run {
         if (notify) {
-            EmailUtil.sendEmail(
+            EmailController.sendEmail(
                 from = Recipient(
-                    Runtime.lpConfig.notificationEmailName,
-                    Runtime.lpConfig.notificationEmailAddress,
+                    Runtime.config[Email.fromName],
+                    Runtime.config[Email.fromAddress],
                     null
                 ),
                 to = listOf(
@@ -265,10 +252,10 @@ fun addRole(role: OperatorRole, operator: Operator? = null, notify: Boolean = tr
     col.insertOne(role)
     operator?.run {
         if (notify) {
-            EmailUtil.sendEmail(
+            EmailController.sendEmail(
                 from = Recipient(
-                    Runtime.lpConfig.notificationEmailName,
-                    Runtime.lpConfig.notificationEmailAddress,
+                    Runtime.config[Email.fromName],
+                    Runtime.config[Email.fromAddress],
                     null
                 ),
                 to = listOf(
@@ -291,7 +278,7 @@ fun addRole(role: OperatorRole, operator: Operator? = null, notify: Boolean = tr
     )
 }
 
-private fun addRole(ctx: Context): Context {
+fun addRole(ctx: Context): Context {
     val role = ctx.body<OperatorRole>()
     val operator = AuthManager.getUser(ctx)
     val result = addRole(role = role, operator = operator, notify = true)
@@ -319,10 +306,10 @@ fun addEmailGroup(
     col.insertOne(group)
     operator?.run {
         if (notify) {
-            EmailUtil.sendEmail(
+            EmailController.sendEmail(
                 from = Recipient(
-                    Runtime.lpConfig.notificationEmailName,
-                    Runtime.lpConfig.notificationEmailAddress,
+                    Runtime.config[Email.fromName],
+                    Runtime.config[Email.fromAddress],
                     null
                 ),
                 to = listOf(
@@ -357,10 +344,10 @@ fun addEmailGroup(emailGroup: EmailGroup, operator: Operator? = null, notify: Bo
     col.insertOne(emailGroup)
     operator?.run {
         if (notify) {
-            EmailUtil.sendEmail(
+            EmailController.sendEmail(
                 from = Recipient(
-                    Runtime.lpConfig.notificationEmailName,
-                    Runtime.lpConfig.notificationEmailAddress,
+                    Runtime.config[Email.fromName],
+                    Runtime.config[Email.fromAddress],
                     null
                 ),
                 to = listOf(
@@ -393,7 +380,7 @@ fun addEmailGroup(emailGroup: EmailGroup, operator: Operator? = null, notify: Bo
     )
 }
 
-private fun addEmailGroup(ctx: Context): Context {
+fun addEmailGroup(ctx: Context): Context {
     val emailGroup = ctx.body<EmailGroup>()
     val operator = AuthManager.getUser(ctx)
     val result = addEmailGroup(emailGroup = emailGroup, operator = operator, notify = true)
@@ -422,10 +409,10 @@ fun addInstrument(
     col.insertOne(instrument)
     operator?.run {
         if (notify) {
-            EmailUtil.sendEmail(
+            EmailController.sendEmail(
                 from = Recipient(
-                    Runtime.lpConfig.notificationEmailName,
-                    Runtime.lpConfig.notificationEmailAddress,
+                    Runtime.config[Email.fromName],
+                    Runtime.config[Email.fromAddress],
                     null
                 ),
                 to = listOf(
@@ -460,10 +447,10 @@ fun addInstrument(instrument: Instrument, operator: Operator? = null, notify: Bo
     col.insertOne(instrument)
     operator?.run {
         if (notify) {
-            EmailUtil.sendEmail(
+            EmailController.sendEmail(
                 from = Recipient(
-                    Runtime.lpConfig.notificationEmailName,
-                    Runtime.lpConfig.notificationEmailAddress,
+                    Runtime.config[Email.fromName],
+                    Runtime.config[Email.fromAddress],
                     null
                 ),
                 to = listOf(
@@ -486,7 +473,7 @@ fun addInstrument(instrument: Instrument, operator: Operator? = null, notify: Bo
     )
 }
 
-private fun addInstrument(ctx: Context): Context {
+fun addInstrument(ctx: Context): Context {
     val instrument = ctx.body<Instrument>()
     val operator = AuthManager.getUser(ctx)
     val result = addInstrument(instrument, operator, true)
@@ -505,10 +492,10 @@ fun addLocation(location: Location, operator: Operator? = null, notify: Boolean 
     col.insertOne(location)
     operator?.run {
         if (notify) {
-            EmailUtil.sendEmail(
+            EmailController.sendEmail(
                 from = Recipient(
-                    Runtime.lpConfig.notificationEmailName,
-                    Runtime.lpConfig.notificationEmailAddress,
+                    Runtime.config[Email.fromName],
+                    Runtime.config[Email.fromAddress],
                     null
                 ),
                 to = listOf(
@@ -531,7 +518,7 @@ fun addLocation(location: Location, operator: Operator? = null, notify: Boolean 
     )
 }
 
-private fun addLocation(ctx: Context): Context {
+fun addLocation(ctx: Context): Context {
     val location = ctx.body<Location>()
     val operator = AuthManager.getUser(ctx)
     val result = addLocation(location, operator, true)
@@ -554,10 +541,10 @@ fun addStudy(study: Study, config: String? = null, operator: Operator? = null, n
     }
     operator?.run {
         if (notify) {
-            EmailUtil.sendEmail(
+            EmailController.sendEmail(
                 from = Recipient(
-                    Runtime.lpConfig.notificationEmailName,
-                    Runtime.lpConfig.notificationEmailAddress,
+                    Runtime.config[Email.fromName],
+                    Runtime.config[Email.fromAddress],
                     null
                 ),
                 to = listOf(
@@ -580,11 +567,9 @@ fun addStudy(study: Study, config: String? = null, operator: Operator? = null, n
     )
 }
 
-private fun addStudy(ctx: Context): Context {
+fun addStudy(ctx: Context): Context {
     val study = ctx.body<Study>()
     val operator = AuthManager.getUser(ctx)
     val result = addStudy(study, operator = operator, notify = true)
     return ctx.status(result.status).json(result.message)
-}
-
 }
