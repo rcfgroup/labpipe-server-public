@@ -24,7 +24,7 @@ Download latest release [here](../../releases). Once you have downloaded the jar
 java -jar labpipe-server-all.jar --help
 ```
 
-The `help` argument provides you a list of available arguments. Details about command line arguments can be found [here](https://docs.labpipe.org/server-stable/command-line).
+The `help` argument provides you a list of available arguments. Details about command line arguments can be found [here](https://docs.labpipe.org/server/command-line).
 
 For the server to function properly, you will at least set the following parameters:
 
@@ -50,10 +50,10 @@ Or you can set them all together like:
 java -jar labpipe-server-all.jar config db --host=yourhost --port=12345
 ```
 
-If you want to enable email notifications on the server, you will need to set mail server parameters, details can be found [here](https://docs.labpipe.org/server-stable/configuration-file).
+If you want to enable email notifications on the server, you will need to set mail server parameters, details can be found [here](https://docs.labpipe.org/server/configuration-file).
 
-You will need to populate your database with required collections so that your server can provide results through its APIs, details can be found [here](https://docs.labpipe.org/server-stable/database).
+You will need to populate your database with required collections so that your server can provide results through its APIs, details can be found [here](https://docs.labpipe.org/server/database).
 
 
 ## License
-This project is open source under Non-Profit Open Software License 3.0 (NPOSL-3.0).
+This project is open source under GNU General Public License v3.0 (GPL-3.0).
