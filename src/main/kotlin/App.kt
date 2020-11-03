@@ -8,7 +8,6 @@ fun main(args: Array<String>) {
         argArray = arrayOf("--help")
     }
     LPServerCmdLine().subcommands(
-        Config().subcommands(Server(), Database(), Email()),
         Check(), Run(), Init(),
         Add().subcommands(
             AddOperator(),

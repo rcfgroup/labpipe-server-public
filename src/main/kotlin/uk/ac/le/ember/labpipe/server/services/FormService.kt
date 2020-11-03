@@ -1,32 +1,13 @@
 package uk.ac.le.ember.labpipe.server.services
 
-import io.javalin.core.security.SecurityUtil
-import org.litote.kmongo.*
-import uk.ac.le.ember.labpipe.server.API
-import uk.ac.le.ember.labpipe.server.AuthManager
+import org.litote.kmongo.aggregate
+import org.litote.kmongo.eq
+import org.litote.kmongo.excludeId
+import org.litote.kmongo.find
+import org.litote.kmongo.findOne
+import org.litote.kmongo.project
 import uk.ac.le.ember.labpipe.server.FormTemplate
 import uk.ac.le.ember.labpipe.server.MONGO
-import uk.ac.le.ember.labpipe.server.sessions.Runtime
-
-
-fun formRoutes() {
-    println("Add form service routes")
-    Runtime.server.get(
-        API.FORM.ALL,
-        { ctx -> ctx.json(listForms()) },
-        SecurityUtil.roles(AuthManager.ApiRole.AUTHORISED, AuthManager.ApiRole.TOKEN_AUTHORISED)
-    )
-    Runtime.server.get(
-        API.FORM.FROM_IDENTIFIER,
-        { ctx -> getForm(ctx.pathParam("identifier"))?.let { ctx.json(it) } },
-        SecurityUtil.roles(AuthManager.ApiRole.AUTHORISED, AuthManager.ApiRole.TOKEN_AUTHORISED)
-    )
-    Runtime.server.get(
-        API.FORM.FROM_STUDY_INSTRUMENT,
-        { ctx -> ctx.json(getForm(ctx.pathParam("studyIdentifier"), ctx.pathParam("instrumentIdentifier"))) },
-        SecurityUtil.roles(AuthManager.ApiRole.AUTHORISED, AuthManager.ApiRole.TOKEN_AUTHORISED)
-    )
-}
 
 fun listForms(): MutableList<FormTemplate> {
     return MONGO.COLLECTIONS.FORMS.aggregate<FormTemplate>(project(excludeId())).toMutableList()

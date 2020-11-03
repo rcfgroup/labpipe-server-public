@@ -1,17 +1,20 @@
 package uk.ac.le.ember.labpipe.server.services
 
-import io.javalin.core.security.SecurityUtil
 import io.javalin.http.Context
+import mu.KotlinLogging
 import org.litote.kmongo.aggregate
 import org.litote.kmongo.excludeId
 import org.litote.kmongo.findOne
 import org.litote.kmongo.project
-import uk.ac.le.ember.labpipe.server.*
+import uk.ac.le.ember.labpipe.server.DB_COL_FORM_DATA_PREFIX
+import uk.ac.le.ember.labpipe.server.FormTemplate
+import uk.ac.le.ember.labpipe.server.MONGO
+import uk.ac.le.ember.labpipe.server.Message
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 
+private val logger = KotlinLogging.logger {}
 
-
-private fun listRecords(): List<Any> {
+fun listRecords(): List<Any> {
     val colNames = Runtime.mongoDatabase.listCollectionNames()
     val colNameList = colNames.toMutableList().filter { it.startsWith(DB_COL_FORM_DATA_PREFIX) }
     val records = colNameList.map {
@@ -20,8 +23,7 @@ private fun listRecords(): List<Any> {
     return records
 }
 
-private fun listRecords(study: String?): List<Any> {
-    Runtime.logger.info { "Filtering for study: $study" }
+fun listRecords(study: String?): List<Any> {
     return when (study) {
         null -> {
             val colNames = Runtime.mongoDatabase.listCollectionNames()
@@ -41,11 +43,11 @@ private fun listRecords(study: String?): List<Any> {
     }
 }
 
-private fun listStudies(): List<Any> {
+fun listStudies(): List<Any> {
     return Runtime.mongoDatabase.getCollection(MONGO.COL_NAMES.STUDIES).aggregate<Any>(project(excludeId())).toMutableList()
 }
 
-private fun findOneStudy(ctx: Context): Context {
+fun findOneStudy(ctx: Context): Context {
     val identifier = ctx.queryParam("identifier")
     val study = Runtime.mongoDatabase.getCollection(MONGO.COL_NAMES.STUDIES).findOne("{identifier: '${identifier}'}")
     study?.run {
@@ -54,61 +56,15 @@ private fun findOneStudy(ctx: Context): Context {
     return ctx.status(500).json(Message("Study not exists with given identifier"))
 }
 
-private fun listInstruments(): List<Any> {
+fun listInstruments(): List<Any> {
     return Runtime.mongoDatabase.getCollection(MONGO.COL_NAMES.INSTRUMENTS).aggregate<Any>(project(excludeId())).toMutableList()
 }
 
-private fun findOneInstrument(ctx: Context): Context {
+fun findOneInstrument(ctx: Context): Context {
     val identifier = ctx.queryParam("identifier")
     val instrument = Runtime.mongoDatabase.getCollection(MONGO.COL_NAMES.INSTRUMENTS).findOne("{identifier: '${identifier}'}")
     instrument?.run {
         return ctx.status(200).json(instrument)
     }
     return ctx.status(500).json(Message("Instrument not exists with given identifier"))
-}
-
-fun queryRoutes() {
-    println("Add query service routes.")
-    Runtime.server.get(
-        API.QUERY.RECORDS, { ctx -> ctx.json(listRecords()) },
-        SecurityUtil.roles(
-            AuthManager.ApiRole.AUTHORISED,
-            AuthManager.ApiRole.TOKEN_AUTHORISED
-        )
-    )
-    Runtime.server.get(
-        API.QUERY.STUDY_RECORDS, { ctx -> ctx.json(listRecords(ctx.pathParam("studyIdentifier"))) },
-        SecurityUtil.roles(
-            AuthManager.ApiRole.AUTHORISED,
-            AuthManager.ApiRole.TOKEN_AUTHORISED
-        )
-    )
-    Runtime.server.get(
-        API.QUERY.STUDIES, { ctx -> ctx.json(listStudies()) },
-        SecurityUtil.roles(
-            AuthManager.ApiRole.AUTHORISED,
-            AuthManager.ApiRole.TOKEN_AUTHORISED
-        )
-    )
-    Runtime.server.get(
-        API.QUERY.STUDY, { ctx -> findOneStudy(ctx) },
-        SecurityUtil.roles(
-            AuthManager.ApiRole.AUTHORISED,
-            AuthManager.ApiRole.TOKEN_AUTHORISED
-        )
-    )
-    Runtime.server.get(
-        API.QUERY.INSTRUMENTS, { ctx -> ctx.json(listInstruments()) },
-        SecurityUtil.roles(
-            AuthManager.ApiRole.AUTHORISED,
-            AuthManager.ApiRole.TOKEN_AUTHORISED
-        )
-    )
-    Runtime.server.get(
-        API.QUERY.INSTRUMENT, { ctx -> findOneInstrument(ctx) },
-        SecurityUtil.roles(
-            AuthManager.ApiRole.AUTHORISED,
-            AuthManager.ApiRole.TOKEN_AUTHORISED
-        )
-    )
 }

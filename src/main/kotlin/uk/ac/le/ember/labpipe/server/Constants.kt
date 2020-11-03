@@ -1,10 +1,10 @@
 package uk.ac.le.ember.labpipe.server
 
 import org.litote.kmongo.getCollection
-import uk.ac.le.ember.labpipe.server.notification.ReportTemplate
+import uk.ac.le.ember.labpipe.server.controllers.ReportTemplate
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 
-const val DEFAULT_CONFIG_FILE_NAME = "config.ini"
+const val DEFAULT_CONFIG_FILE_NAME = "config.toml"
 const val DB_COL_FORM_DATA_PREFIX = "FORM_DATA_"
 val DEFAULT_ADMIN_ROLE = OperatorRole(identifier = "admin", name = "Admin")
 val DEFAULT_TOKEN_ROLE = OperatorRole(identifier = "token", name = "Token")
@@ -36,6 +36,7 @@ object API {
     object UPLOAD {
         private const val UP_ROOT = "$ROOT/upload"
         const val FORM_FILE = "$UP_ROOT/file/form"
+        const val FORM_FILE_CHUNK = "$UP_ROOT/chunk/form"
     }
 
     object PARAMETER {
@@ -87,27 +88,7 @@ object MESSAGES {
     const val INSTRUMENT_ADDED = "Instrument added."
     const val LOCATION_ADDED = "Location added."
     const val STUDY_ADDED = "Study added."
-}
-
-object CONFIGS {
-    const val SERVER_PORT = "server.port"
-
-    const val DB_HOST = "database.host"
-    const val DB_PORT = "database.port"
-    const val DB_NAME = "database.name"
-    const val DB_USER = "database.user"
-    const val DB_PASS = "database.pass"
-    const val DB_SRV = "database.srv"
-
-    const val MAIL_HOST = "mail.host"
-    const val MAIL_PORT = "mail.port"
-    const val MAIL_USER = "mail.user"
-    const val MAIL_PASS = "mail.pass"
-    const val MAIL_NAME = "mail.notifier.name"
-    const val MAIL_ADDR = "mail.notifier.addr"
-
-    const val PATH_CACHE = "path.cache"
-    const val PATH_UPLOADED = "path.uploaded"
+    const val FORM_ADDED = "Form added."
 }
 
 
@@ -210,6 +191,17 @@ object EmailTemplates {
                 "<p>%s</p>" +
                 "<p><strong>Name:</strong></p>" +
                 "<p>%s</p>"
+    const val CREATE_FORM_TEXT =
+        "A LabPipe form template has been added by you.\n\n" +
+            "Identifier: %s\n" +
+            "Name: %s"
+    const val CREATE_Form_HTML =
+        "<p>A LabPipe form template has been added by you.<p>" +
+            "<br>" +
+            "<p><strong>Identifier:</strong></p>" +
+            "<p>%s</p>" +
+            "<p><strong>Name:</strong></p>" +
+            "<p>%s</p>"
 }
 
 object MONGO {
@@ -228,6 +220,7 @@ object MONGO {
         const val LOCATIONS = "LOCATIONS"
         const val EMAIL_GROUPS = "EMAIL_GROUPS"
         const val UPLOADED = "UPLOADED"
+        const val CHUNKED = "CHUNKED"
     }
 
     object COLLECTIONS {
@@ -245,6 +238,7 @@ object MONGO {
         val LOCATIONS = Runtime.mongoDatabase.getCollection<Location>(COL_NAMES.LOCATIONS)
         val EMAIL_GROUPS = Runtime.mongoDatabase.getCollection<EmailGroup>(COL_NAMES.EMAIL_GROUPS)
         val UPLOADED = Runtime.mongoDatabase.getCollection<FormFileUpload>(COL_NAMES.UPLOADED)
+        val CHUNKED = Runtime.mongoDatabase.getCollection<FormFileChunkUpload>(COL_NAMES.CHUNKED)
     }
 
 

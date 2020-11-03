@@ -3,15 +3,17 @@ package uk.ac.le.ember.labpipe.server
 import com.mongodb.client.model.Filters.eq
 import io.javalin.core.security.Role
 import io.javalin.http.Context
+import mu.KotlinLogging
 import org.litote.kmongo.findOne
 import org.litote.kmongo.getCollection
 import org.mindrot.jbcrypt.BCrypt
 import uk.ac.le.ember.labpipe.server.sessions.Runtime
 
+private val logger = KotlinLogging.logger {}
+
 object AuthManager {
     fun setManager() {
         Runtime.server.config.accessManager { handler, ctx, permittedRoles ->
-            println(ctx.path())
             val userRole = getUserRole(ctx)
             if (permittedRoles.contains(userRole)) {
                 handler.handle(ctx)
@@ -37,21 +39,18 @@ object AuthManager {
         try {
             ctx.basicAuthCredentials()
         } catch (e: IllegalArgumentException) {
-            print("No basic auth.")
             return ApiRole.PUBLIC
         }
         val basicAuthCredentials = ctx.basicAuthCredentials()
         val colOperator = Runtime.mongoDatabase.getCollection<Operator>(MONGO.COL_NAMES.OPERATORS)
         val operator: Operator? = colOperator.findOne(eq("username", basicAuthCredentials.username))
         if (operator == null) {
-            print("No operator auth")
             val colToken =
                 Runtime.mongoDatabase.getCollection<AccessToken>(MONGO.COL_NAMES.ACCESS_TOKENS)
             val accessToken: AccessToken? = colToken.findOne(eq("token", basicAuthCredentials.username))
             return if (accessToken == null) {
                 ApiRole.PUBLIC
             } else {
-                print(accessToken)
                 if (BCrypt.checkpw(basicAuthCredentials.password, accessToken.keyHash)) {
                     val apiRoles: MutableSet<String> = getApiRoles(ctx.matchedPath())
                         .toMutableSet()
@@ -65,7 +64,6 @@ object AuthManager {
                 } else ApiRole.UNAUTHORISED
             }
         } else {
-            print(operator.name)
             return if (BCrypt.checkpw(basicAuthCredentials.password, operator.passwordHash)) {
                 val apiRoles: MutableSet<String> = getApiRoles(ctx.matchedPath())
                     .toMutableSet()
@@ -88,8 +86,8 @@ object AuthManager {
     }
 
     fun getApiRoles(url: String): Set<String> {
-        val apiAccessRole: uk.ac.le.ember.labpipe.server.ApiAccessRole? =
-            Runtime.mongoDatabase.getCollection<uk.ac.le.ember.labpipe.server.ApiAccessRole>(MONGO.COL_NAMES.API_ACCESS_ROLES)
+        val apiAccessRole: ApiAccessRole? =
+            Runtime.mongoDatabase.getCollection<ApiAccessRole>(MONGO.COL_NAMES.API_ACCESS_ROLES)
                 .findOne(eq("url", url))
         return apiAccessRole?.roles ?: setOf()
     }
