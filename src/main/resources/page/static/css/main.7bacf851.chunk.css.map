@@ -1,0 +1,1 @@
+{"version":3,"sources":["webpack://src/App.css"],"names":[],"mappings":"AAAA,SACE,gBACF,CAEA,SACE,cACF","file":"main.7bacf851.chunk.css","sourcesContent":[".full-vh {\n  min-height: 100vh;\n}\n\n.mt-10-p {\n  margin-top: 10%;\n}\n"]}

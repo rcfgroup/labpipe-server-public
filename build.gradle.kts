@@ -7,6 +7,7 @@ plugins {
     kotlin("jvm") version "1.4.10"
     id("com.github.johnrengelman.shadow") version "5.2.0"
     kotlin("kapt") version "1.4.10"
+    id("org.jetbrains.dokka") version "1.4.10.2"
 }
 
 group = "uk.ac.le.ember"
@@ -65,6 +66,9 @@ dependencies {
 
     // https://mvnrepository.com/artifact/io.javalin/javalin
     implementation("io.javalin", "javalin", "3.11.2")
+
+    // https://mvnrepository.com/artifact/io.javalin/javalin-openapi
+    implementation("io.javalin", "javalin-openapi", "3.11.2")
 
     // https://mvnrepository.com/artifact/org.simplejavamail/simple-java-mail
     implementation("org.simplejavamail", "simple-java-mail", "6.4.4")

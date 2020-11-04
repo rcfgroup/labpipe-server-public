@@ -1,0 +1,26 @@
+{
+  "files": {
+    "main.css": "/static/css/main.7bacf851.chunk.css",
+    "main.js": "/static/js/main.6498a40c.chunk.js",
+    "main.js.map": "/static/js/main.6498a40c.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.c81f5884.js",
+    "runtime-main.js.map": "/static/js/runtime-main.c81f5884.js.map",
+    "static/css/2.617c3bb8.chunk.css": "/static/css/2.617c3bb8.chunk.css",
+    "static/js/2.ee236013.chunk.js": "/static/js/2.ee236013.chunk.js",
+    "static/js/2.ee236013.chunk.js.map": "/static/js/2.ee236013.chunk.js.map",
+    "static/js/3.81b7443b.chunk.js": "/static/js/3.81b7443b.chunk.js",
+    "static/js/3.81b7443b.chunk.js.map": "/static/js/3.81b7443b.chunk.js.map",
+    "index.html": "/index.html",
+    "static/css/2.617c3bb8.chunk.css.map": "/static/css/2.617c3bb8.chunk.css.map",
+    "static/css/main.7bacf851.chunk.css.map": "/static/css/main.7bacf851.chunk.css.map",
+    "static/js/2.ee236013.chunk.js.LICENSE.txt": "/static/js/2.ee236013.chunk.js.LICENSE.txt",
+    "static/media/labpipe-logo-light.d987eb96.png": "/static/media/labpipe-logo-light.d987eb96.png"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.c81f5884.js",
+    "static/css/2.617c3bb8.chunk.css",
+    "static/js/2.ee236013.chunk.js",
+    "static/css/main.7bacf851.chunk.css",
+    "static/js/main.6498a40c.chunk.js"
+  ]
+}

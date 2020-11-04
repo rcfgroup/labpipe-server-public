@@ -16,6 +16,9 @@ class ConfigController {
     companion object {
         object LabPipeConfig : ConfigSpec("labpipe") {
             val port by optional<Int>(4567)
+            val showBrowsableApi by optional<Boolean>(true)
+            val showDefaultPage by optional<Boolean>(true)
+            val defaultPageDirectory by optional<String>("")
             object Database : ConfigSpec("database") {
                 val host by optional<String>("localhost")
                 val port by optional<Int>(27017)

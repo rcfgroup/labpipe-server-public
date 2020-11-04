@@ -15,7 +15,7 @@ object AuthManager {
     fun setManager() {
         Runtime.server.config.accessManager { handler, ctx, permittedRoles ->
             val userRole = getUserRole(ctx)
-            if (permittedRoles.contains(userRole)) {
+            if (MONGO.COLLECTIONS.API_ACCESS_ROLES.findOne(eq("url", ctx.matchedPath())) == null || permittedRoles.contains(userRole)) {
                 handler.handle(ctx)
             } else {
                 ctx.status(401)
@@ -35,7 +35,7 @@ object AuthManager {
         return col.findOne(eq("username", basicAuthCredentials.username))
     }
 
-    fun getUserRole(ctx: Context): Role {
+    private fun getUserRole(ctx: Context): Role {
         try {
             ctx.basicAuthCredentials()
         } catch (e: IllegalArgumentException) {
@@ -85,7 +85,7 @@ object AuthManager {
         UNAUTHORISED,
     }
 
-    fun getApiRoles(url: String): Set<String> {
+    private fun getApiRoles(url: String): Set<String> {
         val apiAccessRole: ApiAccessRole? =
             Runtime.mongoDatabase.getCollection<ApiAccessRole>(MONGO.COL_NAMES.API_ACCESS_ROLES)
                 .findOne(eq("url", url))
