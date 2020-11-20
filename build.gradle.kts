@@ -45,7 +45,6 @@ dependencies {
     // https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils
     implementation("commons-beanutils", "commons-beanutils", "1.9.4")
 
-
     // https://mvnrepository.com/artifact/org.apache.commons/commons-configuration2
     implementation("org.apache.commons", "commons-configuration2", "2.7")
 
@@ -92,6 +91,8 @@ dependencies {
     implementation("com.fasterxml.jackson.module", "jackson-module-kotlin", "2.11.3")
 
     implementation("com.uchuhimo", "konf", "0.23.0")
+    implementation("com.github.kittinunf.fuel", "fuel", "2.3.0")
+    implementation("com.github.kittinunf.result", "result", "3.1.0")
 }
 
 configure<JavaPluginConvention> {
