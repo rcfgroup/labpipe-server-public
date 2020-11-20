@@ -1,6 +1,11 @@
 package uk.ac.le.ember.labpipe.server
 
+import com.github.kittinunf.fuel.httpGet
+import com.github.kittinunf.result.Result
 import org.litote.kmongo.Data
+import uk.ac.le.ember.labpipe.server.controllers.ConfigController
+import uk.ac.le.ember.labpipe.server.sessions.Runtime
+import java.net.URLEncoder
 
 @Data
 data class Parameter(var identifier: String) {
@@ -67,6 +72,20 @@ data class FormTemplate(var identifier: String, var name: String) {
             else -> null
         }
     }
+
+    fun validateOntologyProperties(): MutableList<String> {
+        val result = mutableListOf<String>()
+        if (Runtime.config[ConfigController.Companion.LabPipeConfig.BioPortal.api].isNotEmpty()) {
+            for (p in template.pages) {
+                for (q in p.questions) {
+                    if (q.ontology != null && !q.ontology!!.validateWithBioportal()) {
+                        result.add("Ontology [${q.ontology!!.acronym}] class [${q.ontology!!.classId}] is invalid.")
+                    }
+                }
+            }
+        }
+        return result
+    }
 }
 
 @Data
@@ -85,6 +104,26 @@ data class QuestionTemplate(var key: String, var label: String, var controlType:
     var target: String? = null
     var multiple: Boolean = false
     var filter: MutableSet<ElectronFileFilter> = mutableSetOf()
+    var ontology: OntologyClass? = null
+}
+
+@Data
+data class OntologyClass(var acronym: String, var classId: String) {
+    var name: String = ""
+
+    fun validateWithBioportal(): Boolean {
+        val classUrl = URLEncoder.encode("${ONTOLOGY.BIOPORTAL.URL_BASE_CLASS}${acronym}/${classId}", "utf-8")
+        val (_, _, result) = "${ONTOLOGY.BIOPORTAL.URL_GET_CLASS}${acronym}/classes/${classUrl}".httpGet()
+            .responseString()
+        return when (result) {
+            is Result.Failure -> {
+                false
+            }
+            is Result.Success -> {
+                true
+            }
+        }
+    }
 }
 
 @Data

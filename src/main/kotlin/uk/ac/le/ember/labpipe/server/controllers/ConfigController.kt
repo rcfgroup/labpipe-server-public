@@ -51,6 +51,10 @@ class ConfigController {
             object Parameter: ConfigSpec("parameter") {
                 val manifest by optional<MutableSet<String>>(mutableSetOf())
             }
+
+            object BioPortal: ConfigSpec("bioportal") {
+                val api by optional<String>("")
+            }
         }
 
         fun load(path: String = DEFAULT_CONFIG_FILE_NAME): Config {

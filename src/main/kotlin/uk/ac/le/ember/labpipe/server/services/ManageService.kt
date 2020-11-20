@@ -594,6 +594,7 @@ fun addForm(form: FormTemplate, operator: Operator? = null, notify: Boolean = tr
             Message("""Form template with identifier [${form.identifier}] already exists.""")
         )
     }
+    val ontologyValidationResult = form.validateOntologyProperties()
     MONGO.COLLECTIONS.FORMS.insertOne(form)
     operator?.run {
         if (notify) {
@@ -611,8 +612,8 @@ fun addForm(form: FormTemplate, operator: Operator? = null, notify: Boolean = tr
                     )
                 ),
                 subject = "LabPipe Form Template Added",
-                text = String.format(EmailTemplates.CREATE_FORM_TEXT, form.identifier, form.name),
-                html = String.format(EmailTemplates.CREATE_Form_HTML, form.identifier, form.name),
+                text = String.format(EmailTemplates.CREATE_FORM_TEXT, form.identifier, form.name, ontologyValidationResult.joinToString(separator = "\n")),
+                html = String.format(EmailTemplates.CREATE_Form_HTML, form.identifier, form.name, ontologyValidationResult.joinToString(separator = "<br>")),
                 async = true
             )
         }

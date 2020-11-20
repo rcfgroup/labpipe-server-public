@@ -194,14 +194,18 @@ object EmailTemplates {
     const val CREATE_FORM_TEXT =
         "A LabPipe form template has been added by you.\n\n" +
             "Identifier: %s\n" +
-            "Name: %s"
+            "Name: %s\n" +
+            "Ontology validations:\n" +
+            "%s"
     const val CREATE_Form_HTML =
         "<p>A LabPipe form template has been added by you.<p>" +
             "<br>" +
             "<p><strong>Identifier:</strong></p>" +
             "<p>%s</p>" +
             "<p><strong>Name:</strong></p>" +
-            "<p>%s</p>"
+            "<p>%s</p>" +
+            "<p><strong>Ontology validations:</strong></p>" +
+            "%s"
 }
 
 object MONGO {
@@ -242,4 +246,11 @@ object MONGO {
     }
 
 
+}
+
+object ONTOLOGY {
+    object BIOPORTAL {
+        val URL_BASE_CLASS = "http://purl.bioontology.org/ontology/"
+        val URL_GET_CLASS = "http://data.bioontology.org/ontologies/"
+    }
 }
